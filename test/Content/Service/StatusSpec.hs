@@ -9,7 +9,7 @@ import qualified Core.Database.Model.Status as C
 import Test.Hspec
 import qualified Data.UUID as U
 import qualified Data.Time as T
-import Env
+import Dependencies
 import Control.Monad.Reader
 
 import TestUtil

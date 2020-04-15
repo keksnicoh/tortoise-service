@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e5f9c9d87fc307a4201d4f1e729860654b079a1f350123ca569c1a302b674df9
+-- hash: abdf0a823c1cc8ec513bb10291f978c4048e9fdc95c9a7788182ea8f8e4ec07c
 
 name:           turtle-service
 version:        0.1.0.0
@@ -30,11 +30,14 @@ library
       ApiType
       Content.Model.Status
       Content.Model.StatusRequest
+      Content.Model.TimeSeries
       Content.Service.Status
+      Content.Service.TimeSeries
       Content.Status
       Core.Database.Env
       Core.Database.Model.Status
       Core.Internal
+      Dependencies
       Env
   other-modules:
       Paths_turtle_service

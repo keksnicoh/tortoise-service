@@ -2,7 +2,17 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Core.Database.Model.Status where
+module Core.Database.Model.Status
+  ( Status(..)
+  , InsertStatusRepository
+  , FetchStatusRepository
+  , FetchStatusPeriodRepository
+  , mkFetchStatusRepository
+  , insertStatusRepository
+  , fetchStatusPeriodRepository
+  , InsertStatusRepositoryResult(..)
+  )
+where
 
 import           Control.Monad.Reader
 import           GHC.Generics                   ( Generic )
@@ -15,10 +25,12 @@ import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.FromRow
 import           Data.Time                      ( UTCTime )
 
-data InsertStatusRepositoryResult = Success | PkAlreadyExists
-  deriving (Show, Eq)
 type InsertStatusRepository m = Status -> m InsertStatusRepositoryResult
 type FetchStatusRepository m = m [Status]
+type FetchStatusPeriodRepository m = (UTCTime, UTCTime) -> m [Status]
+
+data InsertStatusRepositoryResult = Success | PkAlreadyExists
+  deriving (Show, Eq)
 
 data Status = Status
   { statusId :: UUID
@@ -36,9 +48,7 @@ mkFetchStatusRepository
   :: (MonadIO m, MonadReader e m, HasDbConnection e)
   => Int
   -> FetchStatusRepository m
-mkFetchStatusRepository n = do
-  conn <- reader getDbConnection
-  liftIO $ query conn selectQuery (Only n)
+mkFetchStatusRepository n = simpleQuery selectQuery (Only n)
  where
   selectQuery =
     "SELECT status_id, temperature, humidity, created FROM public.status"
@@ -68,3 +78,22 @@ insertStatusRepository status = do
     insertionQuery
     (statusId status, temperature status, humidity status, created status)
 
+-- |fetches status within a given time frame
+fetchStatusPeriodRepository
+  :: (MonadIO m, MonadReader e m, HasDbConnection e)
+  => FetchStatusPeriodRepository m
+fetchStatusPeriodRepository = simpleQuery selectQuery
+ where
+  selectQuery =
+    "SELECT status_id, temperature, humidity, created FROM public.status"
+      <> " WHERE created > ? AND created < ?"
+      <> " ORDER BY \"created\" DESC"
+
+simpleQuery
+  :: (MonadIO m, MonadReader e m, HasDbConnection e, ToRow a, FromRow b)
+  => Query
+  -> a
+  -> m [b]
+simpleQuery q p = do
+  runner <- query <$> reader getDbConnection
+  liftIO $ runner q p

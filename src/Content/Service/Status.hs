@@ -9,7 +9,7 @@ import           Content.Model.StatusRequest    ( StatusRequest
                                                 , toStatus
                                                 )
 import qualified Core.Database.Model.Status    as C
-import           Env
+import           Dependencies
 
 type GetStatusService m = m [Status]
 type PostStatusService m = StatusRequest -> m Status
@@ -31,4 +31,4 @@ mkPostStatusService insertStatusRepository request = do
   status      <- liftIO $ toStatus request <$> randomUUID <*> currentTime
   insertStatusRepository status >>= \case
     C.Success -> return (from status)
-    _         -> error "unexpected duplication error"
+    _         -> error "unexpected duplication error" -- todo Throw something ...

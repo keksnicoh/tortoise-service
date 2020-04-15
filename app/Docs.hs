@@ -54,12 +54,10 @@ type SwaggerTurtleApi = TurtleAPI:<|> SwaggerAPI :<|> SwaggerDistAPI
 turtleSwagger :: Swagger
 turtleSwagger = toSwagger turtleAPI
 
-
 turtleSwaggerServer :: Server SwaggerTurtleApi
 turtleSwaggerServer =
   error "sry" :<|> return turtleSwagger :<|> serveDirectoryWebApp
     "swagger-ui-dist"
-
 
 --  Server.turtleServer :<|> return turtleSwagger :<|> serveDirectoryWebApp
 --    "swagger-ui-dist"

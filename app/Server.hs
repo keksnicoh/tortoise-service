@@ -1,17 +1,20 @@
 module Server where
-  
+
 import           Control.Monad.Reader
 import           Network.Wai
 import           Servant
 import           ApiType
 import           Env
 import           Content.Service.Status
+import           Content.Service.TimeSeries
 import qualified Core.Database.Model.Status    as C
 
-
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
-turtleServer = mkPostStatusService C.insertStatusRepository
-  :<|> mkGetStatusService (C.mkFetchStatusRepository 10)
+turtleServer = turtleStatusServer :<|> timeSeriesServer
+ where
+  timeSeriesServer   = mkTimeSeriesService C.fetchStatusPeriodRepository
+  turtleStatusServer = mkPostStatusService C.insertStatusRepository
+    :<|> mkGetStatusService (C.mkFetchStatusRepository 10)
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy
