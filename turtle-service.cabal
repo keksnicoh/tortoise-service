@@ -1,0 +1,139 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: e5f9c9d87fc307a4201d4f1e729860654b079a1f350123ca569c1a302b674df9
+
+name:           turtle-service
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/turtle-service#readme>
+homepage:       https://github.com/githubuser/turtle-service#readme
+bug-reports:    https://github.com/githubuser/turtle-service/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/turtle-service
+
+library
+  exposed-modules:
+      ApiType
+      Content.Model.Status
+      Content.Model.StatusRequest
+      Content.Service.Status
+      Content.Status
+      Core.Database.Env
+      Core.Database.Model.Status
+      Core.Internal
+      Env
+  other-modules:
+      Paths_turtle_service
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , extra
+    , hspec
+    , http-api-data
+    , http-client
+    , http-client-tls
+    , http-types
+    , mtl
+    , postgresql-simple
+    , servant
+    , servant-docs
+    , servant-server
+    , servant-swagger
+    , swagger2
+    , text
+    , time
+    , uuid
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable turtle-service-exe
+  main-is: Main.hs
+  other-modules:
+      Docs
+      Server
+      Paths_turtle_service
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -fwarn-unused-imports
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , extra
+    , hspec
+    , http-api-data
+    , http-client
+    , http-client-tls
+    , http-types
+    , mtl
+    , postgresql-simple
+    , servant
+    , servant-docs
+    , servant-server
+    , servant-swagger
+    , swagger2
+    , text
+    , time
+    , turtle-service
+    , uuid
+    , wai
+    , warp
+  default-language: Haskell2010
+
+test-suite turtle-service-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Content.Model.StatusRequestSpec
+      Content.Model.StatusSpec
+      Content.Service.StatusSpec
+      Core.Database.Model.StatusSpec
+      SpecDatabase
+      SpecEnv
+      TestUtil
+      Paths_turtle_service
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -fwarn-unused-imports
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , extra
+    , hspec
+    , http-api-data
+    , http-client
+    , http-client-tls
+    , http-types
+    , mtl
+    , postgresql-simple
+    , servant
+    , servant-docs
+    , servant-server
+    , servant-swagger
+    , swagger2
+    , text
+    , time
+    , turtle-service
+    , uuid
+    , wai
+    , warp
+  default-language: Haskell2010
