@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: abdf0a823c1cc8ec513bb10291f978c4048e9fdc95c9a7788182ea8f8e4ec07c
+-- hash: 87673e5899e4e6d940ae529ac00b9f5cd623cbc227335dd90484014af4d8a3c1
 
 name:           turtle-service
 version:        0.1.0.0
@@ -108,6 +108,7 @@ test-suite turtle-service-test
       Content.Model.StatusRequestSpec
       Content.Model.StatusSpec
       Content.Service.StatusSpec
+      Content.Service.TimeSeriesSpec
       Core.Database.Model.StatusSpec
       SpecDatabase
       SpecEnv

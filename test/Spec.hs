@@ -3,6 +3,7 @@
 import           Test.Hspec
 import qualified Content.Model.StatusSpec      as ModelStatusSpec
 import qualified Content.Service.StatusSpec    as ServiceStatusSpec
+import qualified Content.Service.TimeSeriesSpec    as TimeSeriesSpec
 import qualified Content.Model.StatusRequestSpec
                                                as StatusRequestSpec
 import qualified Core.Database.Model.StatusSpec
@@ -22,7 +23,8 @@ main = do
   let env = Env { dbConnection = dbConnection, dbSchema = fullSchema }
   hspec $ do
     describe "Core.Database.Model.Status" $ CStatusSpec.mkSpec env
-    describe "Content.Model.Status"        ModelStatusSpec.spec
-    describe "Content.Model.StatusRequest" StatusRequestSpec.spec
-    describe "Content.Service.Status"      ServiceStatusSpec.spec
+    describe "Content.Model.Status"         ModelStatusSpec.spec
+    describe "Content.Model.StatusRequest"  StatusRequestSpec.spec
+    describe "Content.Service.Status"       ServiceStatusSpec.spec
+    describe "Content.Service.TimeSeries"   TimeSeriesSpec.spec
 

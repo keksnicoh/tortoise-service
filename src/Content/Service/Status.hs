@@ -1,5 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
-module Content.Service.Status where
+module Content.Service.Status
+  ( GetStatusService
+  , PostStatusService
+  , mkGetStatusService
+  , mkPostStatusService
+  )
+where
 
 import           Control.Monad.Reader
 import           Content.Model.Status           ( Status

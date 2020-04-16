@@ -86,7 +86,7 @@ fetchStatusPeriodRepository = simpleQuery selectQuery
  where
   selectQuery =
     "SELECT status_id, temperature, humidity, created FROM public.status"
-      <> " WHERE created > ? AND created < ?"
+      <> " WHERE created >= ? AND created <= ?"
       <> " ORDER BY \"created\" DESC"
 
 simpleQuery

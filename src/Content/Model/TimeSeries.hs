@@ -1,6 +1,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Content.Model.TimeSeries where
+module Content.Model.TimeSeries
+  ( TimeSeries(..)
+  , from
+  )
+where
 import           Servant.Docs                   ( ToSample
                                                 , toSamples
                                                 , singleSample
@@ -16,7 +20,7 @@ data TimeSeries = TimeSeries
   { xtime        :: [T.NominalDiffTime]
   , ytemperature :: [Temperature]
   , yhumidity    :: [Humidity]
-  } deriving(Generic, Eq)
+  } deriving(Generic, Eq, Show)
 
 instance ToJSON TimeSeries
 instance ToSchema TimeSeries

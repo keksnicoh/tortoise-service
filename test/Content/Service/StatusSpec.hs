@@ -27,8 +27,8 @@ spec = do
           [ C.Status (read "550e8400-e29b-11d4-a716-446655440000") 10 10 (read "2011-11-19 18:28:33")
           , C.Status (read "650e8400-e29b-11d4-a716-446655440000") 11 12 (read "2011-11-20 18:28:42")
           ]
-        mockedService = mkGetStatusService (return records)
-        result = runIdentity mockedService
+        service = mkGetStatusService (return records)
+        result = runIdentity service
       in result `shouldBe` [from (head records), from (records !! 1)]
 
   describe "mkPostStatusService" $ do
