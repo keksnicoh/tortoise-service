@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 87673e5899e4e6d940ae529ac00b9f5cd623cbc227335dd90484014af4d8a3c1
+-- hash: 9f8ecd647c4512668d63641b0fc34e6743fdc3d467cf2cdd6dfb0493cbb6d91e
 
 name:           turtle-service
 version:        0.1.0.0
@@ -47,6 +47,7 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , exceptions
     , extra
     , hspec
     , http-api-data
@@ -80,6 +81,7 @@ executable turtle-service-exe
       aeson
     , base >=4.7 && <5
     , bytestring
+    , exceptions
     , extra
     , hspec
     , http-api-data
@@ -121,6 +123,7 @@ test-suite turtle-service-test
       aeson
     , base >=4.7 && <5
     , bytestring
+    , exceptions
     , extra
     , hspec
     , http-api-data

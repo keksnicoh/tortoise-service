@@ -5,6 +5,7 @@ import Content.Model.Status
 import Content.Service.Status
 import Content.Model.StatusRequest
 import Control.Monad.Identity
+import Control.Exception
 import qualified Core.Database.Model.Status as C
 import Test.Hspec
 import qualified Data.UUID as U
@@ -21,7 +22,7 @@ instance HasRandomUUID DummyEnvironment where  getRandomUUID (DummyEnvironment _
 spec :: Spec
 spec = do
   describe "mkGetStatusService" $ 
-    it "should derp" $
+    it "should return the result of inner repository" $
       let 
         records =
           [ C.Status (read "550e8400-e29b-11d4-a716-446655440000") 10 10 (read "2011-11-19 18:28:33")
@@ -38,9 +39,13 @@ spec = do
       env         = DummyEnvironment (return created) (return uuid)
       request     = StatusRequest 11 12
       expectedRow = C.Status uuid 11 12 created
-
-    it "should work like a charm omg" $ do
+    it "should map a successfull insertion properly" $ do
       let
         insertStatusRepository = mockSingular (`shouldBe` expectedRow) C.Success
         service                = mkPostStatusService insertStatusRepository
-      runReaderT (service request) env >>= shouldBe (from expectedRow)
+      runReaderT (service request) env >>= flip shouldBe (from expectedRow)
+    it "should throw an UUIDCollisionException on PkAlreadyExists summand" $ do
+      let
+        insertStatusRepository = mockSingular (`shouldBe` expectedRow) C.PkAlreadyExists
+        service                = mkPostStatusService insertStatusRepository
+      try (runReaderT (service request) env) >>= flip shouldBe (Left UUIDCollisionException)

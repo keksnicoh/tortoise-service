@@ -27,4 +27,3 @@ main = do
     describe "Content.Model.StatusRequest"  StatusRequestSpec.spec
     describe "Content.Service.Status"       ServiceStatusSpec.spec
     describe "Content.Service.TimeSeries"   TimeSeriesSpec.spec
-

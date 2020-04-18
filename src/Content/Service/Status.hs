@@ -4,6 +4,7 @@ module Content.Service.Status
   , PostStatusService
   , mkGetStatusService
   , mkPostStatusService
+  , PostStatusServiceException(..)
   )
 where
 
@@ -14,6 +15,7 @@ import           Content.Model.Status           ( Status
 import           Content.Model.StatusRequest    ( StatusRequest
                                                 , toStatus
                                                 )
+import           Control.Monad.Catch
 import qualified Core.Database.Model.Status    as C
 import           Dependencies
 
@@ -26,9 +28,18 @@ mkGetStatusService
 mkGetStatusService = (fmap . fmap) from -- note how nice eta reduction and functoriality
                                         -- worked out here, just very cool!
 
+data PostStatusServiceException = UUIDCollisionException
+  deriving (Show, Eq)
+instance Exception PostStatusServiceException
+
 -- |constructs a service which persists a status
 mkPostStatusService
-  :: (MonadIO m, MonadReader e m, HasCurrentTime e, HasRandomUUID e)
+  :: ( MonadIO m
+     , MonadThrow m
+     , MonadReader e m
+     , HasCurrentTime e
+     , HasRandomUUID e
+     )
   => C.InsertStatusRepository m
   -> PostStatusService m
 mkPostStatusService insertStatusRepository request = do
@@ -36,5 +47,5 @@ mkPostStatusService insertStatusRepository request = do
   randomUUID  <- reader getRandomUUID
   status      <- liftIO $ toStatus request <$> randomUUID <*> currentTime
   insertStatusRepository status >>= \case
-    C.Success -> return (from status)
-    _         -> error "unexpected duplication error" -- todo Throw something ...
+    C.Success         -> return (from status)
+    C.PkAlreadyExists -> throwM UUIDCollisionException

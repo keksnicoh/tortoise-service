@@ -41,6 +41,7 @@ dependencies:
 - hspec
 - time
 - extra
+- exceptions
 
 library:
   source-dirs: src

@@ -1,8 +1,4 @@
-module Content.Service.TimeSeries
-  ( mkTimeSeriesService
-  , TimeSeriesService
-  )
-where
+module Content.Service.TimeSeries where
 
 import qualified Data.Time                     as T
 import           Core.Database.Model.Status
