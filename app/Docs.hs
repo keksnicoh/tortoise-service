@@ -51,21 +51,22 @@ type SwaggerTurtleApi = TurtleAPI:<|> SwaggerAPI :<|> SwaggerDistAPI
 --turtleDocsMain :: IO ()
 --turtleDocsMain = run 8081 app
 
-turtleSwagger :: Swagger
-turtleSwagger = toSwagger turtleAPI
+--turtleSwagger :: Swagger
+----turtleSwagger = toSwagger turtleAPI
 
-turtleSwaggerServer :: Server SwaggerTurtleApi
-turtleSwaggerServer =
-  error "sry" :<|> return turtleSwagger :<|> serveDirectoryWebApp
-    "swagger-ui-dist"
+--turtleSwaggerServer :: Server SwaggerTurtleApi
+--turtleSwaggerServer :: a1 :<|> (Handler a2 :<|> Tagged m Application)
+--turtleSwaggerServer =
+--  error "sry" :<|> return turtleSwagger :<|> serveDirectoryWebApp
+--    "swagger-ui-dist"
 
 --  Server.turtleServer :<|> return turtleSwagger :<|> serveDirectoryWebApp
 --    "swagger-ui-dist"
-swaggerAPI :: Proxy SwaggerTurtleApi
-swaggerAPI = Proxy
+--swaggerAPI :: Proxy SwaggerTurtleApi
+--swaggerAPI = Proxy
 
-swaggerApp :: Application
-swaggerApp = serve swaggerAPI turtleSwaggerServer
+--swaggerApp :: Application
+--swaggerApp = serve swaggerAPI turtleSwaggerServer
 
-swaggerMain :: IO ()
-swaggerMain = run 8081 swaggerApp
+--swaggerMain :: IO ()
+--swaggerMain = run 8081 swaggerApp

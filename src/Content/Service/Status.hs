@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE LambdaCase #-}
 module Content.Service.Status
   ( GetStatusService
@@ -29,8 +30,7 @@ mkGetStatusService = (fmap . fmap) from -- note how nice eta reduction and funct
                                         -- worked out here, just very cool!
 
 data PostStatusServiceException = UUIDCollisionException
-  deriving (Show, Eq)
-instance Exception PostStatusServiceException
+  deriving (Show, Eq, Exception)
 
 -- |constructs a service which persists a status
 mkPostStatusService

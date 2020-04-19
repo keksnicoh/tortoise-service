@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
@@ -15,12 +16,13 @@ import qualified Core.Database.Model.Status    as C
 import           Data.UUID
 import           Data.Time
 
-data Status = Status
-  { statusId    :: UUID
-  , temperature :: Temperature
-  , humidity    :: Humidity
-  , created     :: UTCTime
-  } deriving (Generic, Show, Eq)
+data Status 
+  = Status
+    { statusId    :: UUID
+    , temperature :: Temperature
+    , humidity    :: Humidity
+    , created     :: UTCTime
+    } deriving (Generic, Show, Eq, ToJSON, ToSchema)
 
 from :: C.Status -> Status
 from status = Status (C.statusId status)
@@ -28,8 +30,6 @@ from status = Status (C.statusId status)
                      (C.humidity status)
                      (C.created status)
 
-instance ToJSON Status
-instance ToSchema Status
 instance ToSample Status where
   toSamples _ =
     singleSample $ Status nil 1.0 2.0 (read "2011-11-19 18:28:r52.607875 UTC")

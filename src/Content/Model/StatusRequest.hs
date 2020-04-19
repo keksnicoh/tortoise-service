@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
@@ -15,15 +16,14 @@ import           Data.UUID
 import qualified Core.Database.Model.Status    as C
 import           Data.Time                      ( UTCTime )
 
-data StatusRequest = StatusRequest
-  { temperature :: Temperature
-  , humidity    :: Humidity
-  } deriving (Generic, Show, Eq)
+data StatusRequest 
+  = StatusRequest
+    { temperature :: Temperature
+    , humidity    :: Humidity
+    } deriving (Generic, Show, Eq, FromJSON, ToSchema)
 
 toStatus :: StatusRequest -> UUID -> UTCTime -> C.Status
 toStatus (StatusRequest t h) uuid = C.Status uuid t h
 
-instance FromJSON StatusRequest
-instance ToSchema StatusRequest
 instance ToSample StatusRequest where
   toSamples _ = singleSample (StatusRequest 13.37 42.00)

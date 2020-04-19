@@ -7,14 +7,19 @@ import           ApiType
 import           Env
 import           Content.Service.Status
 import           Content.Service.TimeSeries
+import           Content.Service.Monitor
+import           Content.Service.Switch
 import qualified Core.Database.Model.Status    as C
+import qualified Core.State.Repository.State    as CS
 
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
-turtleServer = turtleStatusServer :<|> timeSeriesServer
+turtleServer = turtleStatusServer :<|> timeSeriesServer :<|> monitorServer :<|> controlServer
  where
   timeSeriesServer   = mkTimeSeriesService C.fetchStatusPeriodRepository
   turtleStatusServer = mkPostStatusService C.insertStatusRepository
     :<|> mkGetStatusService (C.mkFetchStatusRepository 10)
+  monitorServer = mkMonitorService CS.currentState C.fetchStatusPeriodRepository
+  controlServer = mkSwitchService CS.updateState
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9f8ecd647c4512668d63641b0fc34e6743fdc3d467cf2cdd6dfb0493cbb6d91e
+-- hash: a543a0529bd0ec34f31de533bbc3407447bfe27fd935fa26d4a4b788267ad4ee
 
 name:           turtle-service
 version:        0.1.0.0
@@ -28,15 +28,22 @@ source-repository head
 library
   exposed-modules:
       ApiType
+      Content.Model.Monitor
       Content.Model.Status
       Content.Model.StatusRequest
+      Content.Model.SwitchRequest
       Content.Model.TimeSeries
+      Content.Service.Monitor
       Content.Service.Status
+      Content.Service.Switch
       Content.Service.TimeSeries
       Content.Status
       Core.Database.Env
       Core.Database.Model.Status
       Core.Internal
+      Core.State.Env
+      Core.State.Model.State
+      Core.State.Repository.State
       Dependencies
       Env
   other-modules:
@@ -112,6 +119,9 @@ test-suite turtle-service-test
       Content.Service.StatusSpec
       Content.Service.TimeSeriesSpec
       Core.Database.Model.StatusSpec
+      Core.State.EnvSpec
+      Core.State.Model.StateSpec
+      Core.State.Repository.StateSpec
       SpecDatabase
       SpecEnv
       TestUtil

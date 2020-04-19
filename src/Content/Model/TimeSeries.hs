@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Content.Model.TimeSeries
@@ -16,14 +17,13 @@ import           Data.Aeson
 import           Core.Internal
 import           Core.Database.Model.Status     ( Status(..) )
 
-data TimeSeries = TimeSeries
-  { xtime        :: [T.NominalDiffTime]
-  , ytemperature :: [Temperature]
-  , yhumidity    :: [Humidity]
-  } deriving(Generic, Eq, Show)
+data TimeSeries
+  = TimeSeries
+    { xtime        :: [T.NominalDiffTime]
+    , ytemperature :: [Temperature]
+    , yhumidity    :: [Humidity]
+    } deriving(Generic, Eq, Show, ToJSON, ToSchema)
 
-instance ToJSON TimeSeries
-instance ToSchema TimeSeries
 instance ToSample TimeSeries where
   toSamples _ = singleSample $ TimeSeries [400, 300, 200, 100, 0]
                                           [23.5, 23.6, 23.7, 23.8, 24]
