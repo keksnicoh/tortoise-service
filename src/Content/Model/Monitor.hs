@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 
 module Content.Model.Monitor
   ( MonitorSwitch(..)
@@ -19,6 +20,7 @@ import           GHC.Generics                   ( Generic )
 import           Data.List.NonEmpty             ( NonEmpty(..) )
 import           Data.List                      ( genericLength )
 import           Data.Swagger
+import           Data.Time
 
 take' :: [a] -> [a]
 take' = take 4
@@ -35,20 +37,22 @@ data MonitorWeather
     { label       :: String
     , temperature :: Temperature
     , humidity    :: Humidity
+    , date        :: UTCTime
     } deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
 data Monitor
   = Monitor
-    { sensorTemperatur :: Temperature
+    { date :: UTCTime
+    , sensorTemperatur :: Temperature
     , sensorHumidity   :: Humidity
     , switchLight1     :: Maybe MonitorSwitch
     , switchLight2     :: Maybe MonitorSwitch
-    , weather          :: Maybe MonitorWeather
+    , weather          :: [MonitorWeather]
     }
   deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
-from :: NonEmpty CDB.Status -> CST.State -> COM.ForecastResult -> Monitor
-from status state forecast = Monitor (mean (CDB.temperature <$> status))
+from :: UTCTime -> NonEmpty CDB.Status -> CST.State -> COM.ForecastResult -> Monitor
+from date status state forecast = Monitor date (mean (CDB.temperature <$> status))
                                      (mean (CDB.humidity <$> status))
                                      (fromSwitch <$> CST.light1 state)
                                      (fromSwitch <$> CST.light2 state)
@@ -60,11 +64,12 @@ from status state forecast = Monitor (mean (CDB.temperature <$> status))
     let stail = take' tail
         p     = stail
     in  (head + sum p) / (1 + genericLength stail)
-  fromForecast (COM.ForecastResult _ []            ) = Nothing
-  fromForecast (COM.ForecastResult _ (forecast : _)) = Just $ MonitorWeather
+  fromForecast (COM.ForecastResult _ forecats) = mapForecast <$> take 6 forecats
+  mapForecast forecast = MonitorWeather
     { label       = renderLabel (COM.weather forecast)
     , temperature = COM.temperature forecast
     , humidity    = COM.humidity forecast
+    , date        = COM.date forecast
     }
   renderLabel Nothing = "Unspecified Weather"
   renderLabel (Just (COM.ForecastWeather name descr)) = name <> " - " <> descr

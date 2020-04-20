@@ -44,7 +44,7 @@ main = do
         OpenWeatherMapEnv
           { managedHttpLbs = (`httpLbs` openWeatherMapTlsManager)
           , weatherUrl     =
-            "https://samples.openweathermap.org/data/2.5/forecast/hourly?lat=35&lon=139&appid=439d4b804bc8187953eb36d2a8c26a02https://samples.openweathermap.org/data/2.5/forecast/hourly?lat=35&lon=139&appid=439d4b804bc8187953eb36d2a8c26a02"
+            "https://api.openweathermap.org/data/2.5/forecast?appid=b24937e45bc0bb6231615290f996a710&lat=54&lon=10"
           }
       }
 

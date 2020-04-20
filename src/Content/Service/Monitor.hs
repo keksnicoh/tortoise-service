@@ -34,6 +34,6 @@ mkMonitorService getState fetchStatusPeriodRepository fetchForecastRepository =
     result <- fetchStatusPeriodRepository (period now) >>= \case
       [] -> return $ Left "no state available in past 30 minutes"
       (x : xs) ->
-        Right <$> (from (x :| xs) <$> getState <*> fetchForecastRepository)
+        Right <$> (from now (x :| xs) <$> getState <*> fetchForecastRepository)
     return $ MR.from result
   where period time = (toStart time, time)

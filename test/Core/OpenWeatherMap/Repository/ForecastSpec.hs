@@ -49,20 +49,27 @@ spec =
 
     it "throw an UnexpectedHttpStatusException if statusCode != 200" $ do
       let
-        env = createEnv $ baseResponse { responseStatus = notFound404 }
+        env = createEnv $ baseResponse 
+          { responseStatus = notFound404 }
       result <- try (runReaderT forecastRepository env)
       result `shouldBe` Left (UnexpectedHttpStatusException notFound404)
 
     it "throw an InvalidResponseBodyException if response could not be parsed" $ do
       let
-        env = createEnv $ baseResponse { responseStatus = ok200, responseBody = "this is not parsable :(" }
+        env = createEnv $ baseResponse
+          { responseStatus = ok200
+          , responseBody = "this is not parsable :("
+          }
       result <- try (runReaderT forecastRepository env)
       result `shouldBe` Left (InvalidResponseBodyException "Error in $: string")
 
     it "return a forecast by parsing json body 200 response" $ do
       contents <- BSL.readFile "test/fixtures/core/open-weather-map/forecast0.json"
       let
-        env = createEnv $ baseResponse { responseStatus = ok200, responseBody = contents }
+        env = createEnv $ baseResponse
+          { responseStatus = ok200
+          , responseBody = contents
+          }
       result <- try (runReaderT forecastRepository env) :: IO (Either ForecastRepositoryException ForecastResult)
       result `shouldSatisfy` isRight
  
