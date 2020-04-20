@@ -16,21 +16,24 @@ import           Control.Monad.Reader           ( liftIO
                                                 , MonadReader
                                                 )
 import           Data.List.NonEmpty             ( NonEmpty((:|)) )
-
+import           Core.OpenWeatherMap.Repository.Forecast
 
 type MonitorService m = m MR.MonitorResult
 toStart :: UTCTime -> UTCTime
-toStart = addUTCTime (-120)
+toStart = addUTCTime (-1800)
 
 mkMonitorService
   :: (MonadIO m, MonadReader e m, HasCurrentTime e)
   => GetState m
   -> FetchStatusPeriodRepository m
+  -> FetchForecastRepository m
   -> MonitorService m
-mkMonitorService getState fetchStatusPeriodRepository = do
-  now    <- reader getCurrentTime >>= liftIO
-  result <- fetchStatusPeriodRepository (period now) >>= \case
-    []       -> return $ Left "no state available in past 30 minutes"
-    (x : xs) -> Right . from (x :| xs) <$> getState
-  return $ MR.from result
+mkMonitorService getState fetchStatusPeriodRepository fetchForecastRepository =
+  do
+    now    <- reader getCurrentTime >>= liftIO
+    result <- fetchStatusPeriodRepository (period now) >>= \case
+      [] -> return $ Left "no state available in past 30 minutes"
+      (x : xs) ->
+        Right <$> (from (x :| xs) <$> getState <*> fetchForecastRepository)
+    return $ MR.from result
   where period time = (toStart time, time)

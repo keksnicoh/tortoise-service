@@ -1,19 +1,22 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import           Test.Hspec
-import qualified Content.Model.StatusSpec      as ModelStatusSpec
-import qualified Content.Service.StatusSpec    as ServiceStatusSpec
-import qualified Content.Service.TimeSeriesSpec
+import           Content.Model.StatusSpec      as ModelStatusSpec
+import           Content.Service.StatusSpec    as ServiceStatusSpec
+import           Content.Service.TimeSeriesSpec
                                                as TimeSeriesSpec
-import qualified Content.Model.StatusRequestSpec
+import           Content.Model.StatusRequestSpec
                                                as StatusRequestSpec
-import qualified Core.Database.Model.StatusSpec
+import           Core.Database.Model.StatusSpec
                                                as CDMStatusSpec
-import qualified Core.State.Model.StateSpec    as CSMStateSpec
-import qualified Core.State.EnvSpec            as CSEnvSpec
-import qualified Core.State.Repository.StateSpec
+import           Core.State.Model.StateSpec    as CSMStateSpec
+import           Core.State.EnvSpec            as CSEnvSpec
+import           Core.State.Repository.StateSpec
                                                as CSRStateSpec
-
+import           Core.OpenWeatherMap.Model.ForecastSpec
+                                               as COMForecastSpec
+import           Core.OpenWeatherMap.Repository.ForecastSpec
+                                               as CORForecastSpec
 import           Database.PostgreSQL.Simple
 import           SpecEnv
 import qualified Data.ByteString               as BS
@@ -29,10 +32,12 @@ main = do
   let env = Env { dbConnection = dbConnection, dbSchema = fullSchema }
   hspec $ do
     describe "Core.Database.Model.Status" $ CDMStatusSpec.mkSpec env
-    describe "Core.State.Model.State"      CSRStateSpec.spec
-    describe "Core.State.Repository.State" CSMStateSpec.spec
-    describe "Core.State.Env"              CSEnvSpec.spec
-    describe "Content.Model.Status"        ModelStatusSpec.spec
-    describe "Content.Model.StatusRequest" StatusRequestSpec.spec
-    describe "Content.Service.Status"      ServiceStatusSpec.spec
-    describe "Content.Service.TimeSeries"  TimeSeriesSpec.spec
+    describe "Core.State.Model.State"                  CSRStateSpec.spec
+    describe "Core.State.Repository.State"             CSMStateSpec.spec
+    describe "Core.State.Env"                          CSEnvSpec.spec
+    describe "Core.OpenWeatherMap.Model.Forecast"      COMForecastSpec.spec
+    describe "Core.OpenWeatherMap.Repository.Forecast" CORForecastSpec.spec
+    describe "Content.Model.Status"                    ModelStatusSpec.spec
+    describe "Content.Model.StatusRequest"             StatusRequestSpec.spec
+    describe "Content.Service.Status"                  ServiceStatusSpec.spec
+    describe "Content.Service.TimeSeries"              TimeSeriesSpec.spec

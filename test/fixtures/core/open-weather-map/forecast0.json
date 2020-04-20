@@ -1,0 +1,71 @@
+{
+  "cod": "200",
+  "message": 0.0106,
+  "cnt": 96,
+  "list": [
+    {
+      "dt": 1553709600,
+      "main": {
+        "temp": 288.02,
+        "temp_min": 287.858,
+        "temp_max": 288.02,
+        "pressure": 1007.942,
+        "sea_level": 1007.942,
+        "grnd_level": 994.369,
+        "humidity": 100,
+        "temp_kf": 0.16
+      },
+      "weather": [
+        {
+          "id": 800,
+          "main": "Clear",
+          "description": "clear sky",
+          "icon": "01n"
+        }
+      ],
+      "clouds": {
+        "all": 0
+      },
+      "wind": {
+        "speed": 10.14,
+        "deg": 250.188
+      },
+      "sys": {
+        "pod": "n"
+      },
+      "dt_txt": "2019-03-27 18:00:00"
+    },
+    {
+      "dt": 1553713200,
+      "main": {
+        "temp": 288.12,
+        "temp_min": 288,
+        "temp_max": 288.12,
+        "pressure": 1007.595,
+        "sea_level": 1007.595,
+        "grnd_level": 993.851,
+        "humidity": 100,
+        "temp_kf": 0.12
+      },
+      "weather": [
+        {
+          "id": 801,
+          "main": "Clouds",
+          "description": "few clouds",
+          "icon": "02n"
+        }
+      ],
+      "clouds": {
+        "all": 17
+      },
+      "wind": {
+        "speed": 10.51,
+        "deg": 252.928
+      },
+      "sys": {
+        "pod": "n"
+      },
+      "dt_txt": "2019-03-27 19:00:00"
+    }
+  ]
+}

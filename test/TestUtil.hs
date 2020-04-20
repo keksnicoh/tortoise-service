@@ -4,5 +4,9 @@ import           Test.Hspec
 import           Control.Monad.Reader
 
 mockSingular
-  :: (Eq a, Show a, MonadIO m) => (a -> Expectation) -> b -> (a -> m b)
+  :: (MonadIO m) => (a -> Expectation) -> b -> (a -> m b)
 mockSingular expect result arg = liftIO $ expect arg >> return result
+
+mockTwo
+  :: (MonadIO m) => (a -> Expectation) -> (b -> Expectation) -> c -> (a -> b -> m c)
+mockTwo e1 e2 result arg1 arg2 = liftIO $ e1 arg1 >> e2 arg2 >> return result

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a543a0529bd0ec34f31de533bbc3407447bfe27fd935fa26d4a4b788267ad4ee
+-- hash: 8c93e07bec0425786d15616e334cb9af8c2092f1b11b848c5ac823e9f3151c63
 
 name:           turtle-service
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       ApiType
       Content.Model.Monitor
+      Content.Model.MonitorResult
       Content.Model.Status
       Content.Model.StatusRequest
       Content.Model.SwitchRequest
@@ -41,6 +42,9 @@ library
       Core.Database.Env
       Core.Database.Model.Status
       Core.Internal
+      Core.OpenWeatherMap.Env
+      Core.OpenWeatherMap.Model.Forecast
+      Core.OpenWeatherMap.Repository.Forecast
       Core.State.Env
       Core.State.Model.State
       Core.State.Repository.State
@@ -71,6 +75,7 @@ library
     , text
     , time
     , uuid
+    , vector
     , wai
     , warp
   default-language: Haskell2010
@@ -106,6 +111,7 @@ executable turtle-service-exe
     , time
     , turtle-service
     , uuid
+    , vector
     , wai
     , warp
   default-language: Haskell2010
@@ -119,6 +125,8 @@ test-suite turtle-service-test
       Content.Service.StatusSpec
       Content.Service.TimeSeriesSpec
       Core.Database.Model.StatusSpec
+      Core.OpenWeatherMap.Model.ForecastSpec
+      Core.OpenWeatherMap.Repository.ForecastSpec
       Core.State.EnvSpec
       Core.State.Model.StateSpec
       Core.State.Repository.StateSpec
@@ -151,6 +159,7 @@ test-suite turtle-service-test
     , time
     , turtle-service
     , uuid
+    , vector
     , wai
     , warp
   default-language: Haskell2010
