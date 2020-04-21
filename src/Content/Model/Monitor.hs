@@ -48,6 +48,7 @@ data Monitor
     , switchLight1     :: Maybe MonitorSwitch
     , switchLight2     :: Maybe MonitorSwitch
     , weather          :: [MonitorWeather]
+    , webcamDate       :: Maybe UTCTime
     }
   deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
@@ -57,6 +58,7 @@ from date status state forecast = Monitor date (mean (CDB.temperature <$> status
                                      (fromSwitch <$> CST.light1 state)
                                      (fromSwitch <$> CST.light2 state)
                                      (fromForecast forecast)
+                                     (CST.webcamDate state)
  where
   fromSwitch (CST.Manual     value) = MonitorSwitch value True
   fromSwitch (CST.Controlled value) = MonitorSwitch value False

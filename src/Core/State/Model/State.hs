@@ -5,6 +5,8 @@ module Core.State.Model.State
   )
 where
 
+import Data.Time
+
 data Switch a
   = Manual a
   | Controlled a
@@ -14,8 +16,9 @@ data State
   = State
     { light1 :: Maybe (Switch Bool)
     , light2 :: Maybe (Switch Bool)
+    , webcamDate :: Maybe UTCTime
     }
   deriving (Show, Eq)
 
 initialState :: State
-initialState = State Nothing Nothing
+initialState = State Nothing Nothing Nothing

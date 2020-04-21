@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Server where
 
 import           Control.Monad.Reader
@@ -5,23 +6,38 @@ import           Network.Wai
 import           Servant
 import           ApiType
 import           Env
-import           Content.Service.Status
-import           Content.Service.TimeSeries
-import           Content.Service.Monitor
-import           Content.Service.Switch
+
+import           Content.Webcam                as Webcam
+import           Content.Status                as Status
+import           Content.Monitor               as Monitor
+import           Content.TimeSeries            as TimeSeries
+import           Content.Switch                as Switch
+
 import qualified Core.Database.Model.Status    as C
-import qualified Core.State.Repository.State    as CS
-import qualified Core.OpenWeatherMap.Repository.Forecast as COR
-import Network.HTTP.Client (httpLbs)
+import qualified Core.State.Repository.State   as CS
+import qualified Core.OpenWeatherMap.Repository.Forecast
+                                               as COR
+import qualified Data.ByteString.Lazy          as LBS
 
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
-turtleServer = turtleStatusServer :<|> timeSeriesServer :<|> monitorServer :<|> controlServer
+turtleServer =
+  turtleStatusServer
+    :<|> timeSeriesServer
+    :<|> monitorServer
+    :<|> controlServer
+    :<|> webcamServer
  where
-  timeSeriesServer   = mkTimeSeriesService C.fetchStatusPeriodRepository
-  turtleStatusServer = mkPostStatusService C.insertStatusRepository
-    :<|> mkGetStatusService (C.mkFetchStatusRepository 10)
-  monitorServer = mkMonitorService CS.currentState C.fetchStatusPeriodRepository COR.forecastRepository
-  controlServer = mkSwitchService CS.updateState
+  timeSeriesServer =
+    TimeSeries.mkTimeSeriesService C.fetchStatusPeriodRepository
+  turtleStatusServer = Status.mkPostStatusService C.insertStatusRepository
+    :<|> Status.mkGetStatusService (C.mkFetchStatusRepository 10)
+  monitorServer = Monitor.mkMonitorService CS.currentState
+                                           C.fetchStatusPeriodRepository
+                                           COR.forecastRepository
+  controlServer = Switch.mkSwitchService CS.updateState
+  webcamServer  = Webcam.mkWebcamHandler
+    (Webcam.mkPersistWebcam CS.updateState LBS.writeFile)
+
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy
