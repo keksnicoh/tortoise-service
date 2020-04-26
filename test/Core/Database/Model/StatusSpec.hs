@@ -14,7 +14,7 @@ mkSpec :: (HasDbConnection e, HasDbSchema e) => e -> Spec
 mkSpec env = do
 
   describe "insertStatusRepository" $ do
-    let record = C.Status UUID.nil 10 10 (read "2011-11-19 18:28:23")
+    let record = C.Status UUID.nil 10 10 (Just 6) Nothing (read "2011-11-19 18:28:23")
         insert = runReaderT (C.insertStatusRepository record)
     it "should not allow inserting the same UUID twice" $ withDatabaseMigrated env $ \conn -> do
       insert conn >>= shouldBe C.Success
@@ -25,7 +25,7 @@ mkSpec env = do
       result `shouldBe` [record]
 
   describe "mkFetchStatusRepository" $ do
-    let record = C.Status UUID.nil 10 10 (read "2011-11-19 18:28:33")
+    let record = C.Status UUID.nil 10 10 (Just 3) (Just 0) (read "2011-11-19 18:28:33")
         records =
           [ record
               { C.statusId = read "550e8400-e29b-11d4-a716-446655440000"
@@ -59,7 +59,7 @@ mkSpec env = do
             result `shouldBe` expected
 
   describe "fetchStatusPeriodRepository" $ do
-    let record = C.Status UUID.nil 10 10 (read "2011-11-19 18:28:33")
+    let record = C.Status UUID.nil 10 10 (Just 5) Nothing (read "2011-11-19 18:28:33")
         records =
           [ record
               { C.statusId = read "550e8400-e29b-11d4-a716-446655440000"

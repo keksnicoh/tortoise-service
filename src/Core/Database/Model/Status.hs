@@ -36,11 +36,13 @@ data Status = Status
   { statusId :: UUID
   , temperature :: Temperature
   , humidity :: Humidity
+  , temperature_outside :: Maybe Temperature
+  , humidity_outside :: Maybe Humidity
   , created :: UTCTime
 } deriving (Generic, Eq, Show)
 
 instance FromRow Status where
-  fromRow = Status <$> field <*> field <*> field <*> field
+  fromRow = Status <$> field <*> field <*> field <*> field <*> field <*> field
 
 -- |constructs a repository which returns the last n status rows
 -- from storage.
@@ -51,7 +53,7 @@ mkFetchStatusRepository
 mkFetchStatusRepository n = simpleQuery selectQuery (Only n)
  where
   selectQuery =
-    "SELECT status_id, temperature, humidity, created FROM public.status"
+    "SELECT status_id, temperature, humidity, temperature_outside, humidity_outside, created FROM public.status"
       <> " ORDER BY \"created\" DESC"
       <> " LIMIT ?"
 
@@ -67,8 +69,8 @@ insertStatusRepository status = do
       _        -> return PkAlreadyExists
  where
   insertionQuery =
-    "INSERT INTO public.status (\"status_id\", \"temperature\", \"humidity\", \"created\")"
-      <> "VALUES (?, ?, ?, ?)"
+    "INSERT INTO public.status (\"status_id\", \"temperature\", \"humidity\", \"temperature_outside\", \"humidity_outside\", \"created\")"
+      <> "VALUES (?, ?, ?, ?, ?, ?)"
   selectQuery =
     "SELECT COUNT(\"status_id\") FROM public.status WHERE \"status_id\"=?"
   countByStatusId conn uuid =
@@ -76,7 +78,13 @@ insertStatusRepository status = do
   insert conn status = execute
     conn
     insertionQuery
-    (statusId status, temperature status, humidity status, created status)
+    ( statusId status
+    , temperature status
+    , humidity status
+    , temperature_outside status
+    , humidity_outside status
+    , created status
+    )
 
 -- |fetches status within a given time frame
 fetchStatusPeriodRepository
@@ -85,7 +93,7 @@ fetchStatusPeriodRepository
 fetchStatusPeriodRepository = simpleQuery selectQuery
  where
   selectQuery =
-    "SELECT status_id, temperature, humidity, created FROM public.status"
+    "SELECT status_id, temperature, humidity, temperature_outside, humidity_outside, created FROM public.status"
       <> " WHERE created >= ? AND created <= ?"
       <> " ORDER BY \"created\" DESC"
 

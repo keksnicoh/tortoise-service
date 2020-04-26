@@ -11,9 +11,9 @@ spec =
   describe "UpdateState" $
     it "should update the state using the given function" $ do
       let 
-        newState0             = State Nothing Nothing
-        newState1             = State (Just (Controlled True)) (Just (Controlled False))
-        newState2             = State (Just (Controlled False)) (Just (Manual False))
+        newState0             = State Nothing Nothing Nothing
+        newState1             = State (Just (Controlled True)) (Just (Controlled False)) Nothing
+        newState2             = State (Just (Controlled False)) (Just (Manual False)) Nothing
         f1 x | x == newState0 = newState1
         f2 x | x == newState1 = newState2
 

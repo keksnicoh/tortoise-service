@@ -25,6 +25,9 @@ dependencies:
 - servant-server
 - servant-docs
 - servant-swagger
+- servant-multipart
+- servant-checked-exceptions
+- servant-websockets
 - aeson
 - uuid
 - text
@@ -43,6 +46,8 @@ dependencies:
 - extra
 - exceptions
 - vector
+- websockets
+
 library:
   source-dirs: src
 

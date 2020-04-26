@@ -42,19 +42,24 @@ data MonitorWeather
 
 data Monitor
   = Monitor
-    { date :: UTCTime
-    , sensorTemperatur :: Temperature
-    , sensorHumidity   :: Humidity
-    , switchLight1     :: Maybe MonitorSwitch
-    , switchLight2     :: Maybe MonitorSwitch
-    , weather          :: [MonitorWeather]
-    , webcamDate       :: Maybe UTCTime
+    { date                    :: UTCTime
+    , sensorTemperatur        :: Temperature
+    , sensorHumidity          :: Humidity
+    , sensorTemperaturOutside :: Maybe Temperature
+    , sensorHumidityOutside   :: Maybe Humidity
+    , switchLight1            :: Maybe MonitorSwitch
+    , switchLight2            :: Maybe MonitorSwitch
+    , weather                 :: [MonitorWeather]
+    , webcamDate              :: Maybe UTCTime
     }
   deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
 from :: UTCTime -> NonEmpty CDB.Status -> CST.State -> COM.ForecastResult -> Monitor
-from date status state forecast = Monitor date (mean (CDB.temperature <$> status))
+from date status state forecast = Monitor date 
+                                     (mean (CDB.temperature <$> status))
                                      (mean (CDB.humidity <$> status))
+                                     (mean <$> traverse CDB.temperature_outside status)
+                                     (mean <$> traverse CDB.humidity_outside status)
                                      (fromSwitch <$> CST.light1 state)
                                      (fromSwitch <$> CST.light2 state)
                                      (fromForecast forecast)

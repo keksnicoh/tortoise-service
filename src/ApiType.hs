@@ -4,13 +4,13 @@
 module ApiType where
 
 import           Servant.API
-import           Content.Status
-import           Content.Model.TimeSeries
+import Servant.API.WebSocket
 import           Data.Time
-import Content.Model.MonitorResult
-import Content.Model.SwitchRequest
-import Network.HTTP.Client.MultipartFormData
-import Servant.Multipart
+import           Content.Monitor
+import           Content.Switch
+import           Content.Status
+import           Content.TimeSeries
+import           Servant.Multipart
 
 type SetStatusAPI = ReqBody '[JSON] StatusRequest :> Post '[JSON] Status
 type GetStatusAPI = Get '[JSON] [Status]
@@ -19,6 +19,7 @@ type GetTimeSeriesAPI
 type PostSwitchAPI = ReqBody '[JSON] SwitchRequest :> PostNoContent '[JSON] ()
 type GetMonitorAPI = Get '[JSON] MonitorResult
 type WebcamAPI = MultipartForm Mem (MultipartData Mem) :> PostNoContent '[JSON] ()
+type StreamAPI = WebSocket
 
 type StatusAPI     = SetStatusAPI :<|> GetStatusAPI
 type TimeSeriesAPI = GetTimeSeriesAPI
@@ -30,4 +31,5 @@ type TurtleAPI =
         :<|> "series"  :> TimeSeriesAPI
         :<|> "monitor" :> MonitorAPI
         :<|> "control" :> ControlAPI
-        :<|> "webcam"  :> WebcamAPI)
+        :<|> "webcam"  :> WebcamAPI
+        :<|> "stream"  :> StreamAPI)

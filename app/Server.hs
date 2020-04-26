@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Server where
 
@@ -6,6 +8,7 @@ import           Network.Wai
 import           Servant
 import           ApiType
 import           Env
+import           Servant.API.WebSocket
 
 import           Content.Webcam                as Webcam
 import           Content.Status                as Status
@@ -18,6 +21,12 @@ import qualified Core.State.Repository.State   as CS
 import qualified Core.OpenWeatherMap.Repository.Forecast
                                                as COR
 import qualified Data.ByteString.Lazy          as LBS
+import Network.Wai              (Application)
+import Servant                  (Proxy (..), serve)
+
+
+import Stream.Service.Action
+
 
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
 turtleServer =
@@ -26,6 +35,7 @@ turtleServer =
     :<|> monitorServer
     :<|> controlServer
     :<|> webcamServer
+    :<|> streamData CS.currentState
  where
   timeSeriesServer =
     TimeSeries.mkTimeSeriesService C.fetchStatusPeriodRepository
@@ -37,7 +47,6 @@ turtleServer =
   controlServer = Switch.mkSwitchService CS.updateState
   webcamServer  = Webcam.mkWebcamHandler
     (Webcam.mkPersistWebcam CS.updateState LBS.writeFile)
-
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy

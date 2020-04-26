@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 15caa65231fa9edaca6e606a56416437e2e8f511d4de15f6cef453f91ce348bb
+-- hash: 0d100fdb5792af0eaae65837161a242239c1f75b78f0ba7bd20da02320985cab
 
 name:           turtle-service
 version:        0.1.0.0
@@ -28,17 +28,23 @@ source-repository head
 library
   exposed-modules:
       ApiType
+      Content.Handler.Webcam
       Content.Model.Monitor
       Content.Model.MonitorResult
       Content.Model.Status
       Content.Model.StatusRequest
       Content.Model.SwitchRequest
       Content.Model.TimeSeries
+      Content.Monitor
       Content.Service.Monitor
       Content.Service.Status
       Content.Service.Switch
       Content.Service.TimeSeries
+      Content.Service.Webcam
       Content.Status
+      Content.Switch
+      Content.TimeSeries
+      Content.Webcam
       Core.Database.Env
       Core.Database.Model.Status
       Core.Internal
@@ -73,6 +79,7 @@ library
     , servant-multipart
     , servant-server
     , servant-swagger
+    , servant-websockets
     , swagger2
     , text
     , time
@@ -80,6 +87,7 @@ library
     , vector
     , wai
     , warp
+    , websockets
   default-language: Haskell2010
 
 executable turtle-service-exe
@@ -110,6 +118,7 @@ executable turtle-service-exe
     , servant-multipart
     , servant-server
     , servant-swagger
+    , servant-websockets
     , swagger2
     , text
     , time
@@ -118,6 +127,7 @@ executable turtle-service-exe
     , vector
     , wai
     , warp
+    , websockets
   default-language: Haskell2010
 
 test-suite turtle-service-test
@@ -160,6 +170,7 @@ test-suite turtle-service-test
     , servant-multipart
     , servant-server
     , servant-swagger
+    , servant-websockets
     , swagger2
     , text
     , time
@@ -168,4 +179,5 @@ test-suite turtle-service-test
     , vector
     , wai
     , warp
+    , websockets
   default-language: Haskell2010
