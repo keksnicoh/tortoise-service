@@ -2,3 +2,6 @@
 .idea
 *~
 webcam.jpg
+stack.yaml.lock
+turtle-service.cabal
+
