@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import           Network.Wai.Handler.Warp
@@ -14,7 +15,8 @@ import           Network.HTTP.Client            ( httpLbs
                                                 , newManager
                                                 )
 import           Network.HTTP.Client.TLS        ( tlsManagerSettings )
-
+import System.Environment
+import Data.ByteString.Internal as BS
 --derk =
 --  "https://samples.openweathermap.org/data/2.5/forecast/hourly?lat=54&lon=10&appid=e46215c483de286ca6a589305c95a42e"
 --53°33'18.7"N 9°54'51.5"E
@@ -22,14 +24,14 @@ import           Network.HTTP.Client.TLS        ( tlsManagerSettings )
 -- https://samples.openweathermap.org/data/2.5/forecast/hourly?lat=54&lon=10&appid=e46215c483de286ca6a589305c95a42e
 main :: IO ()
 main = do
-
+  tortoiseConnectionStr <- lookupEnvRequired "TORTOISE_SERVICE_PSQL"
+  
   putStrLn "initialize state..."
   state <- newIORef initialState
 
   putStrLn "connect to database..."
-  dbConnection <- connectPostgreSQL
-    "host='localhost' user='postgres' password='docker' dbname='test'"
-
+  dbConnection <- connectPostgreSQL $ BS.packChars tortoiseConnectionStr
+  -- host='localhost' user='postgres' password='docker' dbname='test'
   putStrLn "create OpenWeatherMap TlsManager"
   openWeatherMapTlsManager <- newManager tlsManagerSettings
 
@@ -50,3 +52,7 @@ main = do
 
   putStrLn "run server..."
   run (port env) (turtleApp env)
+ where
+  lookupEnvRequired env = lookupEnv env >>= \case
+    Just val -> return val
+    Nothing -> error ("missing environment: " <> env)

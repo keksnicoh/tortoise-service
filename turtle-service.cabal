@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0d100fdb5792af0eaae65837161a242239c1f75b78f0ba7bd20da02320985cab
+-- hash: e73ca589dafd068bf0d127f553adf478a3a5ef988747aea91d777a6b4b19f4bd
 
 name:           turtle-service
 version:        0.1.0.0
@@ -56,6 +56,9 @@ library
       Core.State.Repository.State
       Dependencies
       Env
+      Stream.Model.Action
+      Stream.Model.LightState
+      Stream.Service.Action
   other-modules:
       Paths_turtle_service
   hs-source-dirs:
