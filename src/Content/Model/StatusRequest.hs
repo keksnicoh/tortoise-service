@@ -15,14 +15,19 @@ import           Core.Internal
 import           Data.UUID
 import qualified Core.Database.Model.Status    as C
 import           Data.Time                      ( UTCTime )
+import           Data.Aeson.Casing
 
 data StatusRequest
   = StatusRequest
     { temperature :: Maybe Temperature
     , humidity :: Maybe Humidity
-    , temperature_outside :: Maybe Temperature
-    , humidity_outside :: Maybe Humidity
-    } deriving (Generic, Show, Eq, FromJSON, ToSchema)
+    , temperatureOutside :: Maybe Temperature
+    , humidityOutside :: Maybe Humidity
+    } deriving (Generic, Show, Eq, ToSchema)
+
+instance FromJSON StatusRequest where
+  parseJSON =
+    genericParseJSON $ defaultOptions { fieldLabelModifier = snakeCase }
 
 toStatus :: StatusRequest -> UUID -> UTCTime -> C.Status
 toStatus (StatusRequest t h to ho) uuid = C.Status uuid t h to ho

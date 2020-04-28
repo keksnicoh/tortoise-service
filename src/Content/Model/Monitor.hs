@@ -55,8 +55,8 @@ from :: UTCTime -> [CDB.Status] -> CST.State -> COM.ForecastResult -> Monitor
 from date status state forecast = Monitor date
                                           (mean' CDB.temperature)
                                           (mean' CDB.humidity)
-                                          (mean' CDB.temperature_outside)
-                                          (mean' CDB.humidity_outside)
+                                          (mean' CDB.temperatureOutside)
+                                          (mean' CDB.humidityOutside)
                                           (fromSwitch <$> CST.light1 state)
                                           (fromSwitch <$> CST.light2 state)
                                           (fromForecast forecast)

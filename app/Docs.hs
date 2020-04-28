@@ -7,20 +7,20 @@
 module Docs where
 
 --import           Data.ByteString.Lazy           ( ByteString )
-import           Data.Proxy
+--import           Data.Proxy
 --import           Data.Text.Lazy.Encoding        ( encodeUtf8 )
 --import           Data.Text.Lazy                 ( pack )
 --import           Network.HTTP.Types
-import           Network.Wai
-import           Servant.API
+--import           Network.Wai
+--import           Servant.API
 --import           Servant.Docs
-import           Servant.Server
-import           ApiType
-import           Server
-import           Network.Wai.Handler.Warp
-import           Servant.Swagger
-import           Data.Swagger
-import           Servant.Server.StaticFiles
+--import           Servant.Server
+--import           ApiType
+--import           Server
+--import           Network.Wai.Handler.Warp
+--import           Servant.Swagger
+--import           Data.Swagger-
+--import           Servant.Server.StaticFiles
 
 --apiDocs :: API
 --apiDocs = docs turtleAPI
@@ -31,10 +31,10 @@ import           Servant.Server.StaticFiles
 -- where
 --  intro = DocIntro "Welcome" ["This is our super webservice's API.", "Enjoy!"]
 
-type DocsAPI = TurtleAPI :<|> Raw
-type SwaggerDistAPI = "swagger-ui" :> Raw
-type SwaggerAPI = "swagger.json" :> Get '[JSON] Swagger
-type SwaggerTurtleApi = TurtleAPI:<|> SwaggerAPI :<|> SwaggerDistAPI
+--type DocsAPI = TurtleAPI :<|> Raw
+--type SwaggerDistAPI = "swagger-ui" :> Raw
+--type SwaggerAPI = "swagger.json" :> Get '[JSON] Swagger
+--type SwaggerTurtleApi = TurtleAPI:<|> SwaggerAPI :<|> SwaggerDistAPI
 
 --api :: Proxy DocsAPI
 --api :: Proxy t

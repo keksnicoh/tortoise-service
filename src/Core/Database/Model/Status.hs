@@ -36,8 +36,8 @@ data Status = Status
   { statusId :: UUID
   , temperature :: Maybe Temperature
   , humidity :: Maybe Humidity
-  , temperature_outside :: Maybe Temperature
-  , humidity_outside :: Maybe Humidity
+  , temperatureOutside :: Maybe Temperature
+  , humidityOutside :: Maybe Humidity
   , created :: UTCTime
 } deriving (Generic, Eq, Show)
 
@@ -81,8 +81,8 @@ insertStatusRepository status = do
     ( statusId status
     , temperature status
     , humidity status
-    , temperature_outside status
-    , humidity_outside status
+    , temperatureOutside status
+    , humidityOutside status
     , created status
     )
 

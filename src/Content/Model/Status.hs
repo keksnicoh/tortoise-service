@@ -15,23 +15,28 @@ import           Core.Internal
 import qualified Core.Database.Model.Status    as C
 import           Data.UUID
 import           Data.Time
+import           Data.Aeson.Casing
 
 data Status
   = Status
     { statusId :: UUID
     , temperature :: Maybe Temperature
     , humidity :: Maybe Humidity
-    , temperature_outside :: Maybe Temperature
-    , humidity_outside :: Maybe Humidity
+    , temperatureOutside :: Maybe Temperature
+    , humidityOutside :: Maybe Humidity
     , created :: UTCTime
-    } deriving (Generic, Show, Eq, ToJSON, ToSchema)
+    }
+    deriving (Generic, Show, Eq, ToSchema)
+
+instance ToJSON Status where
+  toJSON = genericToJSON $ defaultOptions { fieldLabelModifier = snakeCase }
 
 from :: C.Status -> Status
 from status = Status (C.statusId status)
                      (C.temperature status)
                      (C.humidity status)
-                     (C.temperature_outside status)
-                     (C.humidity_outside status)
+                     (C.temperatureOutside status)
+                     (C.humidityOutside status)
                      (C.created status)
 
 instance ToSample Status where

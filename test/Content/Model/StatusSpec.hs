@@ -17,7 +17,7 @@ spec = do
         status = Status 
           UUID.nil (Just 2.5) (Just 5) (Just 6) (Just 7) (read "2019-08-31 05:14:37")
         expectedValue = Object $ fromList
-          [ ("statusId",            String "00000000-0000-0000-0000-000000000000")
+          [ ("status_id",           String "00000000-0000-0000-0000-000000000000")
           , ("temperature",         Number 2.5)
           , ("humidity",            Number 5)
           , ("temperature_outside", Number 6)
@@ -31,7 +31,7 @@ spec = do
         status = Status 
           UUID.nil Nothing Nothing Nothing Nothing (read "2019-08-31 05:14:37")
         expectedValue = Object $ fromList
-          [ ("statusId",            String "00000000-0000-0000-0000-000000000000")
+          [ ("status_id",           String "00000000-0000-0000-0000-000000000000")
           , ("temperature",         Null)
           , ("humidity",            Null)
           , ("temperature_outside", Null)

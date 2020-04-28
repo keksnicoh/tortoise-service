@@ -22,16 +22,16 @@ spec =
           { C.statusId = UUID.nil
           , C.temperature = Just 1
           , C.humidity = Just 1
-          , C.temperature_outside = Nothing
-          , C.humidity_outside = Just 5
+          , C.temperatureOutside = Nothing
+          , C.humidityOutside = Just 5
           , C.created = read "2019-02-03 13:37:45" 
           }
         , C.Status
           { C.statusId = UUID.nil
           , C.temperature = Just 2
           , C.humidity = Just 3
-          , C.temperature_outside = Just 9
-          , C.humidity_outside = Just 5
+          , C.temperatureOutside = Just 9
+          , C.humidityOutside = Just 5
           , C.created = read "2019-02-03 13:37:42"
           }
         ]
