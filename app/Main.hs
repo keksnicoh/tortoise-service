@@ -24,6 +24,7 @@ import Data.ByteString.Internal as BS
 -- https://samples.openweathermap.org/data/2.5/forecast/hourly?lat=54&lon=10&appid=e46215c483de286ca6a589305c95a42e
 main :: IO ()
 main = do
+  putStrLn "read environment..."
   tortoiseConnectionStr <- lookupEnvRequired "TORTOISE_SERVICE_PSQL"
   assetsPath <- lookupEnvRequired "TORTOISE_SERVICE_ASSETS_PATH"
   

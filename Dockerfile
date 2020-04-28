@@ -9,4 +9,4 @@ RUN PATH=$PATH:/root/.local/bin
 RUN cd /var && git clone https://github.com/keksnicoh/turtle-service.git
 RUN cd /var/turtle-service && stack build -j1 
 
-CMD cd /var/turtle-service && stack run
+CMD cd /var/turtle-service && git pull && stack run
