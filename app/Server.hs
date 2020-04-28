@@ -21,11 +21,13 @@ import qualified Core.State.Repository.State   as CS
 import qualified Core.OpenWeatherMap.Repository.Forecast
                                                as COR
 import qualified Data.ByteString.Lazy          as LBS
-import Network.Wai              (Application)
-import Servant                  (Proxy (..), serve)
+import           Network.Wai                    ( Application )
+import           Servant                        ( Proxy(..)
+                                                , serve
+                                                )
 
 
-import Stream.Service.Action
+import           Stream.Service.Action
 
 
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
@@ -46,7 +48,7 @@ turtleServer =
                                            COR.forecastRepository
   controlServer = Switch.mkSwitchService CS.updateState
   webcamServer  = Webcam.mkWebcamHandler
-    (Webcam.mkPersistWebcam CS.updateState LBS.writeFile)
+    (Webcam.mkPersistWebcam "webcam.jpg" CS.updateState LBS.writeFile)
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy

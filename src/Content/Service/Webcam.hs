@@ -11,14 +11,16 @@ import           Control.Monad.Reader           ( liftIO
 import qualified Data.ByteString.Lazy          as LBS
 
 
-type PersistWebcam m = FilePath -> LBS.ByteString -> m ()
+type PersistWebcam m = LBS.ByteString -> m ()
 
 mkPersistWebcam
-  :: (MonadIO m, MonadReader e m, HasCurrentTime e)
-  => UpdateState m
+  :: (MonadIO m, MonadReader e m, HasCurrentTime e, HasAssetsPath e)
+  => FilePath
+  -> UpdateState m
   -> (FilePath -> LBS.ByteString -> IO ())
   -> PersistWebcam m
-mkPersistWebcam updateState writeFile filepath payload = do
+mkPersistWebcam filePath updateState writeFile payload = do
+  assetsPath <- reader getAssetsPath
   now <- reader getCurrentTime >>= liftIO
   updateState (\s -> s { webcamDate = Just now })
-  liftIO $ writeFile filepath payload
+  liftIO $ writeFile (assetsPath <> filePath) payload

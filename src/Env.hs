@@ -18,6 +18,7 @@ data Env = Env
   , randomUUID        :: IO UUID
   , state             :: IORef State
   , openWeatherMapEnv :: OpenWeatherMapEnv
+  , assetsPath        :: FilePath
   }
 
 instance HasDbConnection Env where
@@ -30,3 +31,5 @@ instance HasState Env where
   getState = state
 instance HasOpenWeatherMapEnv Env where
   getOpenWeatherMapEnv = openWeatherMapEnv
+instance HasAssetsPath Env where
+  getAssetsPath = assetsPath

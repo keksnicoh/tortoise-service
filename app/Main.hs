@@ -25,6 +25,7 @@ import Data.ByteString.Internal as BS
 main :: IO ()
 main = do
   tortoiseConnectionStr <- lookupEnvRequired "TORTOISE_SERVICE_PSQL"
+  assetsPath <- lookupEnvRequired "TORTOISE_SERVICE_ASSETS_PATH"
   
   putStrLn "initialize state..."
   state <- newIORef initialState
@@ -48,6 +49,7 @@ main = do
           , weatherUrl     =
             "https://api.openweathermap.org/data/2.5/forecast?appid=b24937e45bc0bb6231615290f996a710&lat=54&lon=10"
           }
+      , assetsPath = assetsPath
       }
 
   putStrLn "run server..."

@@ -14,6 +14,6 @@ mkWebcamHandler
 mkWebcamHandler persistWebcam multipartData = do
   case files multipartData of
     [FileData "webcam" "webcam.jpg" "image/jpg" payload] ->
-      persistWebcam "webcam.jpg" payload
+      persistWebcam payload
     _ -> throwError err400
   return ()
