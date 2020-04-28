@@ -29,6 +29,7 @@ dependencies:
 - servant-checked-exceptions
 - servant-websockets
 - aeson
+- aeson-casing
 - uuid
 - text
 - postgresql-simple
