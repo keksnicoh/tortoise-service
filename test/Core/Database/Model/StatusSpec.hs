@@ -14,7 +14,7 @@ mkSpec :: (HasDbConnection e, HasDbSchema e) => e -> Spec
 mkSpec env = do
 
   describe "insertStatusRepository" $ do
-    let record = C.Status UUID.nil 10 10 (Just 6) Nothing (read "2011-11-19 18:28:23")
+    let record = C.Status UUID.nil (Just 10) (Just 10) (Just 6) Nothing (read "2011-11-19 18:28:23")
         insert = runReaderT (C.insertStatusRepository record)
     it "should not allow inserting the same UUID twice" $ withDatabaseMigrated env $ \conn -> do
       insert conn >>= shouldBe C.Success
@@ -25,26 +25,26 @@ mkSpec env = do
       result `shouldBe` [record]
 
   describe "mkFetchStatusRepository" $ do
-    let record = C.Status UUID.nil 10 10 (Just 3) (Just 0) (read "2011-11-19 18:28:33")
+    let record = C.Status UUID.nil (Just 10) (Just 10) (Just 3) (Just 0) (read "2011-11-19 18:28:33")
         records =
           [ record
               { C.statusId = read "550e8400-e29b-11d4-a716-446655440000"
-              , C.temperature = 1
+              , C.temperature = Just 1
               , C.created = read "2011-11-19 18:28:23"
               }
           , record
               { C.statusId = read "650e8400-e29b-11d4-a716-446655440000"
-              , C.temperature = 2
+              , C.temperature = Just 2
               , C.created = read "2011-11-13 18:28:23"
               }
           , record
               { C.statusId = read "750e8400-e29b-11d4-a716-446655440000"
-              , C.temperature = 3
+              , C.temperature = Just 3
               , C.created = read "2011-11-17 18:28:23"
               }
           , record
               { C.statusId = read "850e8400-e29b-11d4-a716-446655440000"
-              , C.temperature = 4
+              , C.temperature = Just 4
               , C.created = read "2011-11-19 18:28:24"
               }
           ]
@@ -55,11 +55,14 @@ mkSpec env = do
       ] $ \(n, expected) -> 
         it (printf "should return the defined number of rows ordered by creation date (%d)" n)
           $ withDatabaseMigrated env $ \conn -> do
-            result <- runReaderT (forM_ records C.insertStatusRepository >> C.mkFetchStatusRepository n) conn
-            result `shouldBe` expected
+            let
+              effect = do
+                forM_ records C.insertStatusRepository
+                C.mkFetchStatusRepository n
+            runReaderT effect conn >>= flip shouldBe expected
 
   describe "fetchStatusPeriodRepository" $ do
-    let record = C.Status UUID.nil 10 10 (Just 5) Nothing (read "2011-11-19 18:28:33")
+    let record = C.Status UUID.nil (Just 10) (Just 10) (Just 5) Nothing (read "2011-11-19 18:28:33")
         records =
           [ record
               { C.statusId = read "550e8400-e29b-11d4-a716-446655440000"
@@ -98,5 +101,9 @@ mkSpec env = do
         )
       ] $ \(label, period, expectedRecords) -> 
         it label $ withDatabaseMigrated env $ \conn -> do
-          result <- runReaderT (forM_ records C.insertStatusRepository >> C.fetchStatusPeriodRepository period) conn
+          let 
+            effect = do
+              forM_ records C.insertStatusRepository
+              C.fetchStatusPeriodRepository period
+          result <- runReaderT effect conn
           result `shouldBe` expectedRecords

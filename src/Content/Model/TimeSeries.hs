@@ -10,7 +10,6 @@ import           Servant.Docs                   ( ToSample
                                                 , toSamples
                                                 , singleSample
                                                 )
-import           Data.Swagger
 import qualified Data.Time                     as T
 import           GHC.Generics                   ( Generic )
 import           Data.Aeson
@@ -28,28 +27,24 @@ data Point a b
 
 data TimeSeries
   = TimeSeries
-    { temperature        :: [Point T.UTCTime Temperature]
-    , humidity           :: [Point T.UTCTime Humidity]
+    { temperature :: [Point T.UTCTime Temperature]
+    , humidity :: [Point T.UTCTime Humidity]
     , temperatureOutside :: [Point T.UTCTime Temperature]
-    , humidityOutside    :: [Point T.UTCTime Humidity]
+    , humidityOutside :: [Point T.UTCTime Humidity]
     } deriving(Generic, Eq, Show, ToJSON)
 
---instance ToSample TimeSeries where
---  toSamples _ = singleSample $ TimeSeries [400, 300, 200, 100, 0]
---                                          [23.5, 23.6, 23.7, 23.8, 24]
---                                          [4, 4, 4, 3, 4]
+time = read "2019-02-01 13:37:42"
+
+instance ToSample TimeSeries where
+  toSamples _ = singleSample
+    $ TimeSeries [Point time 1] [Point time 1] [Point time 1] [Point time 1]
 
 from :: T.UTCTime -> [Status] -> TimeSeries
-from start series = TimeSeries (t <$> series)
-                               (t2 <$> series)
-                               (catMaybes $ t3 <$> series)
-                               (catMaybes $ t4 <$> series)
+from start series = TimeSeries
+  (seriesOf Core.Database.Model.Status.temperature)
+  (seriesOf Core.Database.Model.Status.humidity)
+  (seriesOf Core.Database.Model.Status.temperature_outside)
+  (seriesOf Core.Database.Model.Status.humidity_outside)
  where
-  t status =
-    Point (created status) (Core.Database.Model.Status.temperature status)
-  t2 status =
-    Point (created status) (Core.Database.Model.Status.humidity status)
-  t3 status = Point (created status)
-    <$> Core.Database.Model.Status.temperature_outside status
-  t4 status = Point (created status)
-    <$> Core.Database.Model.Status.humidity_outside status
+  seriesOf member =
+    catMaybes $ (\status -> Point (created status) <$> member status) <$> series

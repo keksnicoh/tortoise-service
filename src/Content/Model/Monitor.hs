@@ -17,13 +17,10 @@ import qualified Core.OpenWeatherMap.Model.Forecast
                                                as COM
 import           Data.Aeson
 import           GHC.Generics                   ( Generic )
-import           Data.List.NonEmpty             ( NonEmpty(..) )
 import           Data.List                      ( genericLength )
 import           Data.Swagger
 import           Data.Time
-
-take' :: [a] -> [a]
-take' = take 4
+import           Data.Maybe                     ( catMaybes )
 
 data MonitorSwitch
   = MonitorSwitch
@@ -34,44 +31,46 @@ data MonitorSwitch
 
 data MonitorWeather
   = MonitorWeather
-    { label       :: String
+    { label :: String
     , temperature :: Temperature
-    , humidity    :: Humidity
-    , date        :: UTCTime
+    , humidity :: Humidity
+    , date :: UTCTime
     } deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
 data Monitor
   = Monitor
-    { date                    :: UTCTime
-    , sensorTemperatur        :: Temperature
-    , sensorHumidity          :: Humidity
+    { date :: UTCTime
+    , sensorTemperatur :: Maybe Temperature
+    , sensorHumidity :: Maybe Humidity
     , sensorTemperaturOutside :: Maybe Temperature
-    , sensorHumidityOutside   :: Maybe Humidity
-    , switchLight1            :: Maybe MonitorSwitch
-    , switchLight2            :: Maybe MonitorSwitch
-    , weather                 :: [MonitorWeather]
-    , webcamDate              :: Maybe UTCTime
+    , sensorHumidityOutside :: Maybe Humidity
+    , switchLight1 :: Maybe MonitorSwitch
+    , switchLight2 :: Maybe MonitorSwitch
+    , weather :: [MonitorWeather]
+    , webcamDate :: Maybe UTCTime
     }
   deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
-from :: UTCTime -> NonEmpty CDB.Status -> CST.State -> COM.ForecastResult -> Monitor
-from date status state forecast = Monitor date 
-                                     (mean (CDB.temperature <$> status))
-                                     (mean (CDB.humidity <$> status))
-                                     (mean <$> traverse CDB.temperature_outside status)
-                                     (mean <$> traverse CDB.humidity_outside status)
-                                     (fromSwitch <$> CST.light1 state)
-                                     (fromSwitch <$> CST.light2 state)
-                                     (fromForecast forecast)
-                                     (CST.webcamDate state)
+from :: UTCTime -> [CDB.Status] -> CST.State -> COM.ForecastResult -> Monitor
+from date status state forecast = Monitor date
+                                          (mean' CDB.temperature)
+                                          (mean' CDB.humidity)
+                                          (mean' CDB.temperature_outside)
+                                          (mean' CDB.humidity_outside)
+                                          (fromSwitch <$> CST.light1 state)
+                                          (fromSwitch <$> CST.light2 state)
+                                          (fromForecast forecast)
+                                          (CST.webcamDate state)
  where
+  mean' f = mean . catMaybes $ f <$> status
   fromSwitch (CST.Manual     value) = MonitorSwitch value True
   fromSwitch (CST.Controlled value) = MonitorSwitch value False
-  mean (head :| tail) =
-    let stail = take' tail
-        p     = stail
-    in  (head + sum p) / (1 + genericLength stail)
-  fromForecast (COM.ForecastResult _ forecats) = mapForecast <$> take 6 forecats
+  mean [] = Nothing
+  mean (head : tail) =
+    let stail = take 4 tail
+    in  Just $ (head + sum stail) / (1 + genericLength stail)
+  fromForecast (COM.ForecastResult _ forecats) =
+    mapForecast <$> take 6 forecats
   mapForecast forecast = MonitorWeather
     { label       = renderLabel (COM.weather forecast)
     , temperature = COM.temperature forecast

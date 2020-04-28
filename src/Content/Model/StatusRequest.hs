@@ -16,16 +16,17 @@ import           Data.UUID
 import qualified Core.Database.Model.Status    as C
 import           Data.Time                      ( UTCTime )
 
-data StatusRequest 
+data StatusRequest
   = StatusRequest
-    { temperature         :: Temperature
-    , humidity            :: Humidity
+    { temperature :: Maybe Temperature
+    , humidity :: Maybe Humidity
     , temperature_outside :: Maybe Temperature
-    , humidity_outside    :: Maybe Humidity
+    , humidity_outside :: Maybe Humidity
     } deriving (Generic, Show, Eq, FromJSON, ToSchema)
 
 toStatus :: StatusRequest -> UUID -> UTCTime -> C.Status
 toStatus (StatusRequest t h to ho) uuid = C.Status uuid t h to ho
 
 instance ToSample StatusRequest where
-  toSamples _ = singleSample (StatusRequest 13.37 42.00 (Just 5) (Just 16))
+  toSamples _ =
+    singleSample (StatusRequest (Just 13.37) Nothing (Just 5) (Just 16))

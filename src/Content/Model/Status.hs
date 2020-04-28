@@ -18,12 +18,12 @@ import           Data.Time
 
 data Status
   = Status
-    { statusId            :: UUID
-    , temperature         :: Temperature
-    , humidity            :: Humidity
+    { statusId :: UUID
+    , temperature :: Maybe Temperature
+    , humidity :: Maybe Humidity
     , temperature_outside :: Maybe Temperature
-    , humidity_outside    :: Maybe Humidity
-    , created             :: UTCTime
+    , humidity_outside :: Maybe Humidity
+    , created :: UTCTime
     } deriving (Generic, Show, Eq, ToJSON, ToSchema)
 
 from :: C.Status -> Status
@@ -37,8 +37,8 @@ from status = Status (C.statusId status)
 instance ToSample Status where
   toSamples _ = singleSample $ Status
     nil
-    1.0
-    2.0
+    (Just 1.0)
+    (Just 2.0)
     (Just 3)
     (Just 5)
     (read "2011-11-19 18:28:r52.607875 UTC")

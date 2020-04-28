@@ -34,8 +34,8 @@ data InsertStatusRepositoryResult = Success | PkAlreadyExists
 
 data Status = Status
   { statusId :: UUID
-  , temperature :: Temperature
-  , humidity :: Humidity
+  , temperature :: Maybe Temperature
+  , humidity :: Maybe Humidity
   , temperature_outside :: Maybe Temperature
   , humidity_outside :: Maybe Humidity
   , created :: UTCTime

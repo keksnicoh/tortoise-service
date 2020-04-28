@@ -9,7 +9,7 @@ import           Dependencies
 type TimeSeriesService m = Maybe T.UTCTime -> Maybe T.UTCTime -> m TimeSeries
 
 defaultTimeFrame :: T.NominalDiffTime
-defaultTimeFrame = 24*3600
+defaultTimeFrame = 24 * 3600
 
 {- |returns a time series of the temperature and humiditiy within a defined
    timeframe (start, end). If start is undefined, then start=now. If end is
