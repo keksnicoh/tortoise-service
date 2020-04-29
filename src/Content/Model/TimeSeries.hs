@@ -18,7 +18,6 @@ import           Core.Internal
 import           Core.Database.Model.Status    as CDMS
                                                 ( Status(..) )
 import           Data.Maybe                     ( catMaybes )
-import           Data.Aeson.Casing
 
 data Point a b
   = Point
@@ -33,11 +32,7 @@ data TimeSeries
     , humidity :: [Point T.UTCTime Humidity]
     , temperatureOutside :: [Point T.UTCTime Temperature]
     , humidityOutside :: [Point T.UTCTime Humidity]
-    } deriving(Generic, Eq, Show)
-
-instance ToJSON TimeSeries where
-  toJSON = genericToJSON $ defaultOptions { fieldLabelModifier = snakeCase }
-
+    } deriving(Generic, Eq, Show, ToJSON)
 
 time = read "2019-02-01 13:37:42"
 

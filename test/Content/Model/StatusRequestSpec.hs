@@ -18,8 +18,8 @@ spec = do
         value = Object $ fromList 
           [ ("temperature", Number 2.1)
           , ("humidity", Number 10)
-          , ("temperature_outside", Number 3)
-          , ("humidity_outside", Number 2)
+          , ("temperatureOutside", Number 3)
+          , ("humidityOutside", Number 2)
           ]
       in parse parseJSON value `shouldBe` Success 
         (StatusRequest (Just 2.1) (Just 10)  (Just 3) (Just 2))
@@ -28,11 +28,12 @@ spec = do
         value = Object $ fromList 
           [ ("temperature", Null)
           , ("humidity", Null)
-          , ("temperature_outside", Null)
-          , ("humidity_outside", Null)
+          , ("temperatureOutside", Null)
+          , ("humidityOutside", Null)
           ]
       in parse parseJSON value `shouldBe` Success
         (StatusRequest Nothing Nothing Nothing Nothing)
+
   describe "toStatus" $ 
     it "should create a Database model" $ 
       let

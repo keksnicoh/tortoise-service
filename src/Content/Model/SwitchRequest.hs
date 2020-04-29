@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Content.Model.SwitchRequest where
@@ -11,7 +12,4 @@ data SwitchRequest
     { light1 :: Maybe Bool
     , light2 :: Maybe Bool
     }
-  deriving (Show, Eq, Generic)
-
-instance ToJSON SwitchRequest
-instance FromJSON SwitchRequest
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
