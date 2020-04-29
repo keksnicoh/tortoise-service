@@ -2,9 +2,10 @@
 
 module Content.Service.Switch where
 
-import           Content.Model.SwitchRequest
+import           Content.Model.Switch
 import           Core.State.Repository.State
 import qualified Core.State.Model.State        as CSM
+import           Control.Applicative
 
 type SwitchService m = SwitchRequest -> m ()
 
@@ -12,9 +13,6 @@ mkSwitchService :: UpdateState m -> SwitchService m
 mkSwitchService updateState switchRequest = updateState modify
  where
   modify state = state
-    { CSM.light1 = switch (CSM.light1 state) (light1 switchRequest)
-    , CSM.light2 = switch (CSM.light2 state) (light2 switchRequest)
+    { CSM.light1 = (toStateSwitch <$> light1 switchRequest) <|> CSM.light1 state
+    , CSM.light2 = (toStateSwitch <$> light2 switchRequest) <|> CSM.light2 state
     }
-  switch (Just (CSM.Controlled a)) Nothing  = Just (CSM.Controlled a)
-  switch (Just (CSM.Manual     a)) Nothing  = Just (CSM.Controlled a)
-  switch _                         newState = CSM.Manual <$> newState

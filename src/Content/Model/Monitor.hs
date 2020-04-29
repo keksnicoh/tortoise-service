@@ -3,8 +3,7 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 
 module Content.Model.Monitor
-  ( MonitorSwitch(..)
-  , Monitor(..)
+  ( Monitor(..)
   , MonitorWeather(..)
   , from
   )
@@ -21,13 +20,7 @@ import           Data.List                      ( genericLength )
 import           Data.Swagger
 import           Data.Time
 import           Data.Maybe                     ( catMaybes )
-
-data MonitorSwitch
-  = MonitorSwitch
-    { value :: Bool
-    , fixed :: Bool
-    }
-  deriving (Show, Eq, Generic, ToSchema, ToJSON)
+import           Content.Model.Switch
 
 data MonitorWeather
   = MonitorWeather
@@ -44,29 +37,28 @@ data Monitor
     , sensorHumidity :: Maybe Humidity
     , sensorTemperaturOutside :: Maybe Temperature
     , sensorHumidityOutside :: Maybe Humidity
-    , switchLight1 :: Maybe MonitorSwitch
-    , switchLight2 :: Maybe MonitorSwitch
+    , switchLight1 :: Maybe Switch
+    , switchLight2 :: Maybe Switch
     , weather :: [MonitorWeather]
     , webcamDate :: Maybe UTCTime
     }
   deriving (Show, Eq, Generic, ToSchema, ToJSON)
 
 from :: UTCTime -> [CDB.Status] -> CST.State -> COM.ForecastResult -> Monitor
-from date status state forecast = Monitor date
-                                          (mean' CDB.temperature)
-                                          (mean' CDB.humidity)
-                                          (mean' CDB.temperatureOutside)
-                                          (mean' CDB.humidityOutside)
-                                          (fromSwitch <$> CST.light1 state)
-                                          (fromSwitch <$> CST.light2 state)
-                                          (fromForecast forecast)
-                                          (CST.webcamDate state)
+from date status state forecast = Monitor
+  date
+  (mean' CDB.temperature)
+  (mean' CDB.humidity)
+  (mean' CDB.temperatureOutside)
+  (mean' CDB.humidityOutside)
+  (fromStateSwitch <$> CST.light1 state)
+  (fromStateSwitch <$> CST.light2 state)
+  (fromForecast forecast)
+  (CST.webcamDate state)
  where
-  mean' f = mean . catMaybes $ f <$> status
-  fromSwitch (CST.Manual     value) = MonitorSwitch value True
-  fromSwitch (CST.Controlled value) = MonitorSwitch value False
-  mean [] = Nothing
-  mean (head : tail) =
+  mean' f = saveMean . catMaybes $ f <$> status
+  saveMean [] = Nothing
+  saveMean (head : tail) =
     let stail = take 4 tail
     in  Just $ (head + sum stail) / (1 + genericLength stail)
   fromForecast (COM.ForecastResult _ forecats) =
