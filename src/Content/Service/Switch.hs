@@ -13,6 +13,6 @@ mkSwitchService :: UpdateState m -> SwitchService m
 mkSwitchService updateState switchRequest = updateState modify
  where
   modify state = state
-    { CSM.light1 = (toStateSwitch <$> light1 switchRequest) <|> CSM.light1 state
-    , CSM.light2 = (toStateSwitch <$> light2 switchRequest) <|> CSM.light2 state
+    { CSM.light1 = (toCoreSwitch <$> light1 switchRequest) <|> CSM.light1 state
+    , CSM.light2 = (toCoreSwitch <$> light2 switchRequest) <|> CSM.light2 state
     }

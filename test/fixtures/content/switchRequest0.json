@@ -1,0 +1,10 @@
+{
+  "light1": {
+    "controlled": true,
+    "value": false
+  },
+  "light2": {
+    "controlled": false,
+    "value": true
+  }
+}

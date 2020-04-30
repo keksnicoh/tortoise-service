@@ -4,8 +4,8 @@
 module Content.Model.Switch
   ( Switch(..)
   , SwitchRequest(..)
-  , toStateSwitch
-  , fromStateSwitch
+  , toCoreSwitch
+  , fromCoreSwitch
   )
 where
 
@@ -26,15 +26,15 @@ data SwitchRequest
     { light1 :: Maybe Switch
     , light2 :: Maybe Switch
     }
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
+  deriving (Show, Eq, Generic, FromJSON)
 
-toStateSwitch :: Switch -> CSM.Switch Bool
-toStateSwitch Switch { controlled = False, value = value } = CSM.Manual value
-toStateSwitch Switch { controlled = True, value = value } =
+toCoreSwitch :: Switch -> CSM.Switch Bool
+toCoreSwitch Switch { controlled = False, value = value } = CSM.Manual value
+toCoreSwitch Switch { controlled = True, value = value } =
   CSM.Controlled value
 
-fromStateSwitch :: CSM.Switch Bool -> Switch
-fromStateSwitch (CSM.Manual value) =
+fromCoreSwitch :: CSM.Switch Bool -> Switch
+fromCoreSwitch (CSM.Manual value) =
   Switch { controlled = False, value = value }
-fromStateSwitch (CSM.Controlled value) =
+fromCoreSwitch (CSM.Controlled value) =
   Switch { controlled = True, value = value }

@@ -51,16 +51,14 @@ from date status state forecast = Monitor
   (mean' CDB.humidity)
   (mean' CDB.temperatureOutside)
   (mean' CDB.humidityOutside)
-  (fromStateSwitch <$> CST.light1 state)
-  (fromStateSwitch <$> CST.light2 state)
+  (fromCoreSwitch <$> CST.light1 state)
+  (fromCoreSwitch <$> CST.light2 state)
   (fromForecast forecast)
   (CST.webcamDate state)
  where
   mean' f = saveMean . catMaybes $ f <$> status
   saveMean [] = Nothing
-  saveMean (head : tail) =
-    let stail = take 4 tail
-    in  Just $ (head + sum stail) / (1 + genericLength stail)
+  saveMean (head : tail) = Just $ (head + sum tail) / (1 + genericLength tail)
   fromForecast (COM.ForecastResult _ forecats) =
     mapForecast <$> take 6 forecats
   mapForecast forecast = MonitorWeather

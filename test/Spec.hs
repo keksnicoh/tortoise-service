@@ -2,6 +2,7 @@
 
 import           Test.Hspec
 import           Content.Model.StatusSpec      as ModelStatusSpec
+import           Content.Model.SwitchSpec      as CMSwitchSpec
 import           Content.Service.StatusSpec    as ServiceStatusSpec
 import           Content.Service.TimeSeriesSpec
                                                as TimeSeriesSpec
@@ -41,3 +42,4 @@ main = do
     describe "Content.Model.StatusRequest"             StatusRequestSpec.spec
     describe "Content.Service.Status"                  ServiceStatusSpec.spec
     describe "Content.Service.TimeSeries"              TimeSeriesSpec.spec
+    describe "Content.Model.SwitchSpec"                CMSwitchSpec.spec
