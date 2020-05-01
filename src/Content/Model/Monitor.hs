@@ -47,18 +47,18 @@ data Monitor
 from :: UTCTime -> [CDB.Status] -> CST.State -> COM.ForecastResult -> Monitor
 from date status state forecast = Monitor
   date
-  (mean' CDB.temperature)
-  (mean' CDB.humidity)
-  (mean' CDB.temperatureOutside)
-  (mean' CDB.humidityOutside)
+  (meanFrom CDB.temperature)
+  (meanFrom CDB.humidity)
+  (meanFrom CDB.temperatureOutside)
+  (meanFrom CDB.humidityOutside)
   (fromCoreSwitch <$> CST.light1 state)
   (fromCoreSwitch <$> CST.light2 state)
   (fromForecast forecast)
   (CST.webcamDate state)
  where
-  mean' f = saveMean . catMaybes $ f <$> status
-  saveMean [] = Nothing
-  saveMean (head : tail) = Just $ (head + sum tail) / (1 + genericLength tail)
+  meanFrom getField = (safeMean . catMaybes) (getField <$> status)
+  safeMean []            = Nothing
+  safeMean (head : tail) = Just $ (head + sum tail) / (1 + genericLength tail)
   fromForecast (COM.ForecastResult _ forecats) =
     mapForecast <$> take 6 forecats
   mapForecast forecast = MonitorWeather
@@ -67,5 +67,5 @@ from date status state forecast = Monitor
     , humidity    = COM.humidity forecast
     , date        = COM.date forecast
     }
-  renderLabel Nothing = "Unspecified Weather"
+  renderLabel Nothing = "unspecified weather"
   renderLabel (Just (COM.ForecastWeather name descr)) = name <> " - " <> descr
