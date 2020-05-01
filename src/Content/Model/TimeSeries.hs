@@ -4,6 +4,7 @@
 
 module Content.Model.TimeSeries
   ( TimeSeries(..)
+  , Point(..)
   , from
   )
 where

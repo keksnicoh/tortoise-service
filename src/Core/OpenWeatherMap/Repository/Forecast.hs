@@ -30,7 +30,6 @@ forecastRepository
   => FetchForecastRepository m
 forecastRepository = do
   env <- reader getOpenWeatherMapEnv
-  liftIO $ print $ weatherUrl env
   liftIO (parseRequest (weatherUrl env) >>= managedHttpLbs env) >>= handle
  where
   handle response = case responseStatus response of

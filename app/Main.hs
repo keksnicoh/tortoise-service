@@ -17,6 +17,7 @@ import           Network.HTTP.Client            ( httpLbs
 import           Network.HTTP.Client.TLS        ( tlsManagerSettings )
 import System.Environment
 import Data.ByteString.Internal as BS
+
 --derk =
 --  "https://samples.openweathermap.org/data/2.5/forecast/hourly?lat=54&lon=10&appid=e46215c483de286ca6a589305c95a42e"
 --53°33'18.7"N 9°54'51.5"E
