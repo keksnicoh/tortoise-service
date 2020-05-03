@@ -6,7 +6,10 @@ import           Content.Model.TimeSeries
 import           Control.Monad.Reader
 import           Dependencies
 
-type TimeSeriesService m = Maybe T.UTCTime -> Maybe T.UTCTime -> m TimeSeries
+type TimeSeriesService m
+  =  Maybe T.UTCTime -- start time, default value: `end` - `defaultTimeFrame`
+  -> Maybe T.UTCTime -- end time, default value: now
+  -> m TimeSeries
 
 defaultTimeFrame :: T.NominalDiffTime
 defaultTimeFrame = 24 * 3600

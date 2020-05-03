@@ -9,6 +9,7 @@ import           Control.Applicative
 
 type SwitchService m = SwitchRequest -> m ()
 
+-- |creates a SwitchService m to update light switch states
 mkSwitchService :: UpdateState m -> SwitchService m
 mkSwitchService updateState switchRequest = updateState modify
  where

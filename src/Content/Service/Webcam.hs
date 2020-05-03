@@ -12,7 +12,7 @@ import qualified Data.ByteString.Lazy          as LBS
 
 type PersistWebcam m = LBS.ByteString -> m ()
 
--- | create an instance of (PersistWebcam m) which modifies the webcamDate
+-- |create an instance of (PersistWebcam m) which modifies the `webcamDate`
 -- state member to the currentTime and uses a `writeFile` handle to persist
 -- the given bytestring.
 -- 
