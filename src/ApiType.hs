@@ -15,7 +15,10 @@ import           Servant.Multipart
 type SetStatusAPI = ReqBody '[JSON] StatusRequest :> Post '[JSON] Status
 type GetStatusAPI = Get '[JSON] [Status]
 type GetTimeSeriesAPI
-  = QueryParam "start" UTCTime :> QueryParam "end" UTCTime :> Get '[JSON] TimeSeries
+  =  QueryParam "start" UTCTime 
+  :> QueryParam "end" UTCTime 
+  :> QueryParam "timeWindow" NominalDiffTime 
+  :> Get '[JSON] TimeSeries
 type PostSwitchAPI = ReqBody '[JSON] SwitchRequest :> PostNoContent '[JSON] ()
 type GetMonitorAPI = Get '[JSON] Monitor
 

@@ -41,11 +41,31 @@ instance ToSample TimeSeries where
   toSamples _ = singleSample
     $ TimeSeries [Point time 1] [Point time 1] [Point time 1] [Point time 1]
 
-from :: T.UTCTime -> [Status] -> TimeSeries
-from start series = TimeSeries (seriesOf CDMS.temperature)
-                               (seriesOf CDMS.humidity)
-                               (seriesOf CDMS.temperatureOutside)
-                               (seriesOf CDMS.humidityOutside)
+from :: T.UTCTime -> T.NominalDiffTime -> [Status] -> TimeSeries
+from start dt series = TimeSeries
+  (groupDt start dt $ reverse $ seriesOf CDMS.temperature)
+  (groupDt start dt $ reverse $ seriesOf CDMS.humidity)
+  (groupDt start dt $ reverse $ seriesOf CDMS.temperatureOutside)
+  (groupDt start dt $ reverse $ seriesOf CDMS.humidityOutside)
  where
   seriesOf member =
     catMaybes $ (\status -> Point (created status) <$> member status) <$> series
+
+  groupDt
+    :: (Fractional a)
+    => T.UTCTime
+    -> T.NominalDiffTime
+    -> [Point T.UTCTime a]
+    -> [Point T.UTCTime a]
+  groupDt t0 dt []   = []
+  groupDt t0 dt list = run t0 [] list
+   where
+    run t []       []       = []
+    run t (b : bs) []       = [safeMean t b bs]
+    run t bL       (p : ps) = if T.diffUTCTime (x p) t > dt
+      then case bL of
+        []       -> run (x p) [p] ps
+        (b : bs) -> safeMean t b bs : run (T.addUTCTime dt t) [] (p : ps)
+      else run t (bL <> [p]) ps
+    safeMean t p ps =
+      Point (x p) ((y p + sum (y <$> ps)) / fromIntegral (1 + length ps))

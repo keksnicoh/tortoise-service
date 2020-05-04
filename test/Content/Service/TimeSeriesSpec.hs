@@ -42,28 +42,28 @@ spec =
         end        = read "2020-02-03 13:37:50"
         repository = mockSingular (`shouldBe` (start, end)) records
         service    = mkTimeSeriesService repository
-        effect     = service (Just start) (Just end)
-      runReaderT effect timeMockNotExpectedToBeInvoke >>= flip shouldBe (from start records)
+        effect     = service (Just start) (Just end) Nothing
+      runReaderT effect timeMockNotExpectedToBeInvoke >>= flip shouldBe (from start 1 records)
     it "use (now - 24hours, now) for undefined period" $ do
       let
         start      = read "2019-02-02 13:37:31"
         repository = mockSingular (`shouldBe` (start, timeNow)) records
         service    = mkTimeSeriesService repository
-        effect     = service Nothing Nothing
-      runReaderT effect timeMock >>= flip shouldBe (from start records)
+        effect     = service Nothing Nothing Nothing
+      runReaderT effect timeMock >>= flip shouldBe (from start 1 records)
     it "use (start, start + 24hours) for undefined end" $ do
       let
         start      = read "2019-02-03 11:33:31"
         end        = read "2019-02-04 11:33:31"
         repository = mockSingular (`shouldBe` (start, end)) records
         service    = mkTimeSeriesService repository
-        effect     = service (Just start) Nothing
-      runReaderT effect timeMock >>= flip shouldBe (from start records)
+        effect     = service (Just start) Nothing Nothing 
+      runReaderT effect timeMock >>= flip shouldBe (from start 1 records)
     it "use (end - 24hours, end) for undefined start" $ do
       let
         start      = read "2019-02-02 13:11:22"
         end        = read "2019-02-03 13:11:22"
         repository = mockSingular (`shouldBe` (start, end)) records
         service    = mkTimeSeriesService repository
-        effect     = service Nothing (Just end)
-      runReaderT effect timeMock >>= flip shouldBe (from start records)
+        effect     = service Nothing (Just end) Nothing
+      runReaderT effect timeMock >>= flip shouldBe (from start 1 records)
