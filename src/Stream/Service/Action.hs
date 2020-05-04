@@ -132,17 +132,17 @@ webcamRequestAction = do
 
 pingPongAction :: StateT ActionEnv IO ActionResult
 pingPongAction = do
-  now      <- gets dispatchTimeC
-  timeDiff <- diffUTCTime now <$> gets pingTimeC
+  timeDiff <- diffUTCTime <$> gets dispatchTimeC <*> gets pingTimeC
   if timeDiff > 10
     then do
       pingPongResponse <- send PingAction >> receive
       if pingPongResponse == "pong"
         then do
-          modify' (\s -> s { pingTimeC = now })
+          updateState
           debug "[ping] pong!"
           return Continue
         else do
           debug "[ping] no pong, terminating..."
           return Exit
     else return Continue
+  where updateState = modify' (\s -> s { pingTimeC = dispatchTimeC s })
