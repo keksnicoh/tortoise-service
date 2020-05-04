@@ -22,5 +22,3 @@ spec =
       readIORef ioRef >>= flip shouldBe newState1
       runReaderT (updateState f2) ioRef
       readIORef ioRef >>= flip shouldBe newState2
-
-
