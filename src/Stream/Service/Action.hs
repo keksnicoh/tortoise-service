@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Stream.Service.Action where
 
@@ -35,6 +36,7 @@ data ActionEnv
     , connectionC :: Connection
     , dispatchTimeC :: UTCTime
     , dispatchStateC :: State
+    , webcamRequestDateC :: UTCTime
     }
 
 data ActionResult = Continue | Exit
@@ -48,12 +50,13 @@ streamData getCurrentState connection = do
   liftIO $ putStrLn "new client"
   currentTime  <- reader D.getCurrentTime >>= liftIO
   currentState <- getCurrentState
-  run ActionEnv { lastLightStateC = fromState currentState
-                , pingTimeC       = currentTime
-                , lightTimeC      = addUTCTime (-300) currentTime
-                , connectionC      = connection
-                , dispatchTimeC    = currentTime
-                , dispatchStateC   = currentState
+  run ActionEnv { lastLightStateC    = fromState currentState
+                , pingTimeC          = currentTime
+                , lightTimeC         = addUTCTime (-300) currentTime
+                , connectionC        = connection
+                , dispatchTimeC      = currentTime
+                , dispatchStateC     = currentState
+                , webcamRequestDateC = currentTime
                 }
  where
   run env = do
@@ -64,13 +67,13 @@ streamData getCurrentState connection = do
         currentState <- getCurrentState
         currentTime  <- reader D.getCurrentTime >>= liftIO
         run env { dispatchStateC = currentState, dispatchTimeC = currentTime }
-      (Exit, a) -> liftIO $ do
-        threadDelay 100000
-        putStrLn "exit..."
+      (Exit, a) -> liftIO $ putStrLn "exit..."
+
 actions :: StateT ActionEnv IO ActionResult
 actions = do
   switchUpdatedAction
   switchAction
+  webcamRequestAction
   pingPongAction
 
 switchUpdatedAction :: StateT ActionEnv IO ()
@@ -93,6 +96,17 @@ switchAction = do
     liftIO $ sendTextData connection (encode $ LightAction state)
     modify' (\s -> s { lastLightStateC = state, lightTimeC = now })
     liftIO $ putStrLn "[light] state send"
+
+webcamRequestAction :: StateT ActionEnv IO ()
+webcamRequestAction = do
+  webcamRequestDate <- gets webcamRequestDateC
+  webcamRequest <$> gets dispatchStateC >>= \case
+    Nothing   -> return ()
+    Just date -> when (webcamRequestDate < date) $ do
+      connection <- gets connectionC
+      liftIO $ sendTextData connection (encode WebcamAction)
+      modify' (\s -> s { webcamRequestDateC = dispatchTimeC s })
+      liftIO $ putStrLn "[webcam] requested"
 
 pingPongAction :: StateT ActionEnv IO ActionResult
 pingPongAction = do

@@ -9,6 +9,6 @@ spec :: Spec
 spec = 
   describe "trivial instance of HasState (IORef State)" $
     it "must be the identity" $ do 
-      let state = State Nothing (Just $ Controlled True) Nothing
+      let state = State Nothing (Just $ Controlled True) Nothing Nothing
       ref <- newIORef state
       readIORef (getState ref) >>= flip shouldBe state

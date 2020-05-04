@@ -94,6 +94,7 @@ spec = do
         { light1 = Nothing
         , light2 = Nothing
         , webcamDate = Nothing
+        , webcamRequest = Nothing
         }
       emptyForecast =  COMForecast.ForecastResult
         { cod = "200"

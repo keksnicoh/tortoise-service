@@ -4,11 +4,9 @@
 module Server where
 
 import           Control.Monad.Reader
-import           Network.Wai
 import           Servant
 import           ApiType
 import           Env
-import           Servant.API.WebSocket
 
 import           Content.Webcam                as Webcam
 import           Content.Status                as Status
@@ -49,6 +47,7 @@ turtleServer =
   controlServer = Switch.mkSwitchService CS.updateState
   webcamServer  = Webcam.mkWebcamHandler
     (Webcam.mkPersistWebcam "webcam.jpg" CS.updateState LBS.writeFile)
+    :<|> Webcam.mkRequestWebcamService CS.updateState
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy

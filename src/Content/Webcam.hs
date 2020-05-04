@@ -2,6 +2,7 @@ module Content.Webcam
   ( mkPersistWebcam
   , PersistWebcam
   , mkWebcamHandler
+  , mkRequestWebcamService
   )
 where
 

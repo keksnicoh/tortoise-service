@@ -7,4 +7,4 @@ spec :: Spec
 spec =
   describe "initialState" $ 
     it "should be empty" $
-      initialState `shouldBe` State Nothing Nothing Nothing
+      initialState `shouldBe` State Nothing Nothing Nothing Nothing

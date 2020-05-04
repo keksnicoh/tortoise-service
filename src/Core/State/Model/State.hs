@@ -17,8 +17,9 @@ data State
     { light1 :: Maybe (Switch Bool)
     , light2 :: Maybe (Switch Bool)
     , webcamDate :: Maybe UTCTime
+    , webcamRequest :: Maybe UTCTime
     }
   deriving (Show, Eq)
 
 initialState :: State
-initialState = State Nothing Nothing Nothing
+initialState = State Nothing Nothing Nothing Nothing
