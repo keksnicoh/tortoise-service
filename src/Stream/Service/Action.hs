@@ -64,8 +64,9 @@ streamData getCurrentState connection = do
         currentState <- getCurrentState
         currentTime  <- reader D.getCurrentTime >>= liftIO
         run env { dispatchStateC = currentState, dispatchTimeC = currentTime }
-      (Exit, a) -> liftIO $ putStrLn "exit..."
-
+      (Exit, a) -> liftIO $ do
+        threadDelay 100000
+        putStrLn "exit..."
 actions :: StateT ActionEnv IO ActionResult
 actions = do
   switchUpdatedAction
@@ -106,7 +107,7 @@ pingPongAction = do
       modify' (\s -> s { pingTimeC = now })
       if pingPongResult == "pong"
         then do
-          liftIO $ putStrLn "[ping] pong!"
+          liftIO $ putStrLn "[ping] pong!"
           return Continue
         else do
           liftIO $ putStrLn "[ping] no pong, terminating..."
