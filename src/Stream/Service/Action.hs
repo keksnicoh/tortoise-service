@@ -107,23 +107,22 @@ switchUpdatedAction = do
 
 switchAction :: StateT ActionEnv IO ()
 switchAction = do
-  now      <- gets dispatchTimeC
-  timeDiff <- diffUTCTime now <$> gets lightTimeC
+  timeDiff <- diffUTCTime <$> gets dispatchTimeC <*> gets lightTimeC
   when (timeDiff > 60) $ do
     state <- fromState <$> gets dispatchStateC
     send (LightAction state)
-    updateState state now
+    updateState state
     debug "[light] state send"
  where
-  updateState state now =
-    modify' (\s -> s { lastLightStateC = state, lightTimeC = now })
+  updateState state =
+    modify' (\s -> s { lastLightStateC = state, lightTimeC = dispatchTimeC s })
 
 webcamRequestAction :: StateT ActionEnv IO ()
-webcamRequestAction = do
-  webcamRequestDate <- gets webcamRequestDateC
-  webcamRequest <$> gets dispatchStateC >>= \case
-    Nothing   -> return ()
-    Just date -> when (webcamRequestDate < date) $ do
+webcamRequestAction = webcamRequest <$> gets dispatchStateC >>= \case
+  Nothing   -> return ()
+  Just date -> do
+    webcamRequestDate <- gets webcamRequestDateC
+    when (webcamRequestDate < date) $ do
       send WebcamAction
       updateState
       debug "[webcam] requested"
