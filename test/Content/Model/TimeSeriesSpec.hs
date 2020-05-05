@@ -41,7 +41,6 @@ spec = do
       in toJSON timeSeries `shouldBe` expectedValue
   describe "from" $ do
     let
-      date = read "2021-02-03 13:37:42"
       emptyStatus = Status.Status
         { Status.statusId = Data.UUID.nil
         , Status.temperature = Nothing
@@ -50,7 +49,7 @@ spec = do
         , Status.humidityOutside = Nothing
         , Status.created = read "2020-02-03 13:37:42"
         }
-    {-it "should create samples of defined points" $ 
+    it "should create samples of defined points" $ 
       let
         status1 = emptyStatus
           { Status.statusId = Data.UUID.nil
@@ -74,12 +73,12 @@ spec = do
           , Status.humidityOutside = Just 3
           , Status.created = read "2020-02-05 13:37:42"
           }
-      in from date 1 [status1, status2, status3] `shouldBe` TimeSeries
-        [ Point (read "2020-02-05 13:37:42") 4, Point (read "2020-02-03 13:37:42") 5 ]
-        [ Point (read "2020-02-04 13:37:42") 1, Point (read "2020-02-03 13:37:42") 7 ]
-        [ Point (read "2020-02-04 13:37:42") 2, Point (read "2020-02-03 13:37:42") 7 ]
-        [ Point (read "2020-02-05 13:37:42") 3, Point (read "2020-02-03 13:37:42") 8 ]-}
+      in from [status1, status2, status3] `shouldBe` TimeSeries
+        [ Point (read "2020-02-03 13:37:42") 5, Point (read "2020-02-05 13:37:42") 4 ]
+        [ Point (read "2020-02-03 13:37:42") 7, Point (read "2020-02-04 13:37:42") 1 ]
+        [ Point (read "2020-02-03 13:37:42") 7, Point (read "2020-02-04 13:37:42") 2 ]
+        [ Point (read "2020-02-03 13:37:42") 8, Point (read "2020-02-05 13:37:42") 3 ]
     it "should work for edge case of empty status list" $
-      from date 1 [] `shouldBe` TimeSeries [] [] [] []
+      from []`shouldBe` TimeSeries [] [] [] []
     it "should work for edge case of list of empty status" $
-      from date 1 [emptyStatus, emptyStatus, emptyStatus] `shouldBe` TimeSeries [] [] [] []
+      from [emptyStatus, emptyStatus, emptyStatus] `shouldBe` TimeSeries [] [] [] []

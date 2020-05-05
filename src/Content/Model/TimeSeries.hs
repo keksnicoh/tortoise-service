@@ -6,6 +6,8 @@ module Content.Model.TimeSeries
   ( TimeSeries(..)
   , Point(..)
   , from
+  , group
+  , groupTimeSeries
   )
 where
 import           Servant.Docs                   ( ToSample
@@ -16,7 +18,7 @@ import qualified Data.Time                     as T
 import           GHC.Generics                   ( Generic )
 import           Data.Aeson
 import           Core.Internal
-import           Core.Database.Model.Status    as CDMS
+import qualified Core.Database.Model.Status    as CDMS
                                                 ( Status(..) )
 import           Data.Maybe                     ( catMaybes )
 
@@ -41,31 +43,37 @@ instance ToSample TimeSeries where
   toSamples _ = singleSample
     $ TimeSeries [Point time 1] [Point time 1] [Point time 1] [Point time 1]
 
-from :: T.UTCTime -> T.NominalDiffTime -> [Status] -> TimeSeries
-from start dt series = TimeSeries
-  (groupDt start dt $ reverse $ seriesOf CDMS.temperature)
-  (groupDt start dt $ reverse $ seriesOf CDMS.humidity)
-  (groupDt start dt $ reverse $ seriesOf CDMS.temperatureOutside)
-  (groupDt start dt $ reverse $ seriesOf CDMS.humidityOutside)
+from :: [CDMS.Status] -> TimeSeries
+from series = TimeSeries (seriesOf CDMS.temperature)
+                         (seriesOf CDMS.humidity)
+                         (seriesOf CDMS.temperatureOutside)
+                         (seriesOf CDMS.humidityOutside)
  where
   seriesOf member =
-    catMaybes $ (\status -> Point (created status) <$> member status) <$> series
+    catMaybes $ (\s -> Point (CDMS.created s) <$> member s) <$> series
 
-  groupDt
-    :: (Fractional a)
-    => T.UTCTime
-    -> T.NominalDiffTime
-    -> [Point T.UTCTime a]
-    -> [Point T.UTCTime a]
-  groupDt t0 dt []   = []
-  groupDt t0 dt list = run t0 [] list
-   where
-    run t []       []       = []
-    run t (b : bs) []       = [safeMean t b bs]
-    run t bL       (p : ps) = if T.diffUTCTime (x p) t > dt
-      then case bL of
-        []       -> run (x p) [p] ps
-        (b : bs) -> safeMean t b bs : run (T.addUTCTime dt t) [] (p : ps)
-      else run t (bL <> [p]) ps
-    safeMean t p ps =
-      Point (x p) ((y p + sum (y <$> ps)) / fromIntegral (1 + length ps))
+groupTimeSeries :: T.NominalDiffTime -> TimeSeries -> TimeSeries
+groupTimeSeries dt timeSeries = timeSeries
+  { temperature        = group dt (temperature timeSeries)
+  , humidity           = group dt (humidity timeSeries)
+  , temperatureOutside = group dt (temperatureOutside timeSeries)
+  , humidityOutside    = group dt (temperature timeSeries)
+  }
+
+group
+  :: (Fractional a)
+  => T.NominalDiffTime
+  -> [Point T.UTCTime a]
+  -> [Point T.UTCTime a]
+group dt []       = []
+group dt (p : ps) = run (x p) [p] ps
+ where
+  run t []       []       = []
+  run t (b : bs) []       = [safeMean t b bs]
+  run t bL       (p : ps) = if T.diffUTCTime t (x p) > dt
+    then case bL of
+      []       -> run (x p) [p] ps
+      (b : bs) -> safeMean t b bs : run (T.addUTCTime dt t) [] (p : ps)
+    else run t (bL <> [p]) ps
+  safeMean t p ps =
+    Point (x p) ((y p + sum (y <$> ps)) / fromIntegral (1 + length ps))

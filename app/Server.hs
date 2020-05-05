@@ -38,7 +38,7 @@ turtleServer =
     :<|> streamData CS.currentState
  where
   timeSeriesServer =
-    TimeSeries.mkTimeSeriesService C.fetchStatusPeriodRepository
+    TimeSeries.mkGroupedTimeSeriesService $ TimeSeries.mkTimeSeriesService C.fetchStatusPeriodRepository
   turtleStatusServer = Status.mkPostStatusService C.insertStatusRepository
     :<|> Status.mkGetStatusService (C.mkFetchStatusRepository 10)
   monitorServer = Monitor.mkMonitorService CS.currentState
