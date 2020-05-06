@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Core.OpenWeatherMap.Model.Forecast
   ( Forecast(..)
   , ForecastResult(..)

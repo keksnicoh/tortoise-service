@@ -1,4 +1,10 @@
-module Core.State.Repository.State where
+module Core.State.Repository.State
+  ( UpdateState
+  , updateState
+  , GetState
+  , currentState
+  )
+where
 
 import           Core.State.Model.State         ( State )
 import           Core.State.Env                 ( HasState(..) )

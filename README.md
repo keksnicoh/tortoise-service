@@ -8,7 +8,7 @@ This is a Haskell practice project.
 
 ## environment
 
-All environment variables are prefixed with `TORTOISE_SERVICE_`, so `*_A` maps to `TORTOISE_SERVICE_A`
+All environment variables are prefixed with `TORTOISE_SERVICE`, so `*_A` maps to `TORTOISE_SERVICE_A`
 
 | ENV                     | Description                            | type    | required |
 |:------------------------|:---------------------------------------|:--------|:---------|

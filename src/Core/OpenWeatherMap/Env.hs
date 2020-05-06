@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+
 module Core.OpenWeatherMap.Env where
 
 import qualified Data.ByteString.Lazy.Internal as LBS

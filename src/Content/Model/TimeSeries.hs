@@ -10,10 +10,6 @@ module Content.Model.TimeSeries
   , groupTimeSeries
   )
 where
-import           Servant.Docs                   ( ToSample
-                                                , toSamples
-                                                , singleSample
-                                                )
 import qualified Data.Time                     as T
 import           GHC.Generics                   ( Generic )
 import           Data.Aeson
@@ -37,12 +33,6 @@ data TimeSeries
     , humidityOutside :: [Point T.UTCTime Humidity]
     } deriving(Generic, Eq, Show, ToJSON)
 
-time = read "2019-02-01 13:37:42"
-
-instance ToSample TimeSeries where
-  toSamples _ = singleSample
-    $ TimeSeries [Point time 1] [Point time 1] [Point time 1] [Point time 1]
-
 from :: [CDMS.Status] -> TimeSeries
 from series = TimeSeries (seriesOf CDMS.temperature)
                          (seriesOf CDMS.humidity)
@@ -60,6 +50,7 @@ groupTimeSeries dt timeSeries = timeSeries
   , humidityOutside    = group dt (temperature timeSeries)
   }
 
+-- todo specs
 group
   :: (Fractional a)
   => T.NominalDiffTime

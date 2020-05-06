@@ -1,6 +1,12 @@
-module Content.Service.MonitorService where
+module Content.Service.MonitorService
+  ( MonitorService
+  , mkMonitorService
+  )
+where
 
-import           Content.Model.Monitor          ( from, Monitor )
+import           Content.Model.Monitor          ( from
+                                                , Monitor
+                                                )
 import           Core.State.Repository.State    ( GetState )
 import           Core.Database.Model.Status     ( FetchStatusPeriodRepository )
 import           Data.Time                      ( addUTCTime

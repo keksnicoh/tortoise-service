@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+
 module Dependencies where
 
 import qualified Data.Time                     as T

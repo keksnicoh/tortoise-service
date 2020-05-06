@@ -1,5 +1,10 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Env where
+
+module Env
+  ( Env(..)
+  , ApplicationMode(..)
+  )
+where
 
 import           Database.PostgreSQL.Simple
 import           Core.Database.Env

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+
 module Core.OpenWeatherMap.Repository.Forecast where
 
 import           Core.OpenWeatherMap.Model.Forecast

@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE LambdaCase #-}
+
 module Content.Service.StatusService
   ( GetStatusService
   , PostStatusService

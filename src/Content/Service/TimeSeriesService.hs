@@ -1,4 +1,10 @@
-module Content.Service.TimeSeriesService where
+module Content.Service.TimeSeriesService
+  ( TimeSeriesService
+  , mkTimeSeriesService
+  , GroupedTimeSeriesService
+  , mkGroupedTimeSeriesService
+  )
+where
 
 import qualified Core.Database.Model.Status    as CStatus
 import qualified Content.Model.TimeSeries      as TimeSeries
