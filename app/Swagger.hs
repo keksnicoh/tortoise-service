@@ -11,7 +11,7 @@ import           Data.Proxy
 import           Network.Wai
 import           Servant.API
 import           Servant.Server
-import           ApiType
+import           Api
 import           Server
 import           Servant.Swagger
 import           Data.Swagger

@@ -3,7 +3,7 @@ module Server where
 
 import           Control.Monad.Reader
 import           Servant
-import           ApiType
+import           Api
 import           Env
 
 import qualified Content.Service.WebcamService as WebcamService

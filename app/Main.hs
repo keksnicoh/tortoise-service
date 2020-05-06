@@ -2,7 +2,6 @@ import qualified Network.Wai.Handler.Warp
 import qualified Env
 import qualified Server
 import qualified Swagger
-
 import qualified Bootstrap
 
 main :: IO ()

@@ -17,6 +17,7 @@ import           Network.HTTP.Client            ( httpLbs
 import           Network.HTTP.Client.TLS        ( tlsManagerSettings )
 import           System.Environment
 import           Data.ByteString.Internal      as BS
+import           Text.Read                      ( readMaybe )
 
 createEnvironment :: IO Env
 createEnvironment = do
@@ -31,21 +32,23 @@ createEnvironment = do
     _ ->
       error
         "invalid application mode, valid application modes are: development, staging, production"
-
+  port <- readMaybe <$> lookupEnvRequired "TORTOISE_SERVICE_PORT" >>= \case
+    Just port -> return port
+    Nothing   -> error "foo"
 
   putStrLn "initialize state..."
   state <- newIORef initialState
 
   putStrLn "connect to database..."
   dbConnection <- connectPostgreSQL $ BS.packChars tortoiseConnectionStr
-  -- host='localhost' user='postgres' password='docker' dbname='test'
+
   putStrLn "create OpenWeatherMap TlsManager"
   openWeatherMapTlsManager <- newManager tlsManagerSettings
 
   return $ Env
     { applicationMode   = applicationMode
     , dbConnection      = dbConnection
-    , port              = 8081
+    , port              = port
     , currentTime       = T.getCurrentTime
     , randomUUID        = nextRandom
     , state             = state
