@@ -2,7 +2,7 @@
 
 import           Test.Hspec
 import qualified Content.Model.StatusSpec
-import qualified Content.Model.TimeSeriesModelSpec
+import qualified Content.Model.TimeSeriesSpec
 import qualified Content.Model.MonitorSpec
 import qualified Content.Model.SwitchSpec
 import qualified Content.Service.WebcamSpec
@@ -43,8 +43,7 @@ main = do
     describe "Content.Service.Status"      Content.Service.StatusSpec.spec
     describe "Content.Service.TimeSeriesService"
              Content.Service.TimeSeriesServiceSpec.spec
-    describe "Content.Model.SwitchSpec"  Content.Model.SwitchSpec.spec
-    describe "Content.Model.MonitorSpec" Content.Model.MonitorSpec.spec
-    describe "Content.Model.TimeSeriesModelSpec"
-             Content.Model.TimeSeriesModelSpec.spec
-    describe "Content.Service.WebcamSpec" Content.Service.WebcamSpec.spec
+    describe "Content.Model.SwitchSpec"     Content.Model.SwitchSpec.spec
+    describe "Content.Model.MonitorSpec"    Content.Model.MonitorSpec.spec
+    describe "Content.Model.TimeSeriesSpec" Content.Model.TimeSeriesSpec.spec
+    describe "Content.Service.WebcamSpec"   Content.Service.WebcamSpec.spec

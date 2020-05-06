@@ -5,7 +5,7 @@ import Test.Hspec
 import Content.Service.TimeSeriesService
 import qualified Core.Database.Model.Status as C
 import TestUtil
-import Content.Model.TimeSeriesModel
+import Content.Model.TimeSeries
 import qualified Data.UUID as UUID
 import Data.Time
 import Control.Monad.Reader (ReaderT(runReaderT))

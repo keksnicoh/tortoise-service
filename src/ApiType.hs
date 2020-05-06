@@ -9,7 +9,7 @@ import           Data.Time
 import           Content.Monitor
 import           Content.Switch
 import           Content.Status
-import           Content.TimeSeries
+import           Content.Model.TimeSeries
 import           Servant.Multipart
 
 type SetStatusAPI = ReqBody '[JSON] StatusRequest :> Post '[JSON] Status

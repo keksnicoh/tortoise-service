@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Content.Model.TimeSeriesModel
+module Content.Model.TimeSeries
   ( TimeSeries(..)
   , Point(..)
   , from
