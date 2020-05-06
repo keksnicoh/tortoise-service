@@ -8,7 +8,8 @@ import           Servant
 import           ApiType
 import           Env
 
-import           Content.Webcam                as Webcam
+import qualified Content.Service.WebcamService as WebcamService
+import qualified Content.Handler.WebcamHandler as WebcamHandler
 import           Content.Status                as Status
 import           Content.Monitor               as Monitor
 import qualified Content.Service.TimeSeriesService
@@ -47,9 +48,10 @@ turtleServer =
                                            COR.forecastRepository
   controlServer = Switch.mkSwitchService CS.updateState
   webcamServer =
-    Webcam.mkWebcamHandler
-        (Webcam.mkPersistWebcam "webcam.jpg" CS.updateState LBS.writeFile)
-      :<|> Webcam.mkRequestWebcamService CS.updateState
+    WebcamHandler.mkWebcamHandler
+        (WebcamService.mkPersistWebcam "webcam.jpg" CS.updateState LBS.writeFile
+        )
+      :<|> WebcamService.mkRequestWebcamService CS.updateState
 
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy

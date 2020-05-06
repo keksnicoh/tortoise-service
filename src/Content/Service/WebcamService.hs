@@ -1,4 +1,10 @@
-module Content.Service.Webcam where
+module Content.Service.WebcamService
+  ( PersistWebcam
+  , mkPersistWebcam
+  , RequestWebcamService
+  , mkRequestWebcamService
+  )
+where
 
 import qualified Core.State.Model.State        as CState
 import qualified Dependencies                  as D

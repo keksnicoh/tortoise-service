@@ -5,7 +5,7 @@ import qualified Content.Model.StatusSpec
 import qualified Content.Model.TimeSeriesSpec
 import qualified Content.Model.MonitorSpec
 import qualified Content.Model.SwitchSpec
-import qualified Content.Service.WebcamSpec
+import qualified Content.Service.WebcamServiceSpec
 import qualified Content.Service.StatusSpec
 import qualified Content.Service.TimeSeriesServiceSpec
 import qualified Content.Model.StatusRequestSpec
@@ -46,4 +46,5 @@ main = do
     describe "Content.Model.SwitchSpec"     Content.Model.SwitchSpec.spec
     describe "Content.Model.MonitorSpec"    Content.Model.MonitorSpec.spec
     describe "Content.Model.TimeSeriesSpec" Content.Model.TimeSeriesSpec.spec
-    describe "Content.Service.WebcamSpec"   Content.Service.WebcamSpec.spec
+    describe "Content.Service.WebcamServiceSpec"
+             Content.Service.WebcamServiceSpec.spec

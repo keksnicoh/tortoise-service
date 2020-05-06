@@ -1,10 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Content.Handler.Webcam where
+
+module Content.Handler.WebcamHandler
+  ( mkWebcamHandler
+  )
+where
 
 import           Control.Monad.Reader
 import           Servant
 import           Env
-import           Content.Service.Webcam
+import           Content.Service.WebcamService
 import           Servant.Multipart
 
 mkWebcamHandler

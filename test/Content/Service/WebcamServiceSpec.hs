@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Content.Service.WebcamSpec where
+module Content.Service.WebcamServiceSpec where
 
 import qualified Core.State.Model.State as State (initialState, webcamDate)
-import Content.Service.Webcam (mkPersistWebcam)
+import Content.Service.WebcamService (mkPersistWebcam)
 import Data.Time (UTCTime)
 import Test.Hspec (shouldBe, Spec, describe, it)
 import Dependencies (HasAssetsPath(..), HasCurrentTime(..))
