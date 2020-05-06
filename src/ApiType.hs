@@ -33,10 +33,11 @@ type TimeSeriesAPI = GetTimeSeriesAPI
 type MonitorAPI    = GetMonitorAPI
 type ControlAPI    = "switch" :> PostSwitchAPI
 
-type TurtleAPI = 
-    "v1" :> ("status"  :> StatusAPI 
+type TurtleJsonAPI =     "v1" :> ("status"  :> StatusAPI 
         :<|> "series"  :> TimeSeriesAPI
         :<|> "monitor" :> MonitorAPI
-        :<|> "control" :> ControlAPI
-        :<|> "webcam"  :> WebcamAPI
-        :<|> "stream"  :> StreamAPI)
+        :<|> "control" :> ControlAPI)
+type TurtleWebcamAPI = "v1" :> (  "webcam"  :> WebcamAPI)
+type TurtleWebsocketsAPI = "v1" :> ("stream"  :> StreamAPI)
+
+type TurtleAPI = TurtleJsonAPI :<|> TurtleWebcamAPI :<|> TurtleWebsocketsAPI

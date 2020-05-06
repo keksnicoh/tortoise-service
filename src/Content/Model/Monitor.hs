@@ -17,7 +17,6 @@ import qualified Core.OpenWeatherMap.Model.Forecast
 import           Data.Aeson
 import           GHC.Generics                   ( Generic )
 import           Data.List                      ( genericLength )
-import           Data.Swagger
 import           Data.Time
 import           Data.Maybe                     ( catMaybes )
 import           Content.Model.Switch
@@ -28,7 +27,7 @@ data MonitorWeather
     , temperature :: Temperature
     , humidity :: Humidity
     , date :: UTCTime
-    } deriving (Show, Eq, Generic, ToSchema, ToJSON)
+    } deriving (Show, Eq, Generic, ToJSON)
 
 data Monitor
   = Monitor
@@ -42,7 +41,7 @@ data Monitor
     , weather :: [MonitorWeather]
     , webcamDate :: Maybe UTCTime
     }
-  deriving (Show, Eq, Generic, ToSchema, ToJSON)
+  deriving (Show, Eq, Generic, ToJSON)
 
 from :: UTCTime -> [CDB.Status] -> CST.State -> COM.ForecastResult -> Monitor
 from date status state forecast = Monitor

@@ -11,7 +11,6 @@ where
 
 import           Data.Aeson
 import           GHC.Generics                   ( Generic )
-import           Data.Swagger
 import qualified Core.State.Model.State        as CSM
 
 data Switch
@@ -19,7 +18,7 @@ data Switch
     { value :: Bool
     , controlled :: Bool
     }
-  deriving (Show, Eq, Generic, ToSchema, ToJSON, FromJSON)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 data SwitchRequest
   = SwitchRequest
