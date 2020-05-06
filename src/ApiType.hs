@@ -6,7 +6,7 @@ module ApiType where
 import           Servant.API
 import Servant.API.WebSocket
 import           Data.Time
-import           Content.Monitor
+import           Content.Model.Monitor
 import           Content.Model.Switch
 import           Content.Model.Status
 import           Content.Model.StatusRequest

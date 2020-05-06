@@ -1,4 +1,4 @@
-module Content.Service.Monitor where
+module Content.Service.MonitorService where
 
 import           Content.Model.Monitor          ( from, Monitor )
 import           Core.State.Repository.State    ( GetState )

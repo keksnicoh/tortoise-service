@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Server where
 
@@ -11,7 +9,8 @@ import           Env
 import qualified Content.Service.WebcamService as WebcamService
 import qualified Content.Handler.WebcamHandler as WebcamHandler
 import           Content.Service.StatusService as StatusService
-import           Content.Monitor               as Monitor
+import           Content.Service.MonitorService
+                                               as MonitorService
 import qualified Content.Service.TimeSeriesService
                                                as TimeSeriesService
 import qualified Content.Service.SwitchService as SwitchService
@@ -43,9 +42,10 @@ turtleServer =
     $ TimeSeriesService.mkTimeSeriesService C.fetchStatusPeriodRepository
   tatusServer = StatusService.mkPostStatusService C.insertStatusRepository
     :<|> StatusService.mkGetStatusService (C.mkFetchStatusRepository 10)
-  monitorServer = Monitor.mkMonitorService CS.currentState
-                                           C.fetchStatusPeriodRepository
-                                           COR.forecastRepository
+  monitorServer = MonitorService.mkMonitorService
+    CS.currentState
+    C.fetchStatusPeriodRepository
+    COR.forecastRepository
   controlServer = SwitchService.mkSwitchService CS.updateState
   webcamServer =
     WebcamHandler.mkWebcamHandler
