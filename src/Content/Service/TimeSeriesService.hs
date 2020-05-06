@@ -1,7 +1,7 @@
-module Content.Service.TimeSeries where
+module Content.Service.TimeSeriesService where
 
 import qualified Core.Database.Model.Status    as CStatus
-import qualified Content.Model.TimeSeries      as XTS
+import qualified Content.Model.TimeSeriesModel as TimeSeriesModel
 import qualified Dependencies                  as D
 import qualified Data.Time                     as T
 import           Control.Monad.Reader
@@ -10,13 +10,13 @@ import           Data.Maybe                     ( fromMaybe )
 type TimeSeriesService m
   =  Maybe T.UTCTime -- start time, default value: `end` - `defaultPeriod`
   -> Maybe T.UTCTime -- end time, default value: now
-  -> m XTS.TimeSeries
+  -> m TimeSeriesModel.TimeSeries
 
 type GroupedTimeSeriesService m
   =  Maybe T.UTCTime -- start time, see `TimeSeriesService m`
   -> Maybe T.UTCTime -- end time, see `TimeSeriesService m`
   -> Maybe T.NominalDiffTime
-  -> m XTS.TimeSeries
+  -> m TimeSeriesModel.TimeSeries
 
 defaultDt, defaultPeriod :: T.NominalDiffTime
 defaultDt = 60
@@ -36,9 +36,8 @@ mkTimeSeriesService fetchStatusPeriodRepository startOpt endOpt = do
     (Just start, Nothing ) -> liftIO $ (,) start <$> currentTime
     (Nothing   , Just end) -> return $ periodEnd end
     (Just start, Just end) -> return (start, end)
-  XTS.from <$> fetchStatusPeriodRepository (start, end)
- where
-  periodEnd time = (T.addUTCTime (-defaultPeriod) time, time)
+  TimeSeriesModel.from <$> fetchStatusPeriodRepository (start, end)
+  where periodEnd time = (T.addUTCTime (-defaultPeriod) time, time)
 
 -- |using a `TimeSeriesService m` this service returns the resukt convoluted
 mkGroupedTimeSeriesService
@@ -46,5 +45,5 @@ mkGroupedTimeSeriesService
 mkGroupedTimeSeriesService timeSeriesService startOpt endOpt dt = do
   timeSeries <- timeSeriesService startOpt endOpt
   let dt'     = fromMaybe defaultDt dt
-      grouped = XTS.group dt'
-  return (XTS.groupTimeSeries dt' timeSeries)
+      grouped = TimeSeriesModel.group dt'
+  return (TimeSeriesModel.groupTimeSeries dt' timeSeries)

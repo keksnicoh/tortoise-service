@@ -2,12 +2,12 @@
 
 import           Test.Hspec
 import qualified Content.Model.StatusSpec
-import qualified Content.Model.TimeSeriesSpec
+import qualified Content.Model.TimeSeriesModelSpec
 import qualified Content.Model.MonitorSpec
 import qualified Content.Model.SwitchSpec
 import qualified Content.Service.WebcamSpec
 import qualified Content.Service.StatusSpec
-import qualified Content.Service.TimeSeriesSpec
+import qualified Content.Service.TimeSeriesServiceSpec
 import qualified Content.Model.StatusRequestSpec
 import qualified Core.Database.Model.StatusSpec
 import qualified Core.State.Model.StateSpec
@@ -38,11 +38,13 @@ main = do
              Core.OpenWeatherMap.Model.ForecastSpec.spec
     describe "Core.OpenWeatherMap.Repository.Forecast"
              Core.OpenWeatherMap.Repository.ForecastSpec.spec
-    describe "Content.Model.Status"         Content.Model.StatusSpec.spec
-    describe "Content.Model.StatusRequest"  Content.Model.StatusRequestSpec.spec
-    describe "Content.Service.Status"       Content.Service.StatusSpec.spec
-    describe "Content.Service.TimeSeries"   Content.Service.TimeSeriesSpec.spec
-    describe "Content.Model.SwitchSpec"     Content.Model.SwitchSpec.spec
-    describe "Content.Model.MonitorSpec"    Content.Model.MonitorSpec.spec
-    describe "Content.Model.TimeSeriesSpec" Content.Model.TimeSeriesSpec.spec
-    describe "Content.Service.WebcamSpec"   Content.Service.WebcamSpec.spec
+    describe "Content.Model.Status"        Content.Model.StatusSpec.spec
+    describe "Content.Model.StatusRequest" Content.Model.StatusRequestSpec.spec
+    describe "Content.Service.Status"      Content.Service.StatusSpec.spec
+    describe "Content.Service.TimeSeriesService"
+             Content.Service.TimeSeriesServiceSpec.spec
+    describe "Content.Model.SwitchSpec"  Content.Model.SwitchSpec.spec
+    describe "Content.Model.MonitorSpec" Content.Model.MonitorSpec.spec
+    describe "Content.Model.TimeSeriesModelSpec"
+             Content.Model.TimeSeriesModelSpec.spec
+    describe "Content.Service.WebcamSpec" Content.Service.WebcamSpec.spec

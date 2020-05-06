@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Content.Model.TimeSeriesSpec where
+module Content.Model.TimeSeriesModelSpec where
 
 import qualified Core.Database.Model.Status as Status
-import Content.Model.TimeSeries
+import Content.Model.TimeSeriesModel
 import qualified Data.UUID
 import GHC.Exts
 import Data.Aeson

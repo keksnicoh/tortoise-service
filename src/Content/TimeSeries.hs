@@ -8,5 +8,5 @@ module Content.TimeSeries
   )
 where
 
-import           Content.Model.TimeSeries
-import           Content.Service.TimeSeries
+import           Content.Model.TimeSeriesModel
+import           Content.Service.TimeSeriesService

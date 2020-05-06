@@ -1,11 +1,11 @@
-module Content.Service.TimeSeriesSpec where
+module Content.Service.TimeSeriesServiceSpec where
 
 import Test.Hspec
 
-import Content.Service.TimeSeries
+import Content.Service.TimeSeriesService
 import qualified Core.Database.Model.Status as C
 import TestUtil
-import Content.Model.TimeSeries
+import Content.Model.TimeSeriesModel
 import qualified Data.UUID as UUID
 import Data.Time
 import Control.Monad.Reader (ReaderT(runReaderT))
