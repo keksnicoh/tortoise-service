@@ -1,6 +1,10 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Content.Service.Switch where
+module Content.Service.SwitchService
+  ( SwitchService
+  , mkSwitchService
+  )
+where
 
 import           Content.Model.Switch
 import           Core.State.Repository.State

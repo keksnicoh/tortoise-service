@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Content.Service.StatusSpec (spec) where
+module Content.Service.StatusServiceSpec (spec) where
 import Content.Model.Status 
-import Content.Service.Status
+import Content.Service.StatusService
 import Content.Model.StatusRequest
 import Control.Monad.Identity
 import Control.Exception

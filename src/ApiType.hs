@@ -7,8 +7,9 @@ import           Servant.API
 import Servant.API.WebSocket
 import           Data.Time
 import           Content.Monitor
-import           Content.Switch
-import           Content.Status
+import           Content.Model.Switch
+import           Content.Model.Status
+import           Content.Model.StatusRequest
 import           Content.Model.TimeSeries
 import           Servant.Multipart
 

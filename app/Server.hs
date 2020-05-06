@@ -10,11 +10,11 @@ import           Env
 
 import qualified Content.Service.WebcamService as WebcamService
 import qualified Content.Handler.WebcamHandler as WebcamHandler
-import           Content.Status                as Status
+import           Content.Service.StatusService as StatusService
 import           Content.Monitor               as Monitor
 import qualified Content.Service.TimeSeriesService
                                                as TimeSeriesService
-import           Content.Switch                as Switch
+import qualified Content.Service.SwitchService as SwitchService
 
 import qualified Core.Database.Model.Status    as C
 import qualified Core.State.Repository.State   as CS
@@ -32,7 +32,7 @@ import           Stream.Service.Action
 
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
 turtleServer =
-  turtleStatusServer
+  tatusServer
     :<|> timeSeriesServer
     :<|> monitorServer
     :<|> controlServer
@@ -41,12 +41,12 @@ turtleServer =
  where
   timeSeriesServer = TimeSeriesService.mkGroupedTimeSeriesService
     $ TimeSeriesService.mkTimeSeriesService C.fetchStatusPeriodRepository
-  turtleStatusServer = Status.mkPostStatusService C.insertStatusRepository
-    :<|> Status.mkGetStatusService (C.mkFetchStatusRepository 10)
+  tatusServer = StatusService.mkPostStatusService C.insertStatusRepository
+    :<|> StatusService.mkGetStatusService (C.mkFetchStatusRepository 10)
   monitorServer = Monitor.mkMonitorService CS.currentState
                                            C.fetchStatusPeriodRepository
                                            COR.forecastRepository
-  controlServer = Switch.mkSwitchService CS.updateState
+  controlServer = SwitchService.mkSwitchService CS.updateState
   webcamServer =
     WebcamHandler.mkWebcamHandler
         (WebcamService.mkPersistWebcam "webcam.jpg" CS.updateState LBS.writeFile

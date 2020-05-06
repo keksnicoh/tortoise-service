@@ -6,7 +6,7 @@ import qualified Content.Model.TimeSeriesSpec
 import qualified Content.Model.MonitorSpec
 import qualified Content.Model.SwitchSpec
 import qualified Content.Service.WebcamServiceSpec
-import qualified Content.Service.StatusSpec
+import qualified Content.Service.StatusServiceSpec
 import qualified Content.Service.TimeSeriesServiceSpec
 import qualified Content.Model.StatusRequestSpec
 import qualified Core.Database.Model.StatusSpec
@@ -29,19 +29,21 @@ main = do
   let fullSchema = [cleanDbSql, dbSchema]
   let env = Env { dbConnection = dbConnection, dbSchema = fullSchema }
   hspec $ do
-    describe "Core.Database.Model.Status"
+    describe "Core.Database.Model.StatusSpec"
       $ Core.Database.Model.StatusSpec.mkSpec env
-    describe "Core.State.Model.State"      Core.State.Repository.StateSpec.spec
-    describe "Core.State.Repository.State" Core.State.Model.StateSpec.spec
-    describe "Core.State.Env"              Core.State.EnvSpec.spec
-    describe "Core.OpenWeatherMap.Model.Forecast"
+    describe "Core.State.Model.StateSpec" Core.State.Repository.StateSpec.spec
+    describe "Core.State.Repository.StateSpec" Core.State.Model.StateSpec.spec
+    describe "Core.State.EnvSpec" Core.State.EnvSpec.spec
+    describe "Core.OpenWeatherMap.Model.ForecastSpec"
              Core.OpenWeatherMap.Model.ForecastSpec.spec
-    describe "Core.OpenWeatherMap.Repository.Forecast"
+    describe "Core.OpenWeatherMap.Repository.ForecastSpec"
              Core.OpenWeatherMap.Repository.ForecastSpec.spec
-    describe "Content.Model.Status"        Content.Model.StatusSpec.spec
-    describe "Content.Model.StatusRequest" Content.Model.StatusRequestSpec.spec
-    describe "Content.Service.Status"      Content.Service.StatusSpec.spec
-    describe "Content.Service.TimeSeriesService"
+    describe "Content.Model.StatusSpec" Content.Model.StatusSpec.spec
+    describe "Content.Model.StatusRequestSpec"
+             Content.Model.StatusRequestSpec.spec
+    describe "Content.Service.StatusServiceSpec"
+             Content.Service.StatusServiceSpec.spec
+    describe "Content.Service.TimeSeriesServiceSpec"
              Content.Service.TimeSeriesServiceSpec.spec
     describe "Content.Model.SwitchSpec"     Content.Model.SwitchSpec.spec
     describe "Content.Model.MonitorSpec"    Content.Model.MonitorSpec.spec
