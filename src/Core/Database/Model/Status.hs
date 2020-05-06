@@ -53,9 +53,13 @@ mkFetchStatusRepository
 mkFetchStatusRepository n = simpleQuery selectQuery (Only n)
  where
   selectQuery =
-    "SELECT status_id, temperature, humidity, temperature_outside, humidity_outside, created FROM public.status"
-      <> " ORDER BY \"created\" DESC"
-      <> " LIMIT ?"
+    ""
+      <> "SELECT "
+      <> "  status_id, temperature, humidity,"
+      <> "  temperature_outside, humidity_outside, created "
+      <> "FROM public.status "
+      <> "ORDER BY \"created\" DESC "
+      <> "LIMIT ?"
 
 -- | consructs a repository which inserts into storage
 insertStatusRepository
@@ -69,8 +73,12 @@ insertStatusRepository status = do
       _        -> return PkAlreadyExists
  where
   insertionQuery =
-    "INSERT INTO public.status (\"status_id\", \"temperature\", \"humidity\", \"temperature_outside\", \"humidity_outside\", \"created\")"
-      <> "VALUES (?, ?, ?, ?, ?, ?)"
+    ""
+      <> "INSERT INTO public.status ("
+      <> "  \"status_id\", \"temperature\", \"humidity\","
+      <> "  \"temperature_outside\", \"humidity_outside\","
+      <> "  \"created\""
+      <> ") VALUES (?, ?, ?, ?, ?, ?)"
   selectQuery =
     "SELECT COUNT(\"status_id\") FROM public.status WHERE \"status_id\"=?"
   countByStatusId conn uuid =
@@ -93,9 +101,13 @@ fetchStatusPeriodRepository
 fetchStatusPeriodRepository = simpleQuery selectQuery
  where
   selectQuery =
-    "SELECT status_id, temperature, humidity, temperature_outside, humidity_outside, created FROM public.status"
-      <> " WHERE created >= ? AND created <= ?"
-      <> " ORDER BY \"created\" DESC"
+    ""
+      <> "SELECT "
+      <> "  status_id, temperature, humidity, temperature_outside,"
+      <> "  humidity_outside, created "
+      <> "FROM public.status "
+      <> "WHERE created >= ? AND created <= ? "
+      <> "ORDER BY \"created\" DESC "
 
 simpleQuery
   :: (MonadIO m, MonadReader e m, HasDbConnection e, ToRow a, FromRow b)

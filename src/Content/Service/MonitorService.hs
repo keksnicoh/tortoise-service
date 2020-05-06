@@ -29,10 +29,4 @@ mkMonitorService getState fetchStatusPeriodRepository fetchForecastRepository =
     now    <- reader getCurrentTime >>= liftIO
     result <- fetchStatusPeriodRepository (period now)
     from now result <$> getState <*> fetchForecastRepository
-
-   --  >>= \case
-   --   [] -> return $ Left "no state available in past 5 minutes"
-   --   (x : xs) ->
-   --     Right <$> (from now (x :| xs) <$> getState <*> fetchForecastRepository)
-   -- return $ MR.from result
   where period time = (toStart time, time)

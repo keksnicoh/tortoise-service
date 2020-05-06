@@ -70,10 +70,21 @@ spec = do
   describe "mkGroupedTimeSeriesService" $ do
     let
       timeSeries = TimeSeries
-        [ Point (read "2019-02-03 13:11:22") 14, Point (read "2019-02-03 13:10:22") 13, Point (read "2019-02-03 13:05:22") 11 ]
-        [ Point (read "2019-02-03 13:05:04") 14, Point (read "2019-02-03 13:02:01") 1 ]
-        [ Point (read "2019-02-03 13:11:22") 22, Point (read "2019-02-03 13:05:22") 22, Point (read "2019-02-03 13:00:22") 11 ]
-        [ Point (read "2019-02-03 13:22:22") 14, Point (read "2019-02-03 13:10:22") 13, Point (read "2019-02-03 13:00:22") 23 ]
+        [ Point (read "2019-02-03 13:11:22") 14
+        , Point (read "2019-02-03 13:10:22") 13
+        , Point (read "2019-02-03 13:05:22") 11
+        ]
+        [ Point (read "2019-02-03 13:05:04") 14
+        , Point (read "2019-02-03 13:02:01") 1 
+        ]
+        [ Point (read "2019-02-03 13:11:22") 22
+        , Point (read "2019-02-03 13:05:22") 22
+        , Point (read "2019-02-03 13:00:22") 11
+        ]
+        [ Point (read "2019-02-03 13:22:22") 14
+        , Point (read "2019-02-03 13:10:22") 13
+        , Point (read "2019-02-03 13:00:22") 23
+        ]
       start        = Just $ read "2019-02-02 13:11:22"
       end          = Just $ read "2019-02-03 13:11:22"
       innerService = mockTwo (`shouldBe` start) (`shouldBe` end) timeSeries

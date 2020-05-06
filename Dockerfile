@@ -6,7 +6,7 @@ RUN apt-get -y install curl
 RUN curl -sSL https://get.haskellstack.org/ | sh
 RUN PATH=$PATH:/root/.local/bin
 
-RUN cd /var && git clone https://github.com/keksnicoh/turtle-service.git
-RUN cd /var/turtle-service && stack build -j1 
+RUN cd /var && git clone https://github.com/keksnicoh/tortoise-service.git
+RUN cd /var/tortoise-service && stack build -j1
 
-CMD cd /var/turtle-service && git pull && stack run
+CMD cd /var/tortoise-service && git pull && stack run

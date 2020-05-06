@@ -1,9 +1,9 @@
-name:                turtle-service
+name:                tortoise-service
 version:             0.1.0.0
 github:              "githubuser/turtle-service"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
+author:              "nicoh"
+maintainer:          "keksnicoh@gmail.com"
 copyright:           "2020 Author name here"
 
 extra-source-files:
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/turtle-service#readme>
+description:         Please see the README on GitHub at <https://github.com/keksnicoh/tortoise-service#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -62,7 +62,7 @@ executables:
     - -with-rtsopts=-N
     - -fwarn-unused-imports
     dependencies:
-    - turtle-service
+    - tortoise-service
 
 tests:
   turtle-service-test:
@@ -74,4 +74,4 @@ tests:
     - -with-rtsopts=-N
     - -fwarn-unused-imports
     dependencies:
-    - turtle-service
+    - tortoise-service

@@ -8,8 +8,8 @@ import           Env
 
 import qualified Content.Service.WebcamService as WebcamService
 import qualified Content.Handler.WebcamHandler as WebcamHandler
-import           Content.Service.StatusService as StatusService
-import           Content.Service.MonitorService
+import qualified Content.Service.StatusService as StatusService
+import qualified Content.Service.MonitorService
                                                as MonitorService
 import qualified Content.Service.TimeSeriesService
                                                as TimeSeriesService
@@ -27,15 +27,23 @@ turtleJsonServer :: ServerT TurtleJsonAPI (ReaderT Env Handler)
 turtleJsonServer =
   statusServer :<|> timeSeriesServer :<|> monitorServer :<|> controlServer
  where
-  timeSeriesServer = TimeSeriesService.mkGroupedTimeSeriesService
-    $ TimeSeriesService.mkTimeSeriesService C.fetchStatusPeriodRepository
-  statusServer = StatusService.mkPostStatusService C.insertStatusRepository
-    :<|> StatusService.mkGetStatusService (C.mkFetchStatusRepository 10)
-  monitorServer = MonitorService.mkMonitorService
+  statusServer     = postStatusService :<|> getStatusService
+  controlServer    = SwitchService.mkSwitchService CS.updateState
+  monitorServer    = monitorService
+  timeSeriesServer = groupedTimeSeriesService
+
+  groupedTimeSeriesService =
+    TimeSeriesService.mkGroupedTimeSeriesService timeSeriesService
+  monitorService = MonitorService.mkMonitorService
     CS.currentState
     C.fetchStatusPeriodRepository
     COR.forecastRepository
-  controlServer = SwitchService.mkSwitchService CS.updateState
+  timeSeriesService =
+    TimeSeriesService.mkTimeSeriesService C.fetchStatusPeriodRepository
+  postStatusService =
+    StatusService.mkPostStatusService C.insertStatusRepository
+  getStatusService =
+    StatusService.mkGetStatusService (C.mkFetchStatusRepository 10)
 
 turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
 turtleServer =

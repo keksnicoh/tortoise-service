@@ -1,8 +1,5 @@
 .stack-work/
-.idea
 *~
-webcam.jpg
 stack.yaml.lock
-turtle-service.cabal
+tortoise-service.cabal
 local-service.sh
-

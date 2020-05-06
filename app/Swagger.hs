@@ -45,9 +45,10 @@ turtleSwagger :: Swagger
 turtleSwagger = toSwagger turtleJsonAPI
 
 turtleSwaggerServer :: ServerT SwaggerTurtleApi (ReaderT Env Handler)
-turtleSwaggerServer =
-  turtleServer :<|> return turtleSwagger :<|> serveDirectoryWebApp
-    "swagger-ui-dist"
+turtleSwaggerServer = turtleServer :<|> swaggerServer :<|> directoryServer
+ where
+  swaggerServer   = return turtleSwagger
+  directoryServer = serveDirectoryWebApp "swagger-ui-dist"
 
 swaggerAPI :: Proxy SwaggerTurtleApi
 swaggerAPI = Proxy

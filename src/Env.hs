@@ -11,29 +11,38 @@ import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
 
-data ApplicationMode = Development | Staging | Production
+data ApplicationMode
+  = Development
+  | Staging
+  | Production
   deriving (Eq, Show)
 
-data Env = Env
-  { applicationMode   :: ApplicationMode
-  , dbConnection      :: Connection
-  , port              :: Int
-  , currentTime       :: IO T.UTCTime
-  , randomUUID        :: IO UUID
-  , state             :: IORef State
-  , openWeatherMapEnv :: OpenWeatherMapEnv
-  , assetsPath        :: FilePath
-  }
+data Env
+  = Env
+    { applicationMode :: ApplicationMode
+    , dbConnection :: Connection
+    , port :: Int
+    , currentTime :: IO T.UTCTime
+    , randomUUID :: IO UUID
+    , state :: IORef State
+    , openWeatherMapEnv :: OpenWeatherMapEnv
+    , assetsPath :: FilePath
+    }
 
 instance HasDbConnection Env where
   getDbConnection = dbConnection
+
 instance HasCurrentTime Env  where
   getCurrentTime = currentTime
+
 instance HasRandomUUID Env where
   getRandomUUID = randomUUID
+
 instance HasState Env where
   getState = state
+
 instance HasOpenWeatherMapEnv Env where
   getOpenWeatherMapEnv = openWeatherMapEnv
+
 instance HasAssetsPath Env where
   getAssetsPath = assetsPath
