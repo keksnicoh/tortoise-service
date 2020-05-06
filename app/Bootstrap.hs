@@ -25,7 +25,7 @@ createEnvironment = do
   tortoiseConnectionStr <- lookupEnvRequired "TORTOISE_SERVICE_PSQL"
   assetsPath <- lookupEnvRequired "TORTOISE_SERVICE_ASSETS_PATH"
   openWeatherMapApi <- lookupEnvRequired "TORTOISE_SERVICE_OPEN_WEATHER_MAP_API"
-  applicationMode <- lookupEnvRequired "TORTOISE_APPLICATION_MODE" >>= \case
+  applicationMode <- lookupEnvRequired "TORTOISE_SERVICE_APPLICATION_MODE" >>= \case
     "development" -> return Development
     "staging"     -> return Staging
     "production"  -> return Production

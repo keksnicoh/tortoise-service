@@ -1,7 +1,7 @@
 module Core.Database.Env where
 
 import           Database.PostgreSQL.Simple
-import Data.ByteString
+import           Data.ByteString
 
 class HasDbConnection a where
   getDbConnection :: a -> Connection

@@ -11,7 +11,7 @@ import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
 
-data ApplicationMode = Development | Staging | Production
+data ApplicationMode = Development | Staging | Production
   deriving (Eq, Show)
 
 data Env = Env
