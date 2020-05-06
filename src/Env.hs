@@ -11,8 +11,12 @@ import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
 
+data ApplicationMode = Development | Staging | Production
+  deriving (Eq, Show)
+
 data Env = Env
-  { dbConnection      :: Connection
+  { applicationMode   :: ApplicationMode
+  , dbConnection      :: Connection
   , port              :: Int
   , currentTime       :: IO T.UTCTime
   , randomUUID        :: IO UUID

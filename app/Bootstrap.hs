@@ -24,6 +24,14 @@ createEnvironment = do
   tortoiseConnectionStr <- lookupEnvRequired "TORTOISE_SERVICE_PSQL"
   assetsPath <- lookupEnvRequired "TORTOISE_SERVICE_ASSETS_PATH"
   openWeatherMapApi <- lookupEnvRequired "TORTOISE_SERVICE_OPEN_WEATHER_MAP_API"
+  applicationMode <- lookupEnvRequired "TORTOISE_APPLICATION_MODE" >>= \case
+    "development" -> return Development
+    "staging"     -> return Staging
+    "production"  -> return Production
+    _ ->
+      error
+        "invalid application mode, valid application modes are: development, staging, production"
+
 
   putStrLn "initialize state..."
   state <- newIORef initialState
@@ -35,7 +43,8 @@ createEnvironment = do
   openWeatherMapTlsManager <- newManager tlsManagerSettings
 
   return $ Env
-    { dbConnection      = dbConnection
+    { applicationMode   = applicationMode
+    , dbConnection      = dbConnection
     , port              = 8081
     , currentTime       = T.getCurrentTime
     , randomUUID        = nextRandom

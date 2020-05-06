@@ -6,8 +6,7 @@
 
 module Swagger where
 
-import qualified Bootstrap
-import Env
+import           Env
 import           Data.Proxy
 import           Network.Wai
 import           Servant.API
@@ -23,8 +22,7 @@ import qualified Content.Model.Status
 import qualified Content.Model.StatusRequest
 import qualified Content.Model.Monitor
 import qualified Data.Time                     as T
-import           Network.Wai.Handler.Warp       ( run )
-import Control.Monad.Reader (ReaderT(runReaderT))
+import           Control.Monad.Reader           ( ReaderT(runReaderT) )
 
 type DocsAPI = TurtleAPI :<|> Raw
 type SwaggerDistAPI = "swagger-ui" :> Raw
@@ -55,10 +53,6 @@ swaggerAPI :: Proxy SwaggerTurtleApi
 swaggerAPI = Proxy
 
 swaggerApp :: Env -> Application
-swaggerApp s = serve swaggerAPI $ hoistServer swaggerAPI (nt s) turtleSwaggerServer
+swaggerApp s = serve swaggerAPI
+  $ hoistServer swaggerAPI (nt s) turtleSwaggerServer
   where nt s x = runReaderT x s
-
-swaggerMain :: IO ()
-swaggerMain = do
-  env <- Bootstrap.createEnvironment
-  run 8081 (swaggerApp env)
