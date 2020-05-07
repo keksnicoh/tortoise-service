@@ -87,4 +87,4 @@ finally, the enduser experience looks like this (vuejs app)
 
 [raspberry pi project repo][1]
 
-![screenshot of raspberry pi](https://github.com/keksnicoh/tortoise-service/blob/master/resources/pi.jpg)
+![screenshot of raspberry pi](https://github.com/keksnicoh/tortoise-service/blob/master/resources/pi.png)
