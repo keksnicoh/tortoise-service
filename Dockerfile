@@ -9,4 +9,4 @@ RUN PATH=$PATH:/root/.local/bin
 RUN cd /var && git clone https://github.com/keksnicoh/tortoise-service.git
 RUN cd /var/tortoise-service && stack build -j1
 
-CMD cd /var/tortoise-service && git pull && stack run
+CMD cd /var/tortoise-service && rm *.cabal && git pull && stack run
