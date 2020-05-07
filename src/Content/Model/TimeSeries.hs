@@ -48,7 +48,7 @@ groupTimeSeries dt timeSeries = timeSeries
   { temperature        = group dt (temperature timeSeries)
   , humidity           = group dt (humidity timeSeries)
   , temperatureOutside = group dt (temperatureOutside timeSeries)
-  , humidityOutside    = group dt (temperature timeSeries)
+  , humidityOutside    = group dt (humidityOutside timeSeries)
   }
 
 -- todo specs
