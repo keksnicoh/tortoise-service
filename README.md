@@ -1,4 +1,4 @@
-# turtle-service
+# tortoise-service
 
 As we host tortoises on our balcony we must ensure that the thermal properties of their home classify habitable.
 Sensor data, [originating from a raspberry pi][1], allow monitoring of the terrarium.
