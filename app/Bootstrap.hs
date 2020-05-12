@@ -7,7 +7,6 @@ import           Database.PostgreSQL.Simple
 import           Env
 import           Data.UUID.V4                   ( nextRandom )
 import qualified Data.Time                     as T
-                                                ( getCurrentTime )
 import           GHC.IORef                      ( newIORef )
 import           Core.State.Model.State         ( initialState )
 import           Core.OpenWeatherMap.Env
@@ -19,6 +18,8 @@ import           System.Environment
 import           Data.ByteString.Internal      as BS
 import           Text.Read                      ( readMaybe )
 import           Data.Maybe                     ( fromMaybe )
+import           Automation.HouseState          ( HouseStateConfig(..) )
+import           Control.Concurrent             ( threadDelay )
 
 defaultPort :: String
 defaultPort = "8081"
@@ -32,6 +33,11 @@ createEnvironment = do
   openWeatherMapApi    <- requiredEnv (e "OPEN_WEATHER_MAP_API")
   applicationMode      <- envApplicationMode (e "APPLICATION_MODE")
   port                 <- envPort (e "PORT")
+  fsmEmergencyDelay    <- envReadOpt (e "FSM_EMERGENCY_DELAY") "900"
+  fsmSensorDelay       <- envReadOpt (e "FSM_SENSOR_DELAY") "60"
+  fsmMinTemperature    <- envReadOpt (e "FSM_MIN_TEMPERATURE") "15"
+  fsmMaxTemperature    <- envReadOpt (e "FSM_MAX_TEMPERATURE") "35"
+  fsmRetry             <- envReadOpt (e "FSM_RETRY") "5"
 
   putStrLn "initialize storages..."
   state                    <- newIORef initialState
@@ -39,7 +45,15 @@ createEnvironment = do
   openWeatherMapTlsManager <- newManager tlsManagerSettings
 
   return
-    $ let openWeatherMapEnv = OpenWeatherMapEnv
+    $ let houseStateConfig = HouseStateConfig
+            { delaySensorRead = fsmSensorDelay * 1000000
+            , minTemperature  = fsmMinTemperature
+            , maxTemperature  = fsmMaxTemperature
+            , retrySensorRead = fsmRetry
+            , maxStatusAge    = 600
+            , emergencyDelay  = threadDelay $ fsmEmergencyDelay * 1000000
+            }
+          openWeatherMapEnv = OpenWeatherMapEnv
             { managedHttpLbs = (`httpLbs` openWeatherMapTlsManager)
             , weatherUrl     = openWeatherMapApi
             }
@@ -51,6 +65,7 @@ createEnvironment = do
               , state             = state
               , openWeatherMapEnv = openWeatherMapEnv
               , assetsPath        = assetsPath
+              , houseStateConfig  = houseStateConfig
               }
  where
   e v = "TORTOISE_SERVICE_" <> v
@@ -60,6 +75,10 @@ createEnvironment = do
   envPort env = readMaybe . fromMaybe defaultPort <$> lookupEnv env >>= \case
     Just port -> return port
     Nothing   -> error $ errorPort env
+  envReadOpt env value =
+    readMaybe . fromMaybe value <$> lookupEnv env >>= \case
+      Just v  -> return v
+      Nothing -> error $ errorInt env
   envApplicationMode env = requiredEnv env >>= \case
     "development" -> return Development
     "staging"     -> return Staging
@@ -71,3 +90,4 @@ createEnvironment = do
       <> " not parsable, valid application modes are: "
       <> "development, staging, production"
   errorPort env = env <> " not parsable"
+  errorInt env = env <> " not parsable"

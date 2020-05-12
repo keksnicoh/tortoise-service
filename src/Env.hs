@@ -15,7 +15,7 @@ import           Core.State.Model.State
 import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
-
+import Automation.HouseState
 data ApplicationMode
   = Development
   | Staging
@@ -32,6 +32,7 @@ data Env
     , state :: IORef State
     , openWeatherMapEnv :: OpenWeatherMapEnv
     , assetsPath :: FilePath
+    , houseStateConfig :: HouseStateConfig
     }
 
 instance HasDbConnection Env where
@@ -51,3 +52,6 @@ instance HasOpenWeatherMapEnv Env where
 
 instance HasAssetsPath Env where
   getAssetsPath = assetsPath
+
+instance HasHouseStateConfig Env where
+  getHouseStateConfig = houseStateConfig

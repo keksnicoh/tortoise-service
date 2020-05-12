@@ -40,6 +40,7 @@ data Monitor
     , switchLight2 :: Maybe Switch
     , weather :: [MonitorWeather]
     , webcamDate :: Maybe UTCTime
+    , houseState :: String
     }
   deriving (Show, Eq, Generic, ToJSON)
 
@@ -54,6 +55,7 @@ from date status state forecast = Monitor
   (fromCoreSwitch <$> CST.light2 state)
   (fromForecast forecast)
   (CST.webcamDate state)
+  (show $ CST.houseMonitor state)
  where
   meanFrom getField = (safeMean . catMaybes) (getField <$> status)
   safeMean []            = Nothing

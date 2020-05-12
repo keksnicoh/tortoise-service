@@ -10,3 +10,5 @@ mockSingular expect result arg = liftIO $ expect arg >> return result
 mockTwo
   :: (MonadIO m) => (a -> Expectation) -> (b -> Expectation) -> c -> (a -> b -> m c)
 mockTwo e1 e2 result arg1 arg2 = liftIO $ e1 arg1 >> e2 arg2 >> return result
+
+a >>?= b = a >>= flip shouldBe b

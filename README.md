@@ -10,14 +10,20 @@ This is a Haskell practice project.
 
 All environment variables are prefixed with `TORTOISE_SERVICE`, so `*_A` maps to `TORTOISE_SERVICE_A`
 
-| ENV                     | Description                            | type    | required |
-|:------------------------|:---------------------------------------|:--------|:---------|
-| `*_PSQL`                | psql connnection string                | string  | __YES__  |
-| `*_ASSETS_PATH`         | path at which assets are located       | string  | __YES__  |
-| `*_OPEN_WEATHER_MAP_API`| open weather map forecast endpoint uri | string  | __YES__  |
-| `*_APPLICATION_MODE`    | development, staging, production       | string  | __YES__  |
-| `*_PORT`                | port, default `8081`                   | int     | __NO__   |
-| `*_PSQL_SPECS`          | specs psql connection string           | string  | __NO__   |
+| ENV                     | Description                                                 | type   | required |
+|:------------------------|:------------------------------------------------------------|:-------|:---------|
+| `*_PSQL`                | psql connnection string                                     | string | __YES__  |
+| `*_ASSETS_PATH`         | path at which assets are located                            | string | __YES__  |
+| `*_OPEN_WEATHER_MAP_API`| open weather map forecast endpoint uri                      | string | __YES__  |
+| `*_APPLICATION_MODE`    | development, staging, production                            | string | __YES__  |
+| `*_PORT`                | port, default `8081`                                        | int    | __NO__   |
+| `*_PSQL_SPECS`          | specs psql connection string                                | string | __NO__   |
+| `*_FSM_SENSOR_DELAY`    | delay in seconds to read HouseState sensor, default `60`.   | int    | __NO__   |
+| `*_FSM_MIN_TEMPERATURE` | a house temperature below triggers emergency, default `15`  | int    | __NO__   |
+| `*_FSM_MAX_TEMPERATURE` | a house temperature above triggers emergency, default `35`  | int    | __NO__   |
+| `*_FSM_RETRY`           | number of retries if sensor couold not be read, default `5` | int    | __NO__   |
+| `*_FSM_EMERGENCY_DELAY` | duration in seconds of emergency state, default `900`       | int    | __NO__   |
+
 
 example (`local-service.sh`)
 
@@ -28,6 +34,11 @@ export TORTOISE_SERVICE_ASSETS_PATH="./assets"
 export TORTOISE_SERVICE_OPEN_WEATHER_MAP_API="https://api.openweathermap.org/data/2.5/forecast?appid=<key>&lat=54&lon=10"
 export TORTOISE_SERVICE_PORT=1337
 export TORTOISE_SERVICE_PSQL_SPECS="host='localhost' user='postgres' password='docker' dbname='test_hspec'"
+export TORTOISE_SERVICE_FSM_EMERGENCY_DELAY=900
+export TORTOISE_SERVICE_FSM_SENSOR_DELAY=60
+export TORTOISE_SERVICE_FSM_MIN_TEMPERATURE=15
+export TORTOISE_SERVICE_FSM_MAX_TEMPERATURE=35
+export TORTOISE_SERVICE_FSM_RETRY=5
 ```
 
 ## features

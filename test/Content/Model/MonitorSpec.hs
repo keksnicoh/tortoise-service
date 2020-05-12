@@ -30,6 +30,7 @@ spec = do
           , weather =
             [ MonitorWeather "foo" 12 43 (read "2019-03-04 14:37:42") ]
           , webcamDate = Just (read "2020-03-04 13:37:42")
+          , houseState = "x"
           }
         expectedValue = Object $ fromList
           [ ("date", String "2019-03-04T13:37:42Z")
@@ -54,6 +55,7 @@ spec = do
               ]
             ])
           , ("webcamDate", String "2020-03-04T13:37:42Z")
+          , ("houseState", String "x")
           ]
       in toJSON monitor `shouldBe` expectedValue
     it "should serialize to JSON properly - minimal" $
@@ -68,6 +70,7 @@ spec = do
           , switchLight2 = Nothing
           , weather = []
           , webcamDate = Nothing
+          , houseState = "x"
           }
         expectedValue = Object $ fromList
           [ ("date", String "2019-03-04T13:37:42Z")
@@ -79,6 +82,7 @@ spec = do
           , ("switchLight2", Null)
           , ("weather", Array $ fromList [])
           , ("webcamDate", Null)
+          , ("houseState", "x")
           ]
       in toJSON monitor `shouldBe` expectedValue
 
@@ -95,6 +99,7 @@ spec = do
         , light2 = Nothing
         , webcamDate = Nothing
         , webcamRequest = Nothing
+        , houseMonitor = CSMState.MonitorOff
         }
       emptyForecast =  COMForecast.ForecastResult
         { cod = "200"
@@ -110,6 +115,7 @@ spec = do
         , switchLight2 = Nothing
         , weather = []
         , webcamDate = Nothing
+        , houseState = "MonitorOff"
         }
       minimalStatus = CDMStatus.Status
         { CDMStatus.statusId = Data.UUID.nil
@@ -205,6 +211,7 @@ spec = do
         , switchLight2 = Nothing
         , weather = [ MonitorWeather "unspecified weather" 2 7 (dates !! 3)]
         , webcamDate = Nothing
+        , houseState = "MonitorOff"
         }
     it "should take 6 weather items" $
       let
@@ -246,4 +253,5 @@ spec = do
           , MonitorWeather "unspecified weather" 22 7 (dates !! 3)
           ]
         , webcamDate = Nothing
+        , houseState = "MonitorOff"
         }

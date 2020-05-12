@@ -14,6 +14,7 @@ import qualified Core.Database.Model.StatusSpec
 import qualified Core.State.Model.StateSpec
 import qualified Core.State.EnvSpec
 import qualified Core.State.Repository.StateSpec
+import qualified Automation.HouseStateSpec
 import qualified Core.OpenWeatherMap.Model.ForecastSpec
 import qualified Core.OpenWeatherMap.Repository.ForecastSpec
 import           Database.PostgreSQL.Simple
@@ -51,6 +52,7 @@ main = do
     describe "Content.Model.SwitchSpec"     Content.Model.SwitchSpec.spec
     describe "Content.Model.MonitorSpec"    Content.Model.MonitorSpec.spec
     describe "Content.Model.TimeSeriesSpec" Content.Model.TimeSeriesSpec.spec
+    describe "Automation.HouseStateSpec"    Automation.HouseStateSpec.spec
     describe "Content.Service.WebcamServiceSpec"
              Content.Service.WebcamServiceSpec.spec
  where
