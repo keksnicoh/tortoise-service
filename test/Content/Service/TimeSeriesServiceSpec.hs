@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Content.Service.TimeSeriesServiceSpec where
 
 import Test.Hspec
@@ -8,7 +11,12 @@ import TestUtil
 import Content.Model.TimeSeries
 import qualified Data.UUID as UUID
 import Data.Time
-import Control.Monad.Reader (ReaderT(runReaderT))
+import Control.Monad.Reader (liftIO, ReaderT(runReaderT))
+import Dependencies 
+
+type RT = ReaderT (IO UTCTime) IO
+instance HasCurrentTime (IO UTCTime) RT where
+  getCurrentTime = liftIO
 
 spec :: Spec
 spec = do

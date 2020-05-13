@@ -7,7 +7,7 @@
 module Automation.HouseState where
 
 import           Control.Monad.IO.Class
-import           Control.Monad.Reader           ( reader
+import           Control.Monad.Reader           (join,  reader
                                                 , MonadReader
                                                 )
 import qualified Core.State.Env                as CSEnv
@@ -104,14 +104,14 @@ instance HasHouseStateConfig TestEnv where
     High, Low or Bound. If no temperature value is available, the 
     result of this function is Nothing. -}
 mkReadSensor
-  :: (MonadIO m, MonadReader e m, HasHouseStateConfig e, D.HasCurrentTime e)
+  :: (MonadIO m, MonadReader e m, HasHouseStateConfig e, D.HasCurrentTime e m)
   => CDMStatus.FetchStatusRepository m
   -> m (Maybe TemperatureSensor)
 mkReadSensor fetchStatusRepository = do
   minT         <- reader (minTemperature . getHouseStateConfig)
   maxT         <- reader (maxTemperature . getHouseStateConfig)
   maxStatusAge <- reader (maxStatusAge . getHouseStateConfig)
-  now          <- reader D.getCurrentTime >>= liftIO
+  now          <- join (reader D.getCurrentTime)
   let ageFilter s = T.diffUTCTime now (CDMStatus.created s) <= maxStatusAge
       interpret [] = Nothing
       interpret (x : _) | x < minT  = Just (Low x)

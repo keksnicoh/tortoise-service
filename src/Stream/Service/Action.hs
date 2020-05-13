@@ -13,10 +13,7 @@ import           Network.WebSockets             ( Connection
                                                 , sendTextData
                                                 , receiveData
                                                 )
-import           Control.Monad.Reader           ( reader
-                                                , MonadReader
-                                                , when
-                                                )
+import Control.Monad.Reader (reader, MonadReader, when, join)
 import           Data.Aeson                     ( ToJSON
                                                 , encode
                                                 )
@@ -59,33 +56,40 @@ receive :: (MonadState ActionEnv m, MonadIO m) => m LBS.ByteString
 receive = gets receiveC >>= liftIO
 
 streamData
-  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e)
+  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e m)
   => CS.GetState m
   -> Connection
   -> m ()
 streamData getCurrentState connection = do
   debug "new client"
-  currentTime  <- reader D.getCurrentTime >>= liftIO
+  currentTime  <- join (reader D.getCurrentTime)
   currentState <- getCurrentState
-  run ActionEnv { lastLightStateC    = fromState currentState
-                , pingTimeC          = currentTime
-                , lightTimeC         = addUTCTime (-300) currentTime
-                , dispatchTimeC      = currentTime
-                , dispatchStateC     = currentState
-                , webcamRequestDateC = currentTime
-                , sendC              = sendTextData connection
-                , receiveC           = receiveData connection
-                }
- where
-  run env = do
-    result <- liftIO $ runStateT actions env
-    case result of
-      (Continue, env) -> do
-        liftIO $ threadDelay 100000
-        currentState <- getCurrentState
-        currentTime  <- reader D.getCurrentTime >>= liftIO
-        run env { dispatchStateC = currentState, dispatchTimeC = currentTime }
-      (Exit, a) -> debug "exit..."
+  let env = ActionEnv { lastLightStateC    = fromState currentState
+                      , pingTimeC          = currentTime
+                      , lightTimeC         = addUTCTime (-300) currentTime
+                      , dispatchTimeC      = currentTime
+                      , dispatchStateC     = currentState
+                      , webcamRequestDateC = currentTime
+                      , sendC              = sendTextData connection
+                      , receiveC           = receiveData connection
+                      }
+  run getCurrentState env
+
+run
+  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e m)
+  => CS.GetState m
+  -> ActionEnv
+  -> m ()
+run getCurrentState env = do
+  result <- liftIO $ runStateT actions env
+  case result of
+    (Continue, env) -> do
+      liftIO $ threadDelay 100000
+      currentState <- getCurrentState
+      currentTime  <- join (reader D.getCurrentTime)
+      run getCurrentState
+          env { dispatchStateC = currentState, dispatchTimeC = currentTime }
+    (Exit, a) -> debug "exit..."
 
 actions :: StateT ActionEnv IO ActionResult
 actions = do

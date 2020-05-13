@@ -8,7 +8,8 @@ where
 
 import qualified Core.State.Model.State        as CState
 import qualified Dependencies                  as D
-import           Control.Monad.Reader           ( liftIO
+import           Control.Monad.Reader           ( join
+                                                , liftIO
                                                 , reader
                                                 , MonadIO
                                                 , MonadReader
@@ -26,23 +27,23 @@ type RequestWebcamService m = m ()
 -- todo: open the bytestring with something like juicepixel in order to ensure
 --       that it contains a valid jpeg.
 mkPersistWebcam
-  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e, D.HasAssetsPath e)
+  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e m, D.HasAssetsPath e)
   => FilePath
   -> CS.UpdateState m
   -> (FilePath -> LBS.ByteString -> IO ())
   -> PersistWebcam m
 mkPersistWebcam filePath updateState writeFile payload = do
   assetsPath <- reader D.getAssetsPath
-  now        <- reader D.getCurrentTime >>= liftIO
+  now        <- join (reader D.getCurrentTime)
   updateState (\s -> s { CState.webcamDate = Just now })
   liftIO $ writeFile (assetsPath <> filePath) payload
 
 -- |create an instance of (RequestWebcamService m) which modifies the `webcamRequest`
 -- state member to trigger webcam action (`Stream.Service.Action`)
 mkRequestWebcamService
-  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e)
+  :: (MonadReader e m, D.HasCurrentTime e m)
   => CS.UpdateState m
   -> RequestWebcamService m
 mkRequestWebcamService updateState = do
-  now <- reader D.getCurrentTime >>= liftIO
+  now <- join (reader D.getCurrentTime)
   updateState (\s -> s { CState.webcamRequest = Just now })

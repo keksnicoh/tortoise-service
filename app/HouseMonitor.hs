@@ -1,5 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
 module HouseMonitor where
 
 import           Control.Concurrent
@@ -9,7 +13,8 @@ import qualified Automation.Env                as AEnv
                                                 , HouseStateConfig(..)
                                                 )
 import           Core.FSM
-import           Control.Monad.Reader           ( MonadReader
+import           Control.Monad.Reader           ( ReaderT
+                                                , MonadReader
                                                 , runReaderT
                                                 , MonadIO(liftIO)
                                                 )
@@ -25,38 +30,35 @@ import qualified Core.State.Repository.State   as CSRState
                                                 )
 import qualified Dependencies                  as D
 import           Text.Printf
+import           Env
 
-start
-  :: ( MonadIO m
-     , D.HasCurrentTime e
-     , CDEnv.HasDbConnection e
-     , CSEnv.HasState e
-     , AEnv.HasHouseStateConfig e
-     )
-  => e
-  -> m ()
-start env = run $ createFSMHandlers env
+type HRT m = HouseT (ReaderT (Env m) m)
+
+
+instance D.HasCurrentTime (Env IO) (HRT IO) where
+  getCurrentTime a = undefined
+
+
+
+
+start :: MonadIO m => Env m -> IO ()
+start env = do
+  --let foerk = createFSMHandlers env
+  undefined
+
+
+run handlers env = runReaderT (runHouseT $ mkFSM handlers) env >>= \case
+  reason -> do
+    --debug reason
+    liftIO $ threadDelay $ 120 * 1000000
+    run handlers env
  where
-  run handlers = runReaderT (runHouseT $ mkFSM handlers) env >>= \case
-    reason -> do
-      debug reason
-      liftIO $ threadDelay $ 120 * 1000000
-      run handlers
-   where
-    debug r = liftIO $ putStrLn $ printf
-      "[Tortoise-Service] Terminating %s. Restart in 120 seconds..."
-      (show r)
+  debug r = liftIO $ putStrLn $ printf
+    "[Tortoise-Service] Terminating %s. Restart in 120 seconds..."
+    (show r)
 
-createFSMHandlers
-  :: ( AEnv.HasHouseStateConfig e
-     , D.HasCurrentTime e
-     , CDEnv.HasDbConnection e
-     , CSEnv.HasState e
-     , MonadIO m
-     , MonadReader e m
-     )
-  => e
-  -> FSMHandlers m
+
+
 createFSMHandlers config = FSMHandlers
   { readSensor = AHouseState.mkReadSensor (CDMStatus.mkFetchStatusRepository 5)
   , controlTick     = liftIO $ putStrLn "controlling :)"

@@ -32,14 +32,14 @@ defaultPeriod = 24 * 3600
    timeframe (start, end). If end is undefined, then end=now. If start is
    undefined, then start=end -1hour. -}
 mkTimeSeriesService
-  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e)
+  :: (Monad m, MonadReader e m, D.HasCurrentTime e m)
   => CStatus.FetchStatusPeriodRepository m
   -> TimeSeriesService m
 mkTimeSeriesService fetchStatusPeriodRepository startOpt endOpt = do
-  currentTime  <- reader D.getCurrentTime
+  getCurrentTime  <- reader D.getCurrentTime
   (start, end) <- case (startOpt, endOpt) of
-    (Nothing   , Nothing ) -> liftIO $ periodEnd <$> currentTime
-    (Just start, Nothing ) -> liftIO $ (,) start <$> currentTime
+    (Nothing   , Nothing ) -> periodEnd <$> getCurrentTime
+    (Just start, Nothing ) -> (,) start <$> getCurrentTime
     (Nothing   , Just end) -> return $ periodEnd end
     (Just start, Just end) -> return (start, end)
   TimeSeries.from <$> fetchStatusPeriodRepository (start, end)

@@ -20,12 +20,13 @@ import           Text.Read                      ( readMaybe )
 import           Data.Maybe                     ( fromMaybe )
 import           Automation.Env                 ( HouseStateConfig(..) )
 import           Control.Concurrent             ( threadDelay )
+import           Control.Monad.Reader           ( MonadIO(liftIO) )
 
 defaultPort :: String
 defaultPort = "8081"
 
 -- |creates an environment by reading system environment.
-createEnvironment :: IO Env
+createEnvironment :: MonadIO m => IO (Env m)
 createEnvironment = do
   putStrLn "read environment..."
   psqlConnectionString <- envPSQL (e "PSQL")
@@ -60,12 +61,13 @@ createEnvironment = do
       in  Env { applicationMode   = applicationMode
               , dbConnection      = dbConnection
               , port              = port
-              , currentTime       = T.getCurrentTime
-              , randomUUID        = nextRandom
+              , currentTime       = liftIO T.getCurrentTime
+              , randomUUID        = liftIO nextRandom
               , state             = state
               , openWeatherMapEnv = openWeatherMapEnv
               , assetsPath        = assetsPath
               , houseStateConfig  = houseStateConfig
+              , logger            = liftIO . putStrLn
               }
  where
   e v = "TORTOISE_SERVICE_" <> v

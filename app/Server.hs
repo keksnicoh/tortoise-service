@@ -23,7 +23,7 @@ import qualified Data.ByteString.Lazy          as LBS
 import           Network.Wai                    ( Application )
 import           Stream.Service.Action
 
-turtleJsonServer :: ServerT TurtleJsonAPI (ReaderT Env Handler)
+turtleJsonServer :: ServerT TurtleJsonAPI (ReaderT (Env Handler) Handler)
 turtleJsonServer =
   statusServer :<|> timeSeriesServer :<|> monitorServer :<|> controlServer
  where
@@ -45,7 +45,7 @@ turtleJsonServer =
   getStatusService =
     StatusService.mkGetStatusService (C.mkFetchStatusRepository 10)
 
-turtleServer :: ServerT TurtleAPI (ReaderT Env Handler)
+turtleServer :: ServerT TurtleAPI (ReaderT (Env Handler) Handler)
 turtleServer =
   turtleJsonServer :<|> webcamServer :<|> streamData CS.currentState
  where
@@ -67,6 +67,6 @@ turtleWebsocketsAPI = Proxy
 turtleAPI :: Proxy TurtleAPI
 turtleAPI = Proxy
 
-turtleApp :: Env -> Application
+turtleApp :: Env Handler -> Application
 turtleApp s = serve turtleAPI $ hoistServer turtleAPI (nt s) turtleServer
   where nt s x = runReaderT x s

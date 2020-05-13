@@ -1,8 +1,12 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
 
 module Env
   ( Env(..)
   , ApplicationMode(..)
+  , RT
   )
 where
 
@@ -16,6 +20,8 @@ import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
 import qualified Automation.Env as AEnv
+import Control.Monad.Reader (ReaderT)
+import Servant
 
 data ApplicationMode
   = Development
@@ -23,36 +29,42 @@ data ApplicationMode
   | Production
   deriving (Eq, Show)
 
-data Env
+type RT m = ReaderT (Env m) m
+
+data Env m
   = Env
     { applicationMode :: ApplicationMode
     , dbConnection :: Connection
     , port :: Int
-    , currentTime :: IO T.UTCTime
-    , randomUUID :: IO UUID
+    , currentTime :: RT m T.UTCTime
+    , randomUUID :: RT m UUID
     , state :: IORef State
     , openWeatherMapEnv :: OpenWeatherMapEnv
     , assetsPath :: FilePath
     , houseStateConfig :: AEnv.HouseStateConfig
+    , logger :: String -> RT m ()
     }
 
-instance HasDbConnection Env where
+instance HasDbConnection (Env m) where
   getDbConnection = dbConnection
 
-instance HasCurrentTime Env  where
+instance HasCurrentTime (Env Handler) (RT Handler)  where
   getCurrentTime = currentTime
 
-instance HasRandomUUID Env where
+instance HasRandomUUID (Env Handler) (RT Handler) where
   getRandomUUID = randomUUID
 
-instance HasState Env where
+instance HasState (Env m) where
   getState = state
 
-instance HasOpenWeatherMapEnv Env where
+instance HasOpenWeatherMapEnv (Env m) where
   getOpenWeatherMapEnv = openWeatherMapEnv
 
-instance HasAssetsPath Env where
+instance HasAssetsPath (Env m) where
   getAssetsPath = assetsPath
 
-instance AEnv.HasHouseStateConfig Env where
+instance AEnv.HasHouseStateConfig (Env m) where
   getHouseStateConfig = houseStateConfig
+
+instance HasLogger (Env Handler) (RT Handler) where
+  getLogger = logger

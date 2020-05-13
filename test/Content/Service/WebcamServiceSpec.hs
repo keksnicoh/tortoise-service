@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Content.Service.WebcamServiceSpec where
@@ -10,9 +12,10 @@ import Dependencies (HasAssetsPath(..), HasCurrentTime(..))
 import Data.IORef (newIORef, modifyIORef, readIORef)
 import Control.Monad.Reader (liftIO, ReaderT(runReaderT))
 
-data TestEnv = TestEnv (IO UTCTime) FilePath
+type RT = ReaderT TestEnv IO
+data TestEnv = TestEnv (RT UTCTime) FilePath
 
-instance HasCurrentTime TestEnv where
+instance HasCurrentTime TestEnv RT where
   getCurrentTime (TestEnv t _) = t
 
 instance HasAssetsPath TestEnv where
@@ -27,7 +30,7 @@ spec =
       ioRef <- newIORef []
       let
         now         = read "2019-03-04 13:37:42"
-        currentTime = return now :: IO UTCTime
+        currentTime = return now 
         assetsPath  = "a/b/"
         env         = TestEnv currentTime assetsPath
         mockedUpdateState f = do

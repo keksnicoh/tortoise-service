@@ -12,9 +12,9 @@ import           Content.Service.WebcamService
 import           Servant.Multipart
 
 mkWebcamHandler
-  :: PersistWebcam (ReaderT Env Handler)
+  :: PersistWebcam (ReaderT (Env Handler) Handler)
   -> MultipartData Mem
-  -> ReaderT Env Handler ()
+  -> ReaderT (Env Handler) Handler ()
 mkWebcamHandler persistWebcam multipartData = do
   case files multipartData of
     [FileData "webcam" "webcam.jpg" "image/jpg" payload] ->

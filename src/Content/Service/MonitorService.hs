@@ -13,8 +13,7 @@ import           Data.Time                      ( addUTCTime
                                                 , UTCTime
                                                 )
 import           Dependencies
-import           Control.Monad.Reader           ( liftIO
-                                                , MonadIO
+import           Control.Monad.Reader           ( join
                                                 , reader
                                                 , MonadReader
                                                 )
@@ -25,14 +24,14 @@ toStart :: UTCTime -> UTCTime
 toStart = addUTCTime (-300)
 
 mkMonitorService
-  :: (MonadIO m, MonadReader e m, HasCurrentTime e)
+  :: (Monad m, MonadReader e m, HasCurrentTime e m, HasLogger e m)
   => GetState m
   -> FetchStatusPeriodRepository m
   -> FetchForecastRepository m
   -> MonitorService m
 mkMonitorService getState fetchStatusPeriodRepository fetchForecastRepository =
   do
-    now    <- reader getCurrentTime >>= liftIO
+    now    <- join (reader getCurrentTime)
     result <- fetchStatusPeriodRepository (period now)
     from now result <$> getState <*> fetchForecastRepository
   where period time = (toStart time, time)

@@ -35,18 +35,18 @@ data PostStatusServiceException = UUIDCollisionException
 
 -- |constructs a service which persists a status
 mkPostStatusService
-  :: ( MonadIO m
+  :: ( Monad m
      , MonadThrow m
      , MonadReader e m
-     , HasCurrentTime e
-     , HasRandomUUID e
+     , HasCurrentTime e m
+     , HasRandomUUID e m
      )
   => C.InsertStatusRepository m
   -> PostStatusService m
 mkPostStatusService insertStatusRepository request = do
-  currentTime <- reader getCurrentTime
-  randomUUID  <- reader getRandomUUID
-  status      <- liftIO $ toStatus request <$> randomUUID <*> currentTime
+  getCurrentTime <- reader getCurrentTime
+  getRandomUUID  <- reader getRandomUUID
+  status         <- toStatus request <$> getRandomUUID <*> getCurrentTime
   insertStatusRepository status >>= \case
     C.Success         -> return (from status)
     C.PkAlreadyExists -> throwM UUIDCollisionException

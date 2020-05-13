@@ -1,3 +1,7 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Automation.HouseStateSpec where
 
 import           TestUtil
@@ -18,6 +22,8 @@ import           Data.IORef                     ( newIORef
                                                 )
 import           Automation.Env
 
+type RT = ReaderT MkReadSensorEnv IO
+
 data MkReadSensorEnv
   = MkReadSensorEnv
     HouseStateConfig
@@ -26,8 +32,8 @@ data MkReadSensorEnv
 instance HasHouseStateConfig MkReadSensorEnv where
   getHouseStateConfig (MkReadSensorEnv c _) = c
 
-instance D.HasCurrentTime MkReadSensorEnv where
-  getCurrentTime (MkReadSensorEnv _ t) = t
+instance D.HasCurrentTime MkReadSensorEnv RT where
+  getCurrentTime (MkReadSensorEnv _ t) = liftIO t
 
 uuid = read "550e8400-e29b-11d4-a716-446655440000"
 

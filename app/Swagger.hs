@@ -44,7 +44,7 @@ api = Proxy
 turtleSwagger :: Swagger
 turtleSwagger = toSwagger turtleJsonAPI
 
-turtleSwaggerServer :: ServerT SwaggerTurtleApi (ReaderT Env Handler)
+turtleSwaggerServer :: ServerT SwaggerTurtleApi (ReaderT (Env Handler) Handler)
 turtleSwaggerServer = turtleServer :<|> swaggerServer :<|> directoryServer
  where
   swaggerServer   = return turtleSwagger
@@ -53,7 +53,7 @@ turtleSwaggerServer = turtleServer :<|> swaggerServer :<|> directoryServer
 swaggerAPI :: Proxy SwaggerTurtleApi
 swaggerAPI = Proxy
 
-swaggerApp :: Env -> Application
+swaggerApp :: Env Handler -> Application
 swaggerApp s = serve swaggerAPI
   $ hoistServer swaggerAPI (nt s) turtleSwaggerServer
   where nt s x = runReaderT x s

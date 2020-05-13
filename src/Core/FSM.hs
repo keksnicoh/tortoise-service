@@ -8,6 +8,10 @@
    "Finite-State Machines, Part 2: Explicit Typed State Transitions"
    by Oskar Wickström.
    https://wickstrom.tech/finite-state-machines/2017/11/19/finite-state-machines-part-2.html
+
+   todo:
+   - how to avoid manual passing of handlers in mkFSM functions?
+   - can we avoid the typeclass?
 -}
 module Core.FSM
   ( mkFSM
