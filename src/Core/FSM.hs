@@ -16,17 +16,21 @@ module Core.FSM
   , TemperatureSensor(..)
   , FSMHandlers(..)
   , TransitionTerminating(..)
-  , TransitionControlled(..)
+  , HasSensorDataEvent(..)
+  , TemperatureBoundEvent(..)
+  , HasFSMNRetry(..)
   , Initializing
-  , Controlled
+  , HasSensorData
+  , TemperatureBound
+  , RetrySensor
   , Emergency
   , Terminating
-  , NoSensorData
   )
 where
 
 import           Control.Monad.IO.Class         ( MonadIO )
-import           Control.Monad.Reader           ( MonadReader
+import           Control.Monad.Reader           ( reader
+                                                , MonadReader
                                                 , (>=>)
                                                 )
 import           Core.Internal                  ( Temperature )
@@ -43,39 +47,46 @@ data TemperatureSensor
 
 {- phantom types representing the possible states of the FSM -}
 data Initializing deriving (Show, Eq)
-data Controlled deriving (Show, Eq)
+data HasSensorData deriving (Show, Eq)
+data TemperatureBound deriving (Show, Eq)
+data RetrySensor deriving (Show, Eq)
 data Emergency deriving (Show, Eq)
 data Terminating deriving (Show, Eq)
-data NoSensorData deriving (Show, Eq)
 
 {- valid states are modeled by a type-class approach using phantom types defined above
-                              ................
-                              : NoSensorData :----------------------.
-                              :.....x........:                      | terminate
-                       noSensorData |        __                     | SensorUnavailable
-                                    |       |__| controlled         |
-         controlled SensorRecovered |       |    SensorVerified     |
- ................                  ..x......x....         ..........x....
- : Initializing :------------------x Controlled :         : Terminating x-.
- :..............: controlled       :.x..........:         :...........x.: |
-        |         StartControlLoop   | controlled                     |   |
-        |                            | EmergencyResolved              |   |
-        |                  emergency |                                |   |
-        |                     .......x.....                           |   |
-        |                     : Emergency :___________________________|   |
-        |                     :...........:    terminate                  |
-        |                                      EmergencyNotResolved       |
-        |_________________________________________________________________|
-                               terminate SensorNotInitialized
+
+                                ................
+                                : Initializing :----X terminate SensorNotInitialized
+                                :..............:
+                                     |                                     X terminate
+                                     |                                     | SensorNotInitialized
+          sensorRead                 | sensorRead SensorReadable           |
+          RecoveredSensorData   .....x...........                       ............
+            .-------------------x HasSensorData :-----------------------x Emergeny :
+            |                   :..........x....:                       :..........:
+            |                        |     |                               |
+            |                        |     | sensorRead NewSensorData      |
+            |                        |     |                               |
+            |               verified |     |                               |
+            |    TemperatureVerified |     |                               |
+        ...............         .....x..............                       |
+     .--x RetrySensor x---------: TemperatureBound x-----------------------
+     |  :.............:         :..................:   verified TemperatureRecovered
+     |      |     |  retry LostSensor
+      ------      |
+  retry           |
+  RetrySensor     X terminate SensorUnavailable
+
 -}
 class HouseFSM m where
   type State m :: * -> *
 
-  initializing     ::                                                m (State m Initializing)
-  controlled       :: TransitionControlled m -> TemperatureSensor -> m (State m Controlled)
-  emergency        :: State m Controlled     -> TemperatureSensor -> m (State m Emergency)
-  noSensorData     :: State m Controlled                          -> m (State m NoSensorData)
-  terminate        :: TransitionTerminating m                     -> m (State m Terminating)
+  initialize   ::                                                 m (State m Initializing)
+  sensorRead   :: TemperatureSensor -> HasSensorDataEvent m    -> m (State m HasSensorData)
+  verified     ::                      TemperatureBoundEvent m -> m (State m TemperatureBound)
+  retry        ::                      RetrySensorEvent m      -> m (State m RetrySensor)
+  emergency    ::                      State m HasSensorData   -> m (State m Emergency)
+  terminate    ::                      TransitionTerminating m -> m (State m Terminating)
 
 -- @todo maybe this should not be defined in this package?
 -- |MTL style transformer
@@ -88,17 +99,26 @@ newtype HouseT m a = HouseT
              , MonadReader e
              )
 
--- |possible transitions into `Controlled` state
-data TransitionControlled m
-  = StartControlLoop (State m Initializing)
-  | SensorVerified (State m Controlled)
-  | EmergencyResolved (State m Emergency)
-  | SensorRecovered (State m NoSensorData)
+-- |possible transitions into `RetrySensor` state
+data RetrySensorEvent m
+  = LostSensor (State m TemperatureBound)
+  | Retry (State m RetrySensor)
+
+-- |possible transitions into `HasSensorDataEvent` state
+data HasSensorDataEvent m
+  = SensorReadable (State m Initializing)
+  | NewSensorData (State m TemperatureBound)
+  | RecoveredSensorData (State m RetrySensor)
+
+-- |possible transitions into `TemperatureBound` state
+data TemperatureBoundEvent m
+  = TemperatureVerified (State m HasSensorData)
+  | TemperatureRecovered (State m Emergency)
 
 -- |possible transitions into `Terminating` state
 data TransitionTerminating m
   = EmergencyNotResolved (State m Emergency)
-  | SensorUnavailable (State m NoSensorData)
+  | SensorUnavailable (State m RetrySensor)
   | SensorNotInitialized (State m Initializing)
 
 -- |contains handlers which are invoked in different stages of the state machine.
@@ -108,53 +128,92 @@ data FSMHandlers m
   , controlTick :: m ()
   , emergencyAction :: TemperatureSensor -> m ()
   , delay :: m ()
-  , nRetry :: Int
   }
 
-mkFSM :: (HouseFSM m, Monad m) => FSMHandlers m -> m (State m Terminating)
-mkFSM handlers = initializing >>= start
+class HasFSMNRetry a where
+  getFSMNRetry :: a -> Int
+
+mkFSM
+  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  => FSMHandlers m
+  -> m (State m Terminating)
+mkFSM h = initialize >>= start h
+
+-- |starts finite state machine by reading sensor data. If no sensor data
+-- is available, then the fsm is terminated.
+start
+  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  => FSMHandlers m
+  -> State m Initializing
+  -> m (State m Terminating)
+start h state = do
+  readSensor h >>= \case
+    Nothing -> onError state
+    Just sd -> onSuccess sd state
  where
-  -- |main loop, if the temperature is bound, then the controlStep is executed.
-  -- Otheriwse a transition into emergency state occurs.
-  controlLoop sd transition = controlled transition sd >>= case sd of
-    (Bound _) -> controlStep
-    sd        -> flip emergency sd >=> emergencyProgram sd
+  onError = terminate . SensorNotInitialized
+  onSuccess sd = sensorRead sd . SensorReadable >=> verifySensorData h sd
 
-  -- |starts finite state machine by reading sensor data. If no sensor data
-  -- is available, then the fsm is terminated.
-  start = process action onError onSuccess
-   where
-    action  = readSensor handlers
-    onError = terminate . SensorNotInitialized
-    onSuccess sd = controlLoop sd . StartControlLoop
+-- |verifies that the temperature is bound (verified) or unbound (emergency).
+verifySensorData
+  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  => FSMHandlers m
+  -> TemperatureSensor
+  -> State m HasSensorData
+  -> m (State m Terminating)
+verifySensorData h (Bound _) = verified . TemperatureVerified >=> bound h
+verifySensorData h sd        = emergency >=> emergencyProgram h sd
 
-  -- |we perform a controlTick within each step, read delayed sensor data and
-  -- either goto the beginning of the controlLoop or retry.
-  controlStep state = do
-    controlTick handlers
-    process action onError onSuccess state
-   where
-    action  = delay handlers >> readSensor handlers
-    onError = noSensorData >=> retryReadSensor (nRetry handlers)
-    onSuccess sd = controlLoop sd . SensorVerified
+-- |temperature is bound, controlTick can be executed. After delay, new sensor
+-- data is read which either leads to a transition back into HasSensorData or
+-- RetrySensor. 
+bound
+  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  => FSMHandlers m
+  -> State m TemperatureBound
+  -> m (State m Terminating)
+bound h state = do
+  controlTick h
+  delay h
+  readSensor h >>= \case
+    Nothing -> onError state
+    Just sd -> onSuccess sd state
+ where
+  onError state = do
+    newState <- retry (LostSensor state)
+    nRetry   <- reader getFSMNRetry
+    retryReadSensor h nRetry newState
+  onSuccess sd = sensorRead sd . NewSensorData >=> verifySensorData h sd
 
-  -- |if n is a positive number, read the delayed sensor data and either
-  -- goto the beginning of the control loop or repeat this procedure, depending
-  -- on whether sensor data exists.
-  retryReadSensor n | n < 1     = terminate . SensorUnavailable
-                    | otherwise = process action onError onSuccess
-   where
-    action  = delay handlers >> readSensor handlers
-    onError = retryReadSensor (n - 1)
-    onSuccess sd = controlLoop sd . SensorRecovered
+-- |when sensor data could not be read, n retries are performed. If temperature
+-- data is available again, then a transition into HasSensorData is performed.
+retryReadSensor
+  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  => FSMHandlers m
+  -> Int
+  -> State m RetrySensor
+  -> m (State m Terminating)
+retryReadSensor h n state
+  | n < 1 = terminate (SensorUnavailable state)
+  | otherwise = do
+    delay h
+    readSensor h >>= \case
+      Nothing -> retry (Retry state) >>= retryReadSensor h (n - 1)
+      Just sd ->
+        sensorRead sd (RecoveredSensorData state) >>= verifySensorData h sd
 
-  -- |when the temperture is out of bounds, this procedure is executed
-  emergencyProgram sd state =
-    emergencyAction handlers sd >> readSensor handlers >>= \case
-      Just sd@(Bound _) -> controlLoop sd (EmergencyResolved state)
-      sensor            -> terminate (EmergencyNotResolved state)
-
--- | helper function to process sensor data
-process read onError onSuccess state = read >>= \case
-  Nothing -> onError state
-  Just sd -> onSuccess sd state
+-- |when the temperture is out of bounds, this procedure is executed
+emergencyProgram
+  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  => FSMHandlers m
+  -> TemperatureSensor
+  -> State m Emergency
+  -> m (State m Terminating)
+emergencyProgram h sd state = do
+  emergencyAction h sd
+  readSensor h >>= \case
+    Just sd@(Bound _) -> onSuccess state
+    sensor            -> onError state
+ where
+  onError   = terminate . EmergencyNotResolved
+  onSuccess = verified . TemperatureRecovered >=> bound h

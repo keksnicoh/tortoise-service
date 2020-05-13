@@ -15,7 +15,7 @@ data Switch a
 
 data HouseMonitor
   = MonitorOK
-  | MonitorIdle
+  | MonitorSensorRetry
   | MonitorEmergency
   | MonitorOff
   deriving (Eq, Show)

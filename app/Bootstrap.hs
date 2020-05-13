@@ -18,7 +18,7 @@ import           System.Environment
 import           Data.ByteString.Internal      as BS
 import           Text.Read                      ( readMaybe )
 import           Data.Maybe                     ( fromMaybe )
-import           Automation.HouseState          ( HouseStateConfig(..) )
+import           Automation.Env                 ( HouseStateConfig(..) )
 import           Control.Concurrent             ( threadDelay )
 
 defaultPort :: String

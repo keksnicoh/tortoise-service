@@ -1,14 +1,13 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE GADTs                #-}
-{-# LANGUAGE LambdaCase           #-}
-{-# LANGUAGE DuplicateRecordFields #-}
 
 module Automation.HouseState where
 
 import           Control.Monad.IO.Class
 import           Control.Monad.Reader           ( reader
-                                                , runReaderT
                                                 , MonadReader
                                                 )
 import qualified Core.State.Env                as CSEnv
@@ -16,41 +15,46 @@ import qualified Core.State.Model.State        as CSMState
 import qualified Core.State.Repository.State   as CSRState
 import           Data.IORef                     ( modifyIORef'
                                                 , IORef
-                                                , newIORef
                                                 )
 import           Core.FSM
-import           Control.Concurrent             ( threadDelay )
 import qualified Core.Database.Model.Status    as CDMStatus
 import qualified Data.Time                     as T
-import           Core.Internal
 import qualified Dependencies                  as D
 import           Data.Maybe                     ( mapMaybe )
+import           Automation.Env
 
 instance (MonadIO m, MonadReader e m, CSEnv.HasState e) => HouseFSM (HouseT m) where
   type State (HouseT m) = HouseState
 
-  initializing = do
-    monitor CSMState.MonitorIdle
+  initialize = do
+    monitor CSMState.MonitorOff
+    liftIO $ putStrLn "initialize house monitoring"
     return Initializing
 
-  controlled _ sd = do
+  sensorRead sd _ = do
     monitor CSMState.MonitorOK
-    liftIO $ putStrLn "[controlled]"
-    return (Controlled sd)
+    liftIO $ putStrLn ("house monitoring: received sensor data - " ++ show sd)
+    return (HasSensorData sd)
 
-  emergency _ sd = do
+  verified _ = do
+    monitor CSMState.MonitorOK
+    liftIO $ putStrLn "house monitoring: temperature verified"
+    return TemperatureBound
+
+  retry _ = do
+    monitor CSMState.MonitorSensorRetry
+    liftIO $ putStrLn "house monitoring: could not read sensor. retry..."
+    return RetrySensor
+
+  emergency _ = do
     monitor CSMState.MonitorEmergency
-    liftIO $ putStrLn "[emergency]"
-    return (Emergency sd)
+    liftIO $ putStrLn "house monitoring: temperature not bound, emergency"
+    return Emergency
 
-  terminate transition = do
+  terminate event = do
     monitor CSMState.MonitorOff
-    return (reasonFrom transition)
-
-  noSensorData _ = do
-    monitor CSMState.MonitorIdle
-    liftIO $ putStrLn "[noSensorData]"
-    return NoSensorData
+    liftIO $ putStrLn "house monitoring: terminating"
+    return $ reasonFrom event
 
 monitor
   :: (MonadReader a m, CSEnv.HasState a, MonadIO m)
@@ -61,50 +65,39 @@ monitor m = do
   liftIO $ modifyIORef' stateIORef $ \s -> s { CSMState.houseMonitor = m }
 
 data TerminateReason
-  = OutOfContronReason
+  = OutOfControlReason
   | SensorUnavailableReason
   deriving (Show)
 
 -- @todo: how to test this function?
 reasonFrom :: TransitionTerminating m -> HouseState Terminating
-reasonFrom (EmergencyNotResolved _) = Terminating OutOfContronReason
+reasonFrom (EmergencyNotResolved _) = Terminating OutOfControlReason
 reasonFrom (SensorUnavailable    _) = Terminating SensorUnavailableReason
 reasonFrom (SensorNotInitialized _) = Terminating SensorUnavailableReason
 
 data HouseState s where
-  Initializing  ::HouseState Initializing
-  Controlled    ::TemperatureSensor -> HouseState Controlled
-  Emergency     ::TemperatureSensor -> HouseState Emergency
-  Terminating   ::TerminateReason -> HouseState Terminating
-  NoSensorData  ::HouseState NoSensorData
+  Initializing     ::HouseState Initializing
+  HasSensorData    ::TemperatureSensor -> HouseState HasSensorData
+  TemperatureBound ::HouseState TemperatureBound
+  RetrySensor      ::HouseState RetrySensor
+  Emergency        ::HouseState Emergency
+  Terminating      ::TerminateReason -> HouseState Terminating
 
 instance Show s => Show (HouseState s) where
-  show Initializing    = "Initializing"
-  show (Controlled  t) = "Controlled " ++ show t
-  show (Emergency   t) = "Emergency " ++ show t
-  show (Terminating r) = "Terminating " ++ show r
-  show NoSensorData    = "NoSensorData"
+  show Initializing      = "Initializing"
+  show (HasSensorData t) = "HasSensorData " ++ show t
+  show TemperatureBound  = "TemperatureBound"
+  show RetrySensor       = "RetrySensor"
+  show Emergency         = "Emergency"
+  show (Terminating r)   = "Terminating " ++ show r
 
-data TestEnv = TestEnv (IORef CSMState.State) HouseStateConfig
+data TestEnv = TestEnv (IORef CSMState.State) HouseStateConfig Int
 
 instance CSEnv.HasState TestEnv where
-  getState (TestEnv s _) = s
-
-data HouseStateConfig
-  = HouseStateConfig
-  { delaySensorRead :: Int
-  , minTemperature :: Temperature
-  , maxTemperature :: Temperature
-  , retrySensorRead :: Int
-  , maxStatusAge :: T.NominalDiffTime
-  , emergencyDelay :: IO ()
-  }
-
-class HasHouseStateConfig a where
-  getHouseStateConfig :: a -> HouseStateConfig
+  getState (TestEnv s _ _) = s
 
 instance HasHouseStateConfig TestEnv where
-  getHouseStateConfig (TestEnv _ c) = c
+  getHouseStateConfig (TestEnv _ c _) = c
 
 {-| reads the last defined temperature within a configured time range.
     if a temperature value exists then it will be interpreted to be 
@@ -167,38 +160,8 @@ mkEmergencyAction getState updateState value     = do
  where
   update1 v = updateState $ \s -> s { CSMState.light1 = v }
   update2 v = updateState $ \s -> s { CSMState.light2 = v }
-
   ifNotManual _      (Just (CSMState.Manual _)) = return ()
   ifNotManual action _                          = action
 
   ifManual action (Just (CSMState.Manual _)) = action
   ifManual _      _                          = return ()
-
-sperk :: IO ()
-sperk = do
-  ioRef <- newIORef CSMState.initialState
-
-  let config = HouseStateConfig { delaySensorRead = 1000000
-                                , minTemperature  = 10
-                                , maxTemperature  = 40
-                                , retrySensorRead = 5
-                                , maxStatusAge    = 10
-                                , emergencyDelay  = return ()
-                                }
-      env         = TestEnv ioRef config
-      fsmHandlers = FSMHandlers
-        { readSensor      = liftIO $ getLine >>= \case
-                              "1" -> return (Just (Bound 17.53))
-                              "2" -> return (Just (Low 2))
-                              "3" -> return (Just (High 40))
-                              "4" -> return Nothing
-        , controlTick     = liftIO $ putStrLn "controlling :)"
-        , emergencyAction = \_ -> return ()
-        , nRetry          = 5
-        , delay           = liftIO $ do
-                              putStrLn "wait..."
-                              threadDelay 1000000
-                              putStrLn "continue..."
-        }
-  runReaderT (runHouseT $ mkFSM fsmHandlers) env
-  return ()

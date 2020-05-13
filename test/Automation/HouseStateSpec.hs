@@ -16,6 +16,7 @@ import           Data.IORef                     ( newIORef
                                                 , modifyIORef'
                                                 , readIORef
                                                 )
+import           Automation.Env
 
 data MkReadSensorEnv
   = MkReadSensorEnv
@@ -101,18 +102,18 @@ spec = do
 
             runReaderT readerSensor (env range) >>?= Just expectedResult
 
-  describe "HouseState#Show" $ do
-    it "should render Initializing" $ do
-      show Initializing `shouldBe` "Initializing"
-    it "should render Controlled" $ do
-      show (Controlled (Bound 5)) `shouldBe` "Controlled Bound 5.0"
-    it "should render Emergency" $ do
-      show (Emergency (Low 5)) `shouldBe` "Emergency Low 5.0"
-    it "should render NoSensorData" $ do
-      show NoSensorData `shouldBe` "NoSensorData"
-    it "should render Terminating" $ do
-      show (Terminating OutOfContronReason)
-        `shouldBe` "Terminating OutOfContronReason"
+  describe "HouseState#Show"
+    $ forM_
+        [ (show Initializing              , "Initializing")
+        , (show (HasSensorData $ Bound 12), "HasSensorData Bound 12.0")
+        , (show TemperatureBound          , "TemperatureBound")
+        , (show RetrySensor               , "RetrySensor")
+        , (show Emergency                 , "Emergency")
+        , ( show (Terminating OutOfControlReason)
+          , "Terminating OutOfControlReason"
+          )
+        ]
+    $ \(subj, expected) -> it ("render " ++ expected) $ subj `shouldBe` expected
 
   describe "mkEmergencyAction" $ do
     let
