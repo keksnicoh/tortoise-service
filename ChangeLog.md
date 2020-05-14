@@ -5,3 +5,4 @@
 ## Unreleased changes
 
 - Finite State Machine House Monitoring
+- Parametrized Application Environment (see https://stackoverflow.com/questions/61780295)

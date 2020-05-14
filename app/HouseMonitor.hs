@@ -1,70 +1,47 @@
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
+
 module HouseMonitor where
 
 import           Control.Concurrent
 import qualified Automation.HouseState         as AHouseState
 import qualified Automation.Env                as AEnv
-                                                ( HasHouseStateConfig(..)
-                                                , HouseStateConfig(..)
-                                                )
+import qualified Automation.Config             as AConfig
 import           Core.FSM
-import           Control.Monad.Reader           ( ReaderT
-                                                , MonadReader
-                                                , runReaderT
+import           Control.Monad.Reader           ( runReaderT
                                                 , MonadIO(liftIO)
                                                 )
 import qualified Core.Database.Model.Status    as CDMStatus
                                                 ( mkFetchStatusRepository )
-import qualified Core.Database.Env             as CDEnv
-                                                ( HasDbConnection )
-import qualified Core.State.Env                as CSEnv
-                                                ( HasState )
 import qualified Core.State.Repository.State   as CSRState
                                                 ( currentState
                                                 , updateState
                                                 )
-import qualified Dependencies                  as D
 import           Text.Printf
-import           Env
+import qualified Env                           as E
 
-type HRT m = HouseT (ReaderT (Env m) m)
-
-
-instance D.HasCurrentTime (Env IO) (HRT IO) where
-  getCurrentTime a = undefined
-
-
-
-
-start :: MonadIO m => Env m -> IO ()
-start env = do
-  --let foerk = createFSMHandlers env
-  undefined
-
-
-run handlers env = runReaderT (runHouseT $ mkFSM handlers) env >>= \case
-  reason -> do
-    --debug reason
-    liftIO $ threadDelay $ 120 * 1000000
-    run handlers env
+start :: MonadIO m => E.Env m -> IO ()
+start env =
+  let
+    automationEnv = AEnv.fromMainEnv env :: AEnv.AutomationEnvironment IO
+    delayDuration =
+      AConfig.delaySensorRead (AConfig.getHouseStateConfig automationEnv)
+    statusRepository = CDMStatus.mkFetchStatusRepository 5
+    handlers         = FSMHandlers
+      { readSensor      = AHouseState.mkReadSensor statusRepository
+      , controlTick     = liftIO (putStrLn "controlling :)")
+      , emergencyAction = AHouseState.mkEmergencyAction CSRState.currentState
+                                                        CSRState.updateState
+      , delay           = liftIO (threadDelay delayDuration)
+      }
+  in
+    run handlers automationEnv
  where
-  debug r = liftIO $ putStrLn $ printf
-    "[Tortoise-Service] Terminating %s. Restart in 120 seconds..."
-    (show r)
-
-
-
-createFSMHandlers config = FSMHandlers
-  { readSensor = AHouseState.mkReadSensor (CDMStatus.mkFetchStatusRepository 5)
-  , controlTick     = liftIO $ putStrLn "controlling :)"
-  , emergencyAction = AHouseState.mkEmergencyAction CSRState.currentState
-                                                    CSRState.updateState
-  , delay           =
-    liftIO
-      $ threadDelay (AEnv.delaySensorRead $ AEnv.getHouseStateConfig config)
-  }
+  run handlers env = runReaderT (runHouseT $ mkFSM handlers) env >>= \case
+    reason -> do
+      debug reason
+      liftIO $ threadDelay $ 120 * 1000000
+      run handlers env
+   where
+    debug r = liftIO $ putStrLn $ printf
+      "[Tortoise-Service] Terminating %s. Restart in 120 seconds..."
+      (show r)

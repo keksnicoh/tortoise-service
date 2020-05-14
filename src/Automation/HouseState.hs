@@ -21,7 +21,7 @@ import qualified Core.Database.Model.Status    as CDMStatus
 import qualified Data.Time                     as T
 import qualified Dependencies                  as D
 import           Data.Maybe                     ( mapMaybe )
-import           Automation.Env
+import           Automation.Config
 
 instance (MonadIO m, MonadReader e m, CSEnv.HasState e) => HouseFSM (HouseT m) where
   type State (HouseT m) = HouseState

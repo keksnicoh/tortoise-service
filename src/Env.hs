@@ -1,7 +1,6 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 
 module Env
   ( Env(..)
@@ -19,9 +18,9 @@ import           Core.State.Model.State
 import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
-import qualified Automation.Env as AEnv
 import Control.Monad.Reader (ReaderT)
 import Servant
+import qualified Automation.Config as AConfig
 
 data ApplicationMode
   = Development
@@ -41,7 +40,7 @@ data Env m
     , state :: IORef State
     , openWeatherMapEnv :: OpenWeatherMapEnv
     , assetsPath :: FilePath
-    , houseStateConfig :: AEnv.HouseStateConfig
+    , houseStateConfig :: AConfig.HouseStateConfig
     , logger :: String -> RT m ()
     }
 
@@ -63,7 +62,7 @@ instance HasOpenWeatherMapEnv (Env m) where
 instance HasAssetsPath (Env m) where
   getAssetsPath = assetsPath
 
-instance AEnv.HasHouseStateConfig (Env m) where
+instance AConfig.HasHouseStateConfig (Env m) where
   getHouseStateConfig = houseStateConfig
 
 instance HasLogger (Env Handler) (RT Handler) where

@@ -26,17 +26,16 @@ type PostStatusService m = StatusRequest -> m Status
 
 -- |constructs a service which returns status rows from storage
 mkGetStatusService
-  :: (Monad m) => C.FetchStatusRepository m -> GetStatusService m
+  :: (Functor m) => C.FetchStatusRepository m -> GetStatusService m
 mkGetStatusService = (fmap . fmap) from -- note how nice eta reduction and functoriality
-                                        -- worked out here, just very cool!
+                                        -- worked out here
 
 data PostStatusServiceException = UUIDCollisionException
   deriving (Show, Eq, Exception)
 
 -- |constructs a service which persists a status
 mkPostStatusService
-  :: ( Monad m
-     , MonadThrow m
+  :: ( MonadThrow m
      , MonadReader e m
      , HasCurrentTime e m
      , HasRandomUUID e m

@@ -32,12 +32,12 @@ defaultPeriod = 24 * 3600
    timeframe (start, end). If end is undefined, then end=now. If start is
    undefined, then start=end -1hour. -}
 mkTimeSeriesService
-  :: (Monad m, MonadReader e m, D.HasCurrentTime e m)
+  :: (MonadReader e m, D.HasCurrentTime e m)
   => CStatus.FetchStatusPeriodRepository m
   -> TimeSeriesService m
 mkTimeSeriesService fetchStatusPeriodRepository startOpt endOpt = do
-  getCurrentTime  <- reader D.getCurrentTime
-  (start, end) <- case (startOpt, endOpt) of
+  getCurrentTime <- reader D.getCurrentTime
+  (start, end)   <- case (startOpt, endOpt) of
     (Nothing   , Nothing ) -> periodEnd <$> getCurrentTime
     (Just start, Nothing ) -> (,) start <$> getCurrentTime
     (Nothing   , Just end) -> return $ periodEnd end
@@ -47,9 +47,8 @@ mkTimeSeriesService fetchStatusPeriodRepository startOpt endOpt = do
 
 -- |using a `TimeSeriesService m` this service returns the resukt convoluted
 mkGroupedTimeSeriesService
-  :: (Monad m) => TimeSeriesService m -> GroupedTimeSeriesService m
+  :: (Functor m) => TimeSeriesService m -> GroupedTimeSeriesService m
 mkGroupedTimeSeriesService timeSeriesService startOpt endOpt dt = do
-  timeSeries <- timeSeriesService startOpt endOpt
   let dt'     = fromMaybe defaultDt dt
       grouped = TimeSeries.group dt'
-  return (TimeSeries.groupTimeSeries dt' timeSeries)
+  TimeSeries.groupTimeSeries dt' <$> timeSeriesService startOpt endOpt

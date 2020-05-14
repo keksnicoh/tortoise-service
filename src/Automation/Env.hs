@@ -1,26 +1,61 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 module Automation.Env where
 
-import           Core.FSM
+import           Data.IORef                     ( IORef )
+import           Control.Monad.Reader           ( MonadIO
+                                                , liftIO
+                                                , ReaderT
+                                                )
+import           Database.PostgreSQL.Simple     ( Connection )
+
+import qualified Core.Database.Env             as CDEnv
+                                                ( HasDbConnection(..) )
+import qualified Core.State.Env                as CSEnv
+                                                ( HasState(..) )
+import qualified Core.State.Model.State        as CSMState
+import qualified Dependencies                  as D
+import qualified Automation.Config             as AConfig
+                                                ( HasHouseStateConfig(..)
+                                                , HouseStateConfig
+                                                )
+import qualified Env                           as E
+import qualified Core.FSM                      as CFSM
 import qualified Data.Time                     as T
-import           Core.Internal
 
+type HRT m = CFSM.HouseT (ReaderT (AutomationEnvironment m) m)
 
-data HouseStateConfig
-  = HouseStateConfig
-  { delaySensorRead :: Int
-  , minTemperature :: Temperature
-  , maxTemperature :: Temperature
-  , retrySensorRead :: Int
-  , maxStatusAge :: T.NominalDiffTime
-  , emergencyDelay :: IO ()
+fromMainEnv :: MonadIO m2 => E.Env m -> AutomationEnvironment m2
+fromMainEnv env = AutomationEnvironment
+  { currentTime      = liftIO T.getCurrentTime
+  , houseStateConfig = E.houseStateConfig env
+  , dbConnection     = E.dbConnection env
+  , state            = E.state env
+  , fsmNRetry        = 10
   }
 
-class HasHouseStateConfig a where
-  getHouseStateConfig :: a -> HouseStateConfig
+data AutomationEnvironment m
+  = AutomationEnvironment
+  { currentTime :: HRT m T.UTCTime
+  , houseStateConfig :: AConfig.HouseStateConfig
+  , dbConnection :: Connection
+  , state :: IORef CSMState.State
+  , fsmNRetry :: Int }
 
-instance HasHouseStateConfig e => HasFSMNRetry e where
-  getFSMNRetry = retrySensorRead . getHouseStateConfig
+instance D.HasCurrentTime (AutomationEnvironment IO) (HRT IO) where
+  getCurrentTime = currentTime
 
+instance CSEnv.HasState (AutomationEnvironment m) where
+  getState = state
+
+instance CDEnv.HasDbConnection (AutomationEnvironment m) where
+  getDbConnection = dbConnection
+
+instance CFSM.HasFSMNRetry (AutomationEnvironment m) where
+  getFSMNRetry = fsmNRetry
+
+instance AConfig.HasHouseStateConfig (AutomationEnvironment m) where
+  getHouseStateConfig = houseStateConfig

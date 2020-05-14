@@ -20,7 +20,7 @@ import           Data.IORef                     ( newIORef
                                                 , modifyIORef'
                                                 , readIORef
                                                 )
-import           Automation.Env
+import           Automation.Config
 
 type RT = ReaderT MkReadSensorEnv IO
 

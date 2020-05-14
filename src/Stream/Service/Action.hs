@@ -13,7 +13,11 @@ import           Network.WebSockets             ( Connection
                                                 , sendTextData
                                                 , receiveData
                                                 )
-import Control.Monad.Reader (reader, MonadReader, when, join)
+import           Control.Monad.Reader           ( reader
+                                                , MonadReader
+                                                , when
+                                                , join
+                                                )
 import           Data.Aeson                     ( ToJSON
                                                 , encode
                                                 )
