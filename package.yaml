@@ -48,6 +48,7 @@ dependencies:
 - exceptions
 - vector
 - websockets
+- free
 
 library:
   source-dirs: src

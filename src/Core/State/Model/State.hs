@@ -27,8 +27,10 @@ data State
     , webcamDate :: Maybe UTCTime
     , webcamRequest :: Maybe UTCTime
     , houseMonitor :: HouseMonitor
+    , controlLockDate1 :: Maybe UTCTime
+    , controlLockDate2 :: Maybe UTCTime
     }
   deriving (Show, Eq)
 
 initialState :: State
-initialState = State Nothing Nothing Nothing Nothing MonitorOff
+initialState = State Nothing Nothing Nothing Nothing MonitorOff Nothing Nothing

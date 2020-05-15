@@ -29,6 +29,10 @@ module Core.FSM
   , RetrySensor
   , Emergency
   , Terminating
+  , ControlHandler
+  , DelayHandler
+  , EmergencyHandler
+  , ReadSensorHandler
   )
 where
 
@@ -128,11 +132,16 @@ data TransitionTerminating m
 -- |contains handlers which are invoked in different stages of the state machine.
 data FSMHandlers m
   = FSMHandlers
-  { readSensor :: m (Maybe TemperatureSensor)
-  , controlTick :: m ()
-  , emergencyAction :: TemperatureSensor -> m ()
-  , delay :: m ()
+  { readSensor :: ReadSensorHandler m
+  , controlTick :: ControlHandler m
+  , emergencyAction :: EmergencyHandler m
+  , delay :: DelayHandler m
   }
+
+type ControlHandler m = m ()
+type EmergencyHandler m = TemperatureSensor -> m ()
+type ReadSensorHandler m = m (Maybe TemperatureSensor)
+type DelayHandler m = m ()
 
 class HasFSMNRetry a where
   getFSMNRetry :: a -> Int
