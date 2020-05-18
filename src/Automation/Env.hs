@@ -18,15 +18,13 @@ import qualified Core.State.Env                as CSEnv
                                                 ( HasState(..) )
 import qualified Core.State.Model.State        as CSMState
 import qualified Dependencies                  as D
-import qualified Automation.Config             as AConfig
-                                                ( HasHouseStateConfig(..)
-                                                , HouseStateConfig
-                                                )
+import           Automation.Model.HouseStateConfig
 import qualified Env                           as E
-import qualified Core.FSM                      as CFSM
 import qualified Data.Time                     as T
+import           Automation.FSM.HouseT          ( HouseT )
+import           Automation.FSM.Transitions
 
-type HRT m = CFSM.HouseT (ReaderT (AutomationEnvironment m) m)
+type HRT m = HouseT (ReaderT (AutomationEnvironment m) m)
 
 fromMainEnv :: MonadIO m2 => E.Env m -> AutomationEnvironment m2
 fromMainEnv env = AutomationEnvironment
@@ -40,7 +38,7 @@ fromMainEnv env = AutomationEnvironment
 data AutomationEnvironment m
   = AutomationEnvironment
   { currentTime :: HRT m T.UTCTime
-  , houseStateConfig :: AConfig.HouseStateConfig
+  , houseStateConfig :: HouseStateConfig
   , dbConnection :: Connection
   , state :: IORef CSMState.State
   , fsmNRetry :: Int }
@@ -54,8 +52,8 @@ instance CSEnv.HasState (AutomationEnvironment m) where
 instance CDEnv.HasDbConnection (AutomationEnvironment m) where
   getDbConnection = dbConnection
 
-instance CFSM.HasFSMNRetry (AutomationEnvironment m) where
+instance HasFSMNRetry (AutomationEnvironment m) where
   getFSMNRetry = fsmNRetry
 
-instance AConfig.HasHouseStateConfig (AutomationEnvironment m) where
+instance HasHouseStateConfig (AutomationEnvironment m) where
   getHouseStateConfig = houseStateConfig

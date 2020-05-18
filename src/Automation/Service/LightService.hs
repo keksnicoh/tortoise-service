@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Automation.Controller where
+module Automation.Service.LightService where
 
 import qualified Data.Time                     as T
 import qualified Dependencies                  as D
@@ -14,7 +14,7 @@ import qualified Core.State.Model.State        as CSMState
 import           Control.Monad                  ( join )
 import           Automation.Header
 import           Automation.Model.SimpleHandlerConfig
-import           Core.FreeSimpleController
+import           Automation.Free.SimpleController
 
 mkGetLightStatus
   :: (MonadReader e m, HasSimpleHandlerConfig e, D.HasCurrentTime e m)
@@ -34,8 +34,8 @@ mkGetLightStatus getState lightId = do
   dispatch _ _ (Just state, Nothing) = mapLight state
   dispatch _ _ (Nothing   , _      ) = LightUndefined
   mapLight (CSMState.Controlled False) = LightOff
-  mapLight (CSMState.Controlled False) = LightOff
-  mapLight (CSMState.Manual     True ) = LightOn
+  mapLight (CSMState.Manual     False) = LightOff
+  mapLight (CSMState.Controlled True ) = LightOn
   mapLight (CSMState.Manual     True ) = LightOn
 
 mkProposeSwitchLight

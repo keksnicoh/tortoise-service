@@ -3,10 +3,11 @@
 module HouseMonitor where
 
 import           Control.Concurrent
-import qualified Automation.HouseState         as AHouseState
 import qualified Automation.Env                as AEnv
-import qualified Automation.Config             as AConfig
-import           Core.FSM
+import qualified Automation.Service.EmergencyService
+                                               as ASEmergencyService
+import qualified Automation.Service.ReadSensorService
+                                               as ASReadSensorService
 import           Control.Monad.Reader           ( runReaderT
                                                 , MonadIO(liftIO)
                                                 )
@@ -17,20 +18,28 @@ import qualified Core.State.Repository.State   as CSRState
                                                 , updateState
                                                 )
 import           Text.Printf
+import           Automation.Model.HouseStateConfig
+                                                ( HouseStateConfig(..)
+                                                , HasHouseStateConfig(..)
+                                                )
+import           Automation.FSM.Transitions     ( FSMHandlers(..)
+                                                , mkFSM
+                                                )
+import           Automation.FSM.HouseT          ( runHouseT )
 import qualified Env                           as E
 
 start :: MonadIO m => E.Env m -> IO ()
 start env =
   let
-    automationEnv = AEnv.fromMainEnv env :: AEnv.AutomationEnvironment IO
-    delayDuration =
-      AConfig.delaySensorRead (AConfig.getHouseStateConfig automationEnv)
+    automationEnv    = AEnv.fromMainEnv env :: AEnv.AutomationEnvironment IO
+    delayDuration    = delaySensorRead (getHouseStateConfig automationEnv)
     statusRepository = CDMStatus.mkFetchStatusRepository 5
     handlers         = FSMHandlers
-      { readSensor      = AHouseState.mkReadSensor statusRepository
+      { readSensor      = ASReadSensorService.mkReadSensor statusRepository
       , controlTick     = liftIO (putStrLn "controlling :)")
-      , emergencyAction = AHouseState.mkEmergencyAction CSRState.currentState
-                                                        CSRState.updateState
+      , emergencyAction = ASEmergencyService.mkEmergencyAction
+                            CSRState.currentState
+                            CSRState.updateState
       , delay           = liftIO (threadDelay delayDuration)
       }
   in

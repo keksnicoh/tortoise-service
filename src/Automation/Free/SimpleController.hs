@@ -8,7 +8,7 @@
     resources
     - https://markkarpov.com/post/free-monad-considered-harmful.html
 -}
-module Core.FreeSimpleController where
+module Automation.Free.SimpleController where
 
 import           Core.Internal
 import           Control.Monad.Free
@@ -32,8 +32,8 @@ data SimpleController a
   | LockLight LightId a
   deriving (Functor)
 
-type Interpreter a m = SimpleControllerM a -> m a
 type SimpleControllerM = Free SimpleController
+type SimpleControllerInterpreter a m = SimpleControllerM a -> m a
 
 getTemperature :: SimpleControllerM (Maybe Temperature)
 getTemperature = Free (GetTemperature return)

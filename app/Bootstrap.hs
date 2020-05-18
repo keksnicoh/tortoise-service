@@ -18,7 +18,8 @@ import           System.Environment
 import           Data.ByteString.Internal      as BS
 import           Text.Read                      ( readMaybe )
 import           Data.Maybe                     ( fromMaybe )
-import           Automation.Config              ( HouseStateConfig(..) )
+import           Automation.Model.HouseStateConfig
+                                                ( HouseStateConfig(..) )
 import           Control.Concurrent             ( threadDelay )
 import           Control.Monad.Reader           ( MonadIO(liftIO) )
 

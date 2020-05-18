@@ -1,12 +1,12 @@
-module Automation.Config
+module Automation.Model.HouseStateConfig
   ( HouseStateConfig(..)
   , HasHouseStateConfig(..)
   )
 where
 
-import           Core.FSM
 import qualified Data.Time                     as T
 import           Core.Internal
+import           Automation.FSM.Transitions
 
 data HouseStateConfig
   = HouseStateConfig

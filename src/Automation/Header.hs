@@ -1,6 +1,7 @@
 module Automation.Header where
 
-import           Core.FreeSimpleController
+import           Automation.Free.SimpleController
+import           Automation.FSM.HouseFSM
 
 -- |Service to set a light state for a certain lightId. Note that there
 -- is no contract that the light state is actually switched to the desired state.
@@ -14,3 +15,18 @@ type LockLight m = LightId -> m ()
 
 -- |Retrieves the current status of a light
 type GetLightStatus m = LightId -> m LightStatus
+
+-- |generic interface to trigger house controlling when temperature is bound
+type ControlHandler m = m ()
+
+-- |generic interface to trigger emergenceny action when the temperature is not bound
+type EmergencyHandler m = TemperatureSensor -> m ()
+
+-- |interface to read sensor data
+type ReadSensorHandler m = m (Maybe TemperatureSensor)
+
+-- |generic delay effect
+type DelayHandler m = m ()
+
+
+

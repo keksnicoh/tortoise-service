@@ -72,4 +72,3 @@ spec =
           }
       result <- try (runReaderT forecastRepository env) :: IO (Either ForecastRepositoryException ForecastResult)
       result `shouldSatisfy` isRight
- 

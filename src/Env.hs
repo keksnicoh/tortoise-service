@@ -18,9 +18,10 @@ import           Core.State.Model.State
 import           Core.State.Env
 import           Core.OpenWeatherMap.Env
 import           GHC.IORef                      ( IORef )
-import Control.Monad.Reader (ReaderT)
-import Servant
-import qualified Automation.Config as AConfig
+import           Control.Monad.Reader           ( ReaderT )
+import           Servant
+import qualified Automation.Model.HouseStateConfig
+                                               as AMHouseStateConfig
 
 data ApplicationMode
   = Development
@@ -40,7 +41,7 @@ data Env m
     , state :: IORef State
     , openWeatherMapEnv :: OpenWeatherMapEnv
     , assetsPath :: FilePath
-    , houseStateConfig :: AConfig.HouseStateConfig
+    , houseStateConfig :: AMHouseStateConfig.HouseStateConfig
     , logger :: String -> RT m ()
     }
 
@@ -62,7 +63,7 @@ instance HasOpenWeatherMapEnv (Env m) where
 instance HasAssetsPath (Env m) where
   getAssetsPath = assetsPath
 
-instance AConfig.HasHouseStateConfig (Env m) where
+instance AMHouseStateConfig.HasHouseStateConfig (Env m) where
   getHouseStateConfig = houseStateConfig
 
 instance HasLogger (Env Handler) (RT Handler) where

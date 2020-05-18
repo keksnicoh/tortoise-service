@@ -17,7 +17,7 @@ import qualified Data.UUID
 spec :: Spec
 spec = do
   describe "Monitor#ToJSON" $ do
-    it "should serialize to JSON properly" $
+    it "should serialize to JSON properly" $ do
       let
         monitor = Monitor
           { date = read "2019-03-04 13:37:42"
@@ -57,8 +57,8 @@ spec = do
           , ("webcamDate", String "2020-03-04T13:37:42Z")
           , ("houseState", String "x")
           ]
-      in toJSON monitor `shouldBe` expectedValue
-    it "should serialize to JSON properly - minimal" $
+      toJSON monitor `shouldBe` expectedValue
+    it "should serialize to JSON properly - minimal" $ do
       let
         monitor = Monitor
           { date = read "2019-03-04 13:37:42"
@@ -84,7 +84,7 @@ spec = do
           , ("webcamDate", Null)
           , ("houseState", "x")
           ]
-      in toJSON monitor `shouldBe` expectedValue
+      toJSON monitor `shouldBe` expectedValue
 
   describe "from" $ do
     let 
@@ -100,6 +100,8 @@ spec = do
         , webcamDate = Nothing
         , webcamRequest = Nothing
         , houseMonitor = CSMState.MonitorOff
+        , controlLockDate1 = Nothing
+        , controlLockDate2 = Nothing
         }
       emptyForecast =  COMForecast.ForecastResult
         { cod = "200"
@@ -125,7 +127,7 @@ spec = do
         , CDMStatus.humidityOutside = Nothing
         , CDMStatus.created = head dates
         }
-    it "should produce correct Monitor data" $
+    it "should produce correct Monitor data" $ do
       let
         status1 = minimalStatus
           { CDMStatus.statusId = Data.UUID.nil
@@ -171,7 +173,7 @@ spec = do
           { COMForecast.cod = "200"
           , COMForecast.list = [forecast]
           }
-      in from (dates !! 1) [status1, status2, status3, status4] state forecastResult `shouldBe` minimalMonitor
+      from (dates !! 1) [status1, status2, status3, status4] state forecastResult `shouldBe` minimalMonitor
         { date = dates !! 1
         , sensorTemperatur = Just 5
         , sensorHumidity = Just 12
@@ -182,11 +184,11 @@ spec = do
         , weather = [ MonitorWeather "sun - foo" 2 7 (dates !! 3)]
         , webcamDate = Just (dates !! 2)
         }
-    it "should work with minimal data and undefined sensor data" $
+    it "should work with minimal data and undefined sensor data" $ do
       from (dates !! 1) [minimalStatus] emptyState emptyForecast `shouldBe` minimalMonitor
-    it "should work with minimal data and an empty status list" $
+    it "should work with minimal data and an empty status list" $ do 
       from (dates !! 1) [] emptyState emptyForecast `shouldBe` minimalMonitor
-    it "should render a default weather string" $
+    it "should render a default weather string" $ do 
       let
         forecast = COMForecast.Forecast
           { COMForecast.date = dates !! 3
@@ -201,7 +203,7 @@ spec = do
           { COMForecast.cod = "200"
           , COMForecast.list = [forecast]
           }
-      in from (dates !! 1) [] emptyState forecastResult `shouldBe` Monitor
+      from (dates !! 1) [] emptyState forecastResult `shouldBe` Monitor
         { date = dates !! 1
         , sensorTemperatur = Nothing
         , sensorHumidity = Nothing
@@ -213,7 +215,7 @@ spec = do
         , webcamDate = Nothing
         , houseState = "MonitorOff"
         }
-    it "should take 6 weather items" $
+    it "should take 6 weather items" $ do
       let
         forecast = COMForecast.Forecast
           { COMForecast.date = dates !! 3
@@ -236,7 +238,7 @@ spec = do
             , forecast { COMForecast.temperature = 23 }
             ]
           }
-      in from (dates !! 1) [] emptyState forecastResult `shouldBe` Monitor
+      from (dates !! 1) [] emptyState forecastResult `shouldBe` Monitor
         { date = dates !! 1
         , sensorTemperatur = Nothing
         , sensorHumidity = Nothing

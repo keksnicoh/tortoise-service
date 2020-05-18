@@ -10,19 +10,23 @@ import           Control.Monad.Reader           ( ReaderT(runReaderT) )
 
 spec :: Spec
 spec = do
-  describe "UpdateState" $ do
+  describe "updateState" $ do
     it "should update the state using the given function" $ do
-      let newState0 = State Nothing Nothing Nothing Nothing MonitorOff
+      let newState0 = initialState
           newState1 = State (Just (Controlled True))
                             (Just (Controlled False))
                             Nothing
                             Nothing
                             MonitorOff
+                            Nothing
+                            Nothing
           newState2 = State (Just (Controlled False))
                             (Just (Manual False))
                             Nothing
                             Nothing
                             MonitorOK
+                            Nothing
+                            (Just (read "2019-02-03 13:37:42"))
           f1 x | x == newState0 = newState1
           f2 x | x == newState1 = newState2
 
