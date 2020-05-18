@@ -3,15 +3,15 @@
 
 module Automation.Free.Interpreter where
 
-import           Control.Monad.Reader           ( MonadReader )
 import           Control.Monad.Free
-import qualified Dependencies                  as D
+
 import qualified Core.Database.Model.Status    as CDMStatus
+
 import           Automation.Header
 import           Automation.Free.SimpleController
 
 mkInterpreter
-  :: (MonadReader e m, D.HasCurrentTime e m)
+  :: (Monad m)
   => GetLightStatus m
   -> ProposeSwitchLight m
   -> LockLight m

@@ -30,7 +30,7 @@ mkControllerHandler interpreter =
     lightA temperature lightId tRange LightOn =
       when (temperature > highT tRange) $ switch lightId False
     lightA temperature lightId tRange LightUndefined =
-      proposeLightSwitch lightId (temperature < lowT tRange)
+      proposeLightSwitch lightId (temperature < highT tRange)
     lightA _ _ _ _ = return ()
 
     switch lightId value = do

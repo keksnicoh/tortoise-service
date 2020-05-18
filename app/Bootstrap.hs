@@ -20,6 +20,10 @@ import           Text.Read                      ( readMaybe )
 import           Data.Maybe                     ( fromMaybe )
 import           Automation.Model.HouseStateConfig
                                                 ( HouseStateConfig(..) )
+import           Automation.Model.SimpleHandlerConfig
+                                                ( SimpleHandlerConfig(..)
+                                                , TRange(..)
+                                                )
 import           Control.Concurrent             ( threadDelay )
 import           Control.Monad.Reader           ( MonadIO(liftIO) )
 
@@ -59,17 +63,22 @@ createEnvironment = do
             { managedHttpLbs = (`httpLbs` openWeatherMapTlsManager)
             , weatherUrl     = openWeatherMapApi
             }
-      in  Env { applicationMode   = applicationMode
-              , dbConnection      = dbConnection
-              , port              = port
-              , currentTime       = liftIO T.getCurrentTime
-              , randomUUID        = liftIO nextRandom
-              , state             = state
-              , openWeatherMapEnv = openWeatherMapEnv
-              , assetsPath        = assetsPath
-              , houseStateConfig  = houseStateConfig
-              , logger            = liftIO . putStrLn
-              }
+      in  Env
+            { applicationMode     = applicationMode
+            , dbConnection        = dbConnection
+            , port                = port
+            , currentTime         = liftIO T.getCurrentTime
+            , randomUUID          = liftIO nextRandom
+            , state               = state
+            , openWeatherMapEnv   = openWeatherMapEnv
+            , assetsPath          = assetsPath
+            , houseStateConfig    = houseStateConfig
+            , logger              = liftIO . putStrLn
+            , simpleHandlerConfig = SimpleHandlerConfig { l1TRange = TRange 0 0
+                                                        , l2TRange = TRange 0 0
+                                                        , lockDuration = 600
+                                                        }
+            }
  where
   e v = "TORTOISE_SERVICE_" <> v
   requiredEnv env = lookupEnv env >>= \case

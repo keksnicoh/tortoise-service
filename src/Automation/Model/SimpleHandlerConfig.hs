@@ -1,7 +1,8 @@
 module Automation.Model.SimpleHandlerConfig where
 
-import Core.Internal
-import qualified Data.Time as T
+import qualified Data.Time                     as T
+
+import           Core.Internal
 
 data TRange
   = TRange
@@ -18,3 +19,6 @@ data SimpleHandlerConfig
 
 class HasSimpleHandlerConfig e where
   getSimpleHandlerConfig :: e -> SimpleHandlerConfig
+
+instance HasSimpleHandlerConfig SimpleHandlerConfig where
+  getSimpleHandlerConfig = id

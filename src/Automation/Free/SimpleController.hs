@@ -1,9 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveFunctor #-}
 
-{-| Free Monad Algebra for light switch control. The Algerbra provides simple
-    operations to control the light switches. The choice of using Free for this
-    implementation is motivated to gain practice with different concepts.
+{-| Free Monad Algebra providing a set of operations to control the light switches
+    The choice of using Free for this package is motivated to gain practice 
+    with different concepts.
 
     resources
     - https://markkarpov.com/post/free-monad-considered-harmful.html

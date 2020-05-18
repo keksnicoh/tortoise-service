@@ -26,17 +26,40 @@ import           Automation.FSM.Transitions     ( FSMHandlers(..)
                                                 , mkFSM
                                                 )
 import           Automation.FSM.HouseT          ( runHouseT )
+import           Automation.Free.Interpreter
+import           Automation.Service.GetLightStatusService
+import           Automation.Service.ProposeSwitchLightService
+import           Automation.Service.LockLightService
+import           Automation.Service.SimpleControllerService
 import qualified Env                           as E
+
+
+{-
+  :: (Monad m)
+  => GetLightStatus m
+  -> ProposeSwitchLight m
+  -> LockLight m
+  -> CDMStatus.FetchStatusRepository m
+  -> SimpleControllerInterpreter a m-}
 
 start :: MonadIO m => E.Env m -> IO ()
 start env =
   let
-    automationEnv    = AEnv.fromMainEnv env :: AEnv.AutomationEnvironment IO
-    delayDuration    = delaySensorRead (getHouseStateConfig automationEnv)
-    statusRepository = CDMStatus.mkFetchStatusRepository 5
-    handlers         = FSMHandlers
+    automationEnv  = AEnv.fromMainEnv env :: AEnv.AutomationEnvironment IO
+    delayDuration  = delaySensorRead (getHouseStateConfig automationEnv)
+    getLightStatus = mkGetLightStatus CSRState.currentState
+    proposeSwitchLight =
+      mkProposeSwitchLight getLightStatus CSRState.updateState
+    lockLight             = mkLockLight CSRState.updateState
+    fetchStatusRepository = CDMStatus.mkFetchStatusRepository 1
+    interpreter           = mkInterpreter getLightStatus
+                                          proposeSwitchLight
+                                          lockLight
+                                          fetchStatusRepository
+    statusRepository  = CDMStatus.mkFetchStatusRepository 5
+    handlers          = FSMHandlers
       { readSensor      = ASReadSensorService.mkReadSensor statusRepository
-      , controlTick     = liftIO (putStrLn "controlling :)")
+      , controlTick     = mkControllerHandler interpreter
       , emergencyAction = ASEmergencyService.mkEmergencyAction
                             CSRState.currentState
                             CSRState.updateState

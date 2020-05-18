@@ -9,6 +9,9 @@ import qualified Automation.Service.EmergencyServiceSpec
 import qualified Automation.Service.GetLightStatusServiceSpec
 import qualified Automation.Service.ProposeSwitchLightServiceSpec
 import qualified Automation.Service.LockLightServiceSpec
+import qualified Automation.Service.SimpleControllerServiceSpec
+
+import qualified Automation.Free.InterpreterSpec
 
 spec :: Spec
 spec = do
@@ -24,6 +27,9 @@ spec = do
   describe "Automation.Service.ProposeSwitchLightServiceSpec"
            Automation.Service.ProposeSwitchLightServiceSpec.spec
   describe "Automation.Service.LockLightServiceSpec"
+           Automation.Service.SimpleControllerServiceSpec.spec
+  describe "Automation.Service.SimpleControllerServiceSpec"
            Automation.Service.LockLightServiceSpec.spec
 
-
+  describe "Automation.Free.InterpreterSpec"
+           Automation.Free.InterpreterSpec.spec

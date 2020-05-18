@@ -22,7 +22,8 @@ import           Control.Monad.Reader           ( ReaderT )
 import           Servant
 import qualified Automation.Model.HouseStateConfig
                                                as AMHouseStateConfig
-
+import qualified Automation.Model.SimpleHandlerConfig
+                                               as AMSimpleHandlerConfig
 data ApplicationMode
   = Development
   | Staging
@@ -42,6 +43,7 @@ data Env m
     , openWeatherMapEnv :: OpenWeatherMapEnv
     , assetsPath :: FilePath
     , houseStateConfig :: AMHouseStateConfig.HouseStateConfig
+    , simpleHandlerConfig :: AMSimpleHandlerConfig.SimpleHandlerConfig
     , logger :: String -> RT m ()
     }
 
@@ -65,6 +67,9 @@ instance HasAssetsPath (Env m) where
 
 instance AMHouseStateConfig.HasHouseStateConfig (Env m) where
   getHouseStateConfig = houseStateConfig
+
+instance AMSimpleHandlerConfig.HasSimpleHandlerConfig (Env m) where
+  getSimpleHandlerConfig = simpleHandlerConfig
 
 instance HasLogger (Env Handler) (RT Handler) where
   getLogger = logger
