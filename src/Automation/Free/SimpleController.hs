@@ -23,6 +23,7 @@ data LightStatus
   | LightOff
   | LightLocked
   | LightUndefined
+  | LightManual
   deriving (Show, Eq)
 
 data SimpleController a
