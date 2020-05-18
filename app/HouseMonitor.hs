@@ -56,10 +56,13 @@ start env =
                                           proposeSwitchLight
                                           lockLight
                                           fetchStatusRepository
-    statusRepository  = CDMStatus.mkFetchStatusRepository 5
-    handlers          = FSMHandlers
+    controlHandler   = mkControllerHandler interpreter
+    statusRepository = CDMStatus.mkFetchStatusRepository 5
+    handlers         = FSMHandlers
       { readSensor      = ASReadSensorService.mkReadSensor statusRepository
-      , controlTick     = mkControllerHandler interpreter
+      , controlTick     = do
+                            liftIO $ putStrLn "control"
+                            controlHandler
       , emergencyAction = ASEmergencyService.mkEmergencyAction
                             CSRState.currentState
                             CSRState.updateState

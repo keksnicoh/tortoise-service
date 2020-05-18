@@ -26,6 +26,7 @@ mkGetLightStatus
 mkGetLightStatus getState lightId = do
   lockDuration <- lockDuration <$> reader getSimpleHandlerConfig
   time         <- join (reader D.getCurrentTime)
+  
   dispatch time lockDuration . getByLightId lightId <$> getState
  where
   dispatch time lockDuration (Just state, Just date) =

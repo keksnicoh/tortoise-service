@@ -19,11 +19,14 @@ All environment variables are prefixed with `TORTOISE_SERVICE`, so `*_A` maps to
 | `*_PORT`                | port, default `8081`                                        | int    | __NO__   |
 | `*_PSQL_SPECS`          | specs psql connection string                                | string | __NO__   |
 | `*_FSM_SENSOR_DELAY`    | delay in seconds to read HouseState sensor, default `60`.   | int    | __NO__   |
-| `*_FSM_MIN_TEMPERATURE` | a house temperature below triggers emergency, default `15`  | int    | __NO__   |
-| `*_FSM_MAX_TEMPERATURE` | a house temperature above triggers emergency, default `35`  | int    | __NO__   |
+| `*_FSM_MIN_TEMPERATURE` | a house temperature below triggers emergency, default `15`  | float  | __NO__   |
+| `*_FSM_MAX_TEMPERATURE` | a house temperature above triggers emergency, default `35`  | float  | __NO__   |
 | `*_FSM_RETRY`           | number of retries if sensor couold not be read, default `5` | int    | __NO__   |
 | `*_FSM_EMERGENCY_DELAY` | duration in seconds of emergency state, default `900`       | int    | __NO__   |
-
+| `*_FSM_SC_L1_TLOW`      | temperature below light1 is turned back on, default `16`    | float  | __NO__   |
+| `*_FSM_SC_L1_THIGH`     | temperature below light1 is turned back off, default `25`   | float  | __NO__   |
+| `*_FSM_SC_L2_TLOW`      | temperature below light2 is turned back on, default `20`    | float  | __NO__   |
+| `*_FSM_SC_L2_THIGH`     | temperature below light1 is turned back off, default `34`   | float  | __NO__   |
 
 example (`local-service.sh`)
 
@@ -34,11 +37,17 @@ export TORTOISE_SERVICE_ASSETS_PATH="./assets"
 export TORTOISE_SERVICE_OPEN_WEATHER_MAP_API="https://api.openweathermap.org/data/2.5/forecast?appid=<key>&lat=54&lon=10"
 export TORTOISE_SERVICE_PORT=1337
 export TORTOISE_SERVICE_PSQL_SPECS="host='localhost' user='postgres' password='docker' dbname='test_hspec'"
+
 export TORTOISE_SERVICE_FSM_EMERGENCY_DELAY=900
 export TORTOISE_SERVICE_FSM_SENSOR_DELAY=60
 export TORTOISE_SERVICE_FSM_MIN_TEMPERATURE=15
 export TORTOISE_SERVICE_FSM_MAX_TEMPERATURE=35
 export TORTOISE_SERVICE_FSM_RETRY=5
+
+export TORTOISE_SERVICE_FSM_SC_L1_TLOW=16
+export TORTOISE_SERVICE_FSM_SC_L1_THIGH=25
+export TORTOISE_SERVICE_FSM_SC_L2_TLOW=20
+export TORTOISE_SERVICE_FSM_SC_L2_THIGH=34
 ```
 
 ## features

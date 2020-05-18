@@ -4,30 +4,18 @@
 module Automation.Service.ProposeSwitchLightServiceSpec where
 
 import           Test.Hspec
-import           TestUtil
-import           Control.Monad.Reader           ( liftIO
-                                                , runReaderT
-                                                , ReaderT
-                                                )
-import qualified Data.Time                     as T
 
-import qualified Dependencies                  as D
 import qualified Core.State.Model.State        as CSMState
+import qualified Core.State.Repository.State   as CSRState
 
 import           Automation.Service.ProposeSwitchLightService
 import           Automation.Free.SimpleController
 import           Automation.Header
-import           Data.IORef                     ( modifyIORef
-                                                , newIORef
-                                                , readIORef
-                                                )
 import           Control.Monad                  ( forM_ )
-
-type ST = ReaderT ProposeLightSwitchEnv IO
-newtype ProposeLightSwitchEnv = ProposeLightSwitchEnv T.UTCTime
-
-instance D.HasCurrentTime ProposeLightSwitchEnv ST where
-  getCurrentTime (ProposeLightSwitchEnv t) = return t
+import           Control.Monad.Writer           ( tell
+                                                , runWriter
+                                                , Writer
+                                                )
 
 initialState :: CSMState.State
 initialState = CSMState.initialState { CSMState.light1           = Nothing
@@ -41,26 +29,28 @@ spec = do
 
   describe "mkProposeLightSwitch" $ do
     let
-      date = read "2019-02-03 13:37:42"
-      env  = ProposeLightSwitchEnv date
       runService lightStatus = do
-        ioRef <- liftIO $ newIORef []
-        let getLightStatus :: GetLightStatus ST
-            getLightStatus LightId1 = return lightStatus
-            getLightStatus LightId2 = return lightStatus
+        let
+          getLightStatus
+            :: GetLightStatus (Writer [CSMState.State -> CSMState.State])
+          getLightStatus LightId1 = return lightStatus
+          getLightStatus LightId2 = return lightStatus
 
-            updateState state = liftIO $ modifyIORef ioRef $ \s -> s ++ [state]
-            service = mkProposeSwitchLight getLightStatus updateState
+          updateState
+            :: CSRState.UpdateState (Writer [CSMState.State -> CSMState.State])
+          updateState statef = tell [statef]
 
-        runReaderT (service LightId1 True) env >>?= ()
-        runReaderT (service LightId1 False) env >>?= ()
-        runReaderT (service LightId2 True) env >>?= ()
-        runReaderT (service LightId2 False) env >>?= ()
+          service
+            :: ProposeSwitchLight (Writer [CSMState.State -> CSMState.State])
+          service       = mkProposeSwitchLight getLightStatus updateState
 
-        result <- readIORef ioRef
-        let mappedStates = (\f -> f initialState) <$> result
-
-        return mappedStates
+          (result, log) = runWriter $ do
+            service LightId1 True
+            service LightId1 False
+            service LightId2 True
+            service LightId2 False
+          mappedStates = (\f -> f initialState) <$> log
+        mappedStates
 
     forM_
         [ ("LightUndefined", LightUndefined)
@@ -70,24 +60,20 @@ spec = do
       $ \(label, lightStatus) ->
           it ("overwrite state by proposed values for: " ++ label) $ do
             runService lightStatus
-              >>?= [ initialState
-                     { CSMState.light1 = Just (CSMState.Controlled True)
-                     , CSMState.controlLockDate1 = Just date
-                     }
-                   , initialState
-                     { CSMState.light1 = Just (CSMState.Controlled False)
-                     , CSMState.controlLockDate1 = Just date
-                     }
-                   , initialState
-                     { CSMState.light2 = Just (CSMState.Controlled True)
-                     , CSMState.controlLockDate2 = Just date
-                     }
-                   , initialState
-                     { CSMState.light2 = Just (CSMState.Controlled False)
-                     , CSMState.controlLockDate2 = Just date
-                     }
-                   ]
+              `shouldBe` [ initialState
+                           { CSMState.light1 = Just (CSMState.Controlled True)
+                           }
+                         , initialState
+                           { CSMState.light1 = Just (CSMState.Controlled False)
+                           }
+                         , initialState
+                           { CSMState.light2 = Just (CSMState.Controlled True)
+                           }
+                         , initialState
+                           { CSMState.light2 = Just (CSMState.Controlled False)
+                           }
+                         ]
 
     forM_ [("LightLocked", LightLocked), ("LightManual", LightManual)]
       $ \(label, lightStatus) -> it ("ignore proposition for: " ++ label) $ do
-          runService lightStatus >>?= []
+          runService lightStatus `shouldBe` []

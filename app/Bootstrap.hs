@@ -39,11 +39,14 @@ createEnvironment = do
   openWeatherMapApi    <- requiredEnv (e "OPEN_WEATHER_MAP_API")
   applicationMode      <- envApplicationMode (e "APPLICATION_MODE")
   port                 <- envPort (e "PORT")
+
   fsmEmergencyDelay    <- envReadOpt (e "FSM_EMERGENCY_DELAY") "900"
   fsmSensorDelay       <- envReadOpt (e "FSM_SENSOR_DELAY") "60"
   fsmMinTemperature    <- envReadOpt (e "FSM_MIN_TEMPERATURE") "15"
   fsmMaxTemperature    <- envReadOpt (e "FSM_MAX_TEMPERATURE") "35"
   fsmRetry             <- envReadOpt (e "FSM_RETRY") "5"
+  fsmScL1TLow          <- TRange <$> envReadOpt (e "FSM_SC_L1_TLOW") "16" <*> envReadOpt (e "FSM_SC_L1_THIGH") "25"
+  fsmScL2TLow          <- TRange <$> envReadOpt (e "FSM_SC_L2_TLOW") "20" <*> envReadOpt (e "FSM_SC_L2_THIGH") "34"
 
   putStrLn "initialize storages..."
   state                    <- newIORef initialState
@@ -74,8 +77,8 @@ createEnvironment = do
             , assetsPath          = assetsPath
             , houseStateConfig    = houseStateConfig
             , logger              = liftIO . putStrLn
-            , simpleHandlerConfig = SimpleHandlerConfig { l1TRange = TRange 0 0
-                                                        , l2TRange = TRange 0 0
+            , simpleHandlerConfig = SimpleHandlerConfig { l1TRange = fsmScL1TLow
+                                                        , l2TRange = fsmScL2TLow
                                                         , lockDuration = 600
                                                         }
             }
