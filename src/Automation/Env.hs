@@ -27,7 +27,7 @@ import           Automation.FSM.Transitions
 
 type HRT m = HouseT (ReaderT (AutomationEnvironment m) m)
 
-fromMainEnv :: MonadIO m2 => E.Env m -> AutomationEnvironment m2
+fromMainEnv :: MonadIO m' => E.Env m -> AutomationEnvironment m'
 fromMainEnv env = AutomationEnvironment
   { currentTime         = liftIO T.getCurrentTime
   , houseStateConfig    = E.houseStateConfig env

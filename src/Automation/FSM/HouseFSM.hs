@@ -27,8 +27,6 @@ module Automation.FSM.HouseFSM
   )
 where
 
-import           Control.Monad.IO.Class         ( MonadIO )
-import           Control.Monad.Reader           ( MonadReader )
 import           Core.Internal                  ( Temperature )
 
 type Delay = Int

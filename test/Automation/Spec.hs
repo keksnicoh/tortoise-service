@@ -12,6 +12,7 @@ import qualified Automation.Service.LockLightServiceSpec
 import qualified Automation.Service.SimpleControllerServiceSpec
 
 import qualified Automation.Free.InterpreterSpec
+import qualified Automation.Free.SimpleControllerSpec
 
 spec :: Spec
 spec = do
@@ -33,3 +34,5 @@ spec = do
 
   describe "Automation.Free.InterpreterSpec"
            Automation.Free.InterpreterSpec.spec
+  describe "Automation.Free.SimpleControllerSpec"
+           Automation.Free.SimpleControllerSpec.spec

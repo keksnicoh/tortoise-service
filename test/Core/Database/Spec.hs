@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -10,19 +11,26 @@ import           SpecEnv
 import qualified Data.ByteString               as BS
 import           Data.ByteString.Internal      as BSI
 import           System.Environment             ( lookupEnv )
+import           Control.Exception              ( SomeException
+                                                , try
+                                                )
 
-databaseSpec :: IO Spec
+databaseSpec :: IO (Maybe Spec)
 databaseSpec = do
   putStrLn "connect to database..."
+
   psqlConnectionString <- envPSQL (e "PSQL_SPECS")
-  dbConnection         <- connectPostgreSQL psqlConnectionString
-  cleanDbSql           <- BS.readFile "sql/clean.sql"
-  dbSchema             <- BS.readFile "sql/db.sql"
-  let fullSchema = [cleanDbSql, dbSchema]
-  let env = Env { dbConnection = dbConnection, dbSchema = fullSchema }
-  return $ do
-    describe "Core.Database.Model.StatusSpec"
-      $ Core.Database.Model.StatusSpec.mkSpec env
+  try (connectPostgreSQL psqlConnectionString) >>= \case
+    Left  (x :: SomeException) -> return Nothing
+    Right connection           -> do
+      cleanDbSql <- BS.readFile "sql/clean.sql"
+      dbSchema   <- BS.readFile "sql/db.sql"
+      let fullSchema = [cleanDbSql, dbSchema]
+          env        = Env { dbConnection = connection, dbSchema = fullSchema }
+      return
+        $ Just
+        $ describe "Core.Database.Model.StatusSpec"
+        $ Core.Database.Model.StatusSpec.mkSpec env
  where
   e v = "TORTOISE_SERVICE_" <> v
   requiredEnv env = lookupEnv env >>= \case

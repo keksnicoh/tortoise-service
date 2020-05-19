@@ -13,6 +13,9 @@ module Automation.Free.SimpleController where
 import           Core.Internal
 import           Control.Monad.Free
 
+type SimpleControllerM = Free SimpleController
+type SimpleControllerInterpreter a m = SimpleControllerM a -> m a
+
 data LightId
   = LightId1
   | LightId2
@@ -32,9 +35,6 @@ data SimpleController a
   | GetTemperature (Maybe Temperature -> a)
   | LockLight LightId a
   deriving (Functor)
-
-type SimpleControllerM = Free SimpleController
-type SimpleControllerInterpreter a m = SimpleControllerM a -> m a
 
 getTemperature :: SimpleControllerM (Maybe Temperature)
 getTemperature = Free (GetTemperature return)

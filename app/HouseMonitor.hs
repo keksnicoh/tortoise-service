@@ -33,15 +33,6 @@ import           Automation.Service.LockLightService
 import           Automation.Service.SimpleControllerService
 import qualified Env                           as E
 
-
-{-
-  :: (Monad m)
-  => GetLightStatus m
-  -> ProposeSwitchLight m
-  -> LockLight m
-  -> CDMStatus.FetchStatusRepository m
-  -> SimpleControllerInterpreter a m-}
-
 start :: MonadIO m => E.Env m -> IO ()
 start env =
   let
@@ -60,9 +51,7 @@ start env =
     statusRepository = CDMStatus.mkFetchStatusRepository 5
     handlers         = FSMHandlers
       { readSensor      = ASReadSensorService.mkReadSensor statusRepository
-      , controlTick     = do
-                            liftIO $ putStrLn "control"
-                            controlHandler
+      , controlTick     = controlHandler
       , emergencyAction = ASEmergencyService.mkEmergencyAction
                             CSRState.currentState
                             CSRState.updateState

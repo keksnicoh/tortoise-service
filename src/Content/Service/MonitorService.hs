@@ -24,7 +24,7 @@ toStart :: UTCTime -> UTCTime
 toStart = addUTCTime (-300)
 
 mkMonitorService
-  :: (Monad m, MonadReader e m, HasCurrentTime e m, HasLogger e m)
+  :: (Monad m, MonadReader e m, HasCurrentTime e m)
   => GetState m
   -> FetchStatusPeriodRepository m
   -> FetchForecastRepository m

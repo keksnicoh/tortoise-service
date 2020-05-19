@@ -27,6 +27,3 @@ type ReadSensorHandler m = m (Maybe TemperatureSensor)
 
 -- |generic delay effect
 type DelayHandler m = m ()
-
-
-

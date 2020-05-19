@@ -44,7 +44,6 @@ data Env m
     , assetsPath :: FilePath
     , houseStateConfig :: AMHouseStateConfig.HouseStateConfig
     , simpleHandlerConfig :: AMSimpleHandlerConfig.SimpleHandlerConfig
-    , logger :: String -> RT m ()
     }
 
 instance HasDbConnection (Env m) where
@@ -70,6 +69,3 @@ instance AMHouseStateConfig.HasHouseStateConfig (Env m) where
 
 instance AMSimpleHandlerConfig.HasSimpleHandlerConfig (Env m) where
   getSimpleHandlerConfig = simpleHandlerConfig
-
-instance HasLogger (Env Handler) (RT Handler) where
-  getLogger = logger

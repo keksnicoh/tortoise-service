@@ -10,6 +10,7 @@ import qualified Core.Database.Model.Status    as CDMStatus
 import           Automation.Header
 import           Automation.Free.SimpleController
 
+{-| canonical interpreter using dependency injection -}
 mkInterpreter
   :: (Monad m)
   => GetLightStatus m

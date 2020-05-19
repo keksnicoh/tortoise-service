@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -47,6 +48,7 @@ createEnvironment = do
   fsmRetry             <- envReadOpt (e "FSM_RETRY") "5"
   fsmScL1TLow          <- TRange <$> envReadOpt (e "FSM_SC_L1_TLOW") "16" <*> envReadOpt (e "FSM_SC_L1_THIGH") "25"
   fsmScL2TLow          <- TRange <$> envReadOpt (e "FSM_SC_L2_TLOW") "20" <*> envReadOpt (e "FSM_SC_L2_THIGH") "34"
+  fsmScLockDuration    <- envReadOpt (e "FSM_SC_LOCK_DURATION") "600"
 
   putStrLn "initialize storages..."
   state                    <- newIORef initialState
@@ -76,10 +78,9 @@ createEnvironment = do
             , openWeatherMapEnv   = openWeatherMapEnv
             , assetsPath          = assetsPath
             , houseStateConfig    = houseStateConfig
-            , logger              = liftIO . putStrLn
             , simpleHandlerConfig = SimpleHandlerConfig { l1TRange = fsmScL1TLow
                                                         , l2TRange = fsmScL2TLow
-                                                        , lockDuration = 600
+                                                        , lockDuration = fromInteger fsmScLockDuration
                                                         }
             }
  where
