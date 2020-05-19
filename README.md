@@ -61,13 +61,13 @@ export TORTOISE_SERVICE_FSM_SC_LOCK_DURATION=600
 - webcam endpoints to send or request an image
 - sensor data timeseries for different periods and resolutions
 - light switch control
+- finite state machine monitoring if temperature is acceptable
+- automatic temperature controlling
 
 ## upcoming / todo
 
-- documentation of the raspberry pi project
 - implement missing specs
 - webcam endpoint swagger docs
-- control of light switches from differential, intergral and dynamical parameters
 
 ## setup
 
