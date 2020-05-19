@@ -72,19 +72,19 @@ type ControlAPI
 
 {-- combined apis --}
 type TurtleJsonAPI
-  =  "status"  :> StatusAPI     :<|> 
-     "series"  :> TimeSeriesAPI :<|> 
-     "monitor" :> MonitorAPI    :<|> 
-     "control" :> ControlAPI
+  =  "v1" :> ("status"  :> StatusAPI     :<|> 
+              "series"  :> TimeSeriesAPI :<|> 
+              "monitor" :> MonitorAPI    :<|> 
+              "control" :> ControlAPI)
 
 type TurtleWebcamAPI
-  =  "webcam"  :> WebcamAPI
+  =  "v1" :> "webcam" :> WebcamAPI
 
 type TurtleWebsocketsAPI 
-  =  "stream"  :> StreamAPI
+  =  "v1" :> "stream" :> StreamAPI
 
 {-- full api type --}
 type TurtleAPI 
-  =  "v1" :> (TurtleJsonAPI   :<|> 
-              TurtleWebcamAPI :<|> 
-              TurtleWebsocketsAPI)
+  = TurtleJsonAPI :<|> 
+    TurtleWebcamAPI :<|> 
+    TurtleWebsocketsAPI
