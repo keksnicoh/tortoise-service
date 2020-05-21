@@ -43,12 +43,16 @@ createEnvironment = do
 
   fsmEmergencyDelay    <- envReadOpt (e "FSM_EMERGENCY_DELAY") "900"
   fsmSensorDelay       <- envReadOpt (e "FSM_SENSOR_DELAY") "60"
-  fsmMinTemperature    <- envReadOpt (e "FSM_MIN_TEMPERATURE") "15"
+  fsmMinTemperature    <- envReadOpt (e "FSM_MIN_TEMPERATURE") "11"
   fsmMaxTemperature    <- envReadOpt (e "FSM_MAX_TEMPERATURE") "35"
   fsmRetry             <- envReadOpt (e "FSM_RETRY") "5"
-  fsmScL1TLow          <- TRange <$> envReadOpt (e "FSM_SC_L1_TLOW") "16" <*> envReadOpt (e "FSM_SC_L1_THIGH") "25"
-  fsmScL2TLow          <- TRange <$> envReadOpt (e "FSM_SC_L2_TLOW") "20" <*> envReadOpt (e "FSM_SC_L2_THIGH") "34"
-  fsmScLockDuration    <- envReadOpt (e "FSM_SC_LOCK_DURATION") "600"
+  fsmScL1TLow <- TRange <$> envReadOpt (e "FSM_SC_L1_TLOW") "16" <*> envReadOpt
+    (e "FSM_SC_L1_THIGH")
+    "25"
+  fsmScL2TLow <- TRange <$> envReadOpt (e "FSM_SC_L2_TLOW") "20" <*> envReadOpt
+    (e "FSM_SC_L2_THIGH")
+    "34"
+  fsmScLockDuration <- envReadOpt (e "FSM_SC_LOCK_DURATION") "600"
 
   putStrLn "initialize storages..."
   state                    <- newIORef initialState
@@ -78,10 +82,12 @@ createEnvironment = do
             , openWeatherMapEnv   = openWeatherMapEnv
             , assetsPath          = assetsPath
             , houseStateConfig    = houseStateConfig
-            , simpleHandlerConfig = SimpleHandlerConfig { l1TRange = fsmScL1TLow
-                                                        , l2TRange = fsmScL2TLow
-                                                        , lockDuration = fromInteger fsmScLockDuration
-                                                        }
+            , simpleHandlerConfig = SimpleHandlerConfig
+                                      { l1TRange     = fsmScL1TLow
+                                      , l2TRange     = fsmScL2TLow
+                                      , lockDuration = fromInteger
+                                                         fsmScLockDuration
+                                      }
             }
  where
   e v = "TORTOISE_SERVICE_" <> v

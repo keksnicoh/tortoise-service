@@ -2,7 +2,8 @@
 
 As we host tortoises on our balcony we must ensure that the thermal properties of their home classify habitable.
 Sensor data, [originating from a raspberry pi][1], allow monitoring of the terrarium.
-Manual or automatic actions can be triggered to control the environment (turn on/off light bulp, ...)
+Manual or automatic actions can be triggered to control the environment (turn on/off light bulp, ...).
+[tortoise-ui][2] implements a simple standalone vuejs user interface to this service.
 
 This is a Haskell practice project.
 
@@ -97,16 +98,18 @@ source local-service.sh
 stack run
 ```
 
-## tortoise-app
+## tortoise-ui
 
-finally, the enduser experience looks like this (vuejs app)
+finally, the enduser experience looks like this (vuejs app).
+[tortoise-ui repo][2].
 
 ![screenshot of tortoise-app](https://github.com/keksnicoh/tortoise-service/blob/master/resources/tortoise-app.png)
-
-[1]: https://github.com/keksnicoh/tortoise-client
 
 ## tortoise-client
 
 [raspberry pi project repo][1]
 
 ![screenshot of raspberry pi](https://github.com/keksnicoh/tortoise-service/blob/master/resources/pi.png)
+
+[1]: https://github.com/keksnicoh/tortoise-client
+[2]: https://github.com/keksnicoh/tortoise-ui

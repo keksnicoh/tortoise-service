@@ -162,9 +162,9 @@ spec = do
           }
         forecast = COMForecast.Forecast
           { COMForecast.date = dates !! 3
-          , COMForecast.temperature = 2
-          , COMForecast.temperatureMin = 6
-          , COMForecast.temperatureMax = 8
+          , COMForecast.temperature = 273.15 + 2
+          , COMForecast.temperatureMin = 273.15 + 6
+          , COMForecast.temperatureMax = 273.15 + 8
           , COMForecast.humidity = 7
           , COMForecast.weather = Just (COMForecast.ForecastWeather "sun" "foo")
           , COMForecast.wind = 13.37
@@ -192,9 +192,9 @@ spec = do
       let
         forecast = COMForecast.Forecast
           { COMForecast.date = dates !! 3
-          , COMForecast.temperature = 2
-          , COMForecast.temperatureMin = 6
-          , COMForecast.temperatureMax = 8
+          , COMForecast.temperature = 273.15 + 2
+          , COMForecast.temperatureMin = 273.15 + 6
+          , COMForecast.temperatureMax = 273.15 + 8
           , COMForecast.humidity = 7
           , COMForecast.weather = Nothing
           , COMForecast.wind = 13.37
@@ -219,9 +219,9 @@ spec = do
       let
         forecast = COMForecast.Forecast
           { COMForecast.date = dates !! 3
-          , COMForecast.temperature = 2
-          , COMForecast.temperatureMin = 6
-          , COMForecast.temperatureMax = 8
+          , COMForecast.temperature = 273.15 + 2
+          , COMForecast.temperatureMin = 273.15 + 6
+          , COMForecast.temperatureMax = 273.15 + 8
           , COMForecast.humidity = 7
           , COMForecast.weather = Nothing
           , COMForecast.wind = 13.37
@@ -229,13 +229,13 @@ spec = do
         forecastResult = emptyForecast
           { COMForecast.cod = "200"
           , COMForecast.list =
-            [ forecast { COMForecast.temperature = 17 }
-            , forecast { COMForecast.temperature = 18 }
-            , forecast { COMForecast.temperature = 19 }
-            , forecast { COMForecast.temperature = 20 }
-            , forecast { COMForecast.temperature = 21 }
-            , forecast { COMForecast.temperature = 22 }
-            , forecast { COMForecast.temperature = 23 }
+            [ forecast { COMForecast.temperature = 273.15 + 17 }
+            , forecast { COMForecast.temperature = 273.15 + 18 }
+            , forecast { COMForecast.temperature = 273.15 + 19 }
+            , forecast { COMForecast.temperature = 273.15 + 20 }
+            , forecast { COMForecast.temperature = 273.15 + 21 }
+            , forecast { COMForecast.temperature = 273.15 + 22 }
+            , forecast { COMForecast.temperature = 273.15 + 23 }
             ]
           }
       from (dates !! 1) [] emptyState forecastResult `shouldBe` Monitor

@@ -47,7 +47,7 @@ data AutomationEnvironment m
   , simpleHandlerConfig :: SimpleHandlerConfig
   }
 
-instance D.HasCurrentTime (AutomationEnvironment IO) (HRT IO) where
+instance D.HasCurrentTime (AutomationEnvironment m) (HRT m) where
   getCurrentTime = currentTime
 
 instance CSEnv.HasState (AutomationEnvironment m) where

@@ -64,7 +64,7 @@ from date status state forecast = Monitor
     mapForecast <$> take 6 forecats
   mapForecast forecast = MonitorWeather
     { label       = renderLabel (COM.weather forecast)
-    , temperature = COM.temperature forecast
+    , temperature = COM.temperature forecast - 273.15
     , humidity    = COM.humidity forecast
     , date        = COM.date forecast
     }
