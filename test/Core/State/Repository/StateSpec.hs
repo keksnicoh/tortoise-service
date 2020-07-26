@@ -26,7 +26,7 @@ spec = do
                             Nothing
                             MonitorOK
                             Nothing
-                            (Just (read "2019-02-03 13:37:42"))
+                            (Just (read "2019-02-03 13:37:42Z"))
           f1 x | x == newState0 = newState1
           f2 x | x == newState1 = newState2
 

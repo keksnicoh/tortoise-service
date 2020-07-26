@@ -35,7 +35,7 @@ status = CDMStatus.Status
   , CDMStatus.humidity           = Nothing
   , CDMStatus.temperatureOutside = Nothing
   , CDMStatus.humidityOutside    = Nothing
-  , CDMStatus.created            = read "2019-09-04 13:36:32"
+  , CDMStatus.created            = read "2019-09-04 13:36:32Z"
   }
 
 spec :: Spec
@@ -48,7 +48,7 @@ spec = do
                                   , maxStatusAge    = 60
                                   , emergencyDelay  = return ()
                                   }
-        now            = read "2019-09-04 13:37:32"
+        now            = read "2019-09-04 13:37:32Z"
         getCurrentTime = return now
 
     it "should return Nothing when no status was provided" $ do
@@ -60,10 +60,10 @@ spec = do
 
     it "should return status which are not older than maxStatusAge" $ do
       let mockedRepository = return
-            [ status { CDMStatus.created     = read "2019-09-04 13:36:15"
+            [ status { CDMStatus.created     = read "2019-09-04 13:36:15Z"
                      , CDMStatus.temperature = Nothing
                      }
-            , status { CDMStatus.created     = read "2019-09-04 13:36:32"
+            , status { CDMStatus.created     = read "2019-09-04 13:36:32Z"
                      , CDMStatus.temperature = Just 5
                      }
             ]

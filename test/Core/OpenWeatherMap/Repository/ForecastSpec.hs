@@ -24,8 +24,8 @@ spec :: Spec
 spec =
   describe "forecastRepository" $ do
     manager <- runIO $ newManager defaultManagerSettings
-    let 
-      baseResponse = Response 
+    let
+      baseResponse = Response
         { responseStatus    = undefined
         , responseVersion   = undefined
         , responseHeaders   = undefined
@@ -36,7 +36,7 @@ spec =
       createEnv response = OpenWeatherMapEnv
         { weatherUrl     = "https://www.a.org/data/2.5/forecast/hourly?myQuery=a"
         , managedHttpLbs =
-          mockSingular 
+          mockSingular
             (`shouldSatisfy` \req ->
               method req == "GET"
                 && secure req
@@ -49,7 +49,7 @@ spec =
 
     it "throw an UnexpectedHttpStatusException if statusCode != 200" $ do
       let
-        env = createEnv $ baseResponse 
+        env = createEnv $ baseResponse
           { responseStatus = notFound404 }
       result <- try (runReaderT forecastRepository env)
       result `shouldBe` Left (UnexpectedHttpStatusException notFound404)
@@ -61,7 +61,7 @@ spec =
           , responseBody = "this is not parsable :("
           }
       result <- try (runReaderT forecastRepository env)
-      result `shouldBe` Left (InvalidResponseBodyException "Error in $: string")
+      result `shouldBe` Left (InvalidResponseBodyException "Error in $: string at 'thisisnotparsable:('")
 
     it "return a forecast by parsing json body 200 response" $ do
       contents <- BSL.readFile "test/fixtures/core/open-weather-map/forecast0.json"

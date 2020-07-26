@@ -38,7 +38,7 @@ spec = do
     it
         "lock the lights properly by id using current time and lock duration from environment"
       $ do
-          let date = read "2018-03-05 13:37:42"
+          let date = read "2018-03-05 13:37:42Z"
               env  = LockLightServiceEnv date
               updateState :: CSRState.UpdateState ST
               updateState = lift . tell . pure
@@ -51,10 +51,10 @@ spec = do
           states
             `shouldBe` [ CSMState.initialState
                          { CSMState.controlLockDate1 =
-                           Just (read "2018-03-05 13:37:42")
+                           Just (read "2018-03-05 13:37:42Z")
                          }
                        , CSMState.initialState
                          { CSMState.controlLockDate2 =
-                           Just (read "2018-03-05 13:37:42")
+                           Just (read "2018-03-05 13:37:42Z")
                          }
                        ]

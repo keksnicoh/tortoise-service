@@ -74,7 +74,7 @@ export TORTOISE_SERVICE_FSM_SC_LOCK_DURATION=600
 
 For local execution, create a psql db via docker
 
-```bash 
+```bash
 docker run --rm --name pg-docker \
   -e POSTGRES_PASSWORD=docker    \
   -d -p 5432:5432                \
@@ -91,7 +91,7 @@ source local-service.sh
 stack test
 ```
 
-Run application 
+Run application
 
 ```
 source local-service.sh

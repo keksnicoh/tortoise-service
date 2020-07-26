@@ -23,7 +23,7 @@ type RequestWebcamService m = m ()
 -- |create an instance of (PersistWebcam m) which modifies the `webcamDate`
 -- state member to the currentTime and uses a `writeFile` handle to persist
 -- the given bytestring.
--- 
+--
 -- todo: open the bytestring with something like juicepixel in order to ensure
 --       that it contains a valid jpeg.
 mkPersistWebcam

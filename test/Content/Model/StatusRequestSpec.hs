@@ -13,19 +13,19 @@ import qualified Core.Database.Model.Status    as C
 spec :: Spec
 spec = do
   describe "FromJson" $ do
-    it "should decode a json document properly" $ 
-      let 
-        value = Object $ fromList 
+    it "should decode a json document properly" $
+      let
+        value = Object $ fromList
           [ ("temperature", Number 2.1)
           , ("humidity", Number 10)
           , ("temperatureOutside", Number 3)
           , ("humidityOutside", Number 2)
           ]
-      in parse parseJSON value `shouldBe` Success 
+      in parse parseJSON value `shouldBe` Success
         (StatusRequest (Just 2.1) (Just 10)  (Just 3) (Just 2))
-    it "should decode a minimal json document properly" $ 
-      let 
-        value = Object $ fromList 
+    it "should decode a minimal json document properly" $
+      let
+        value = Object $ fromList
           [ ("temperature", Null)
           , ("humidity", Null)
           , ("temperatureOutside", Null)
@@ -34,10 +34,10 @@ spec = do
       in parse parseJSON value `shouldBe` Success
         (StatusRequest Nothing Nothing Nothing Nothing)
 
-  describe "toStatus" $ 
-    it "should create a Database model" $ 
+  describe "toStatus" $
+    it "should create a Database model" $
       let
         statusRequest = StatusRequest (Just 13.37) (Just 42) (Just 4) (Just 8)
-        date = read "2019-08-31 05:14:37"
-      in toStatus statusRequest UUID.nil date `shouldBe` C.Status 
-        UUID.nil (Just 13.37) (Just 42) (Just 4) (Just 8) date 
+        date = read "2019-08-31 05:14:37Z"
+      in toStatus statusRequest UUID.nil date `shouldBe` C.Status
+        UUID.nil (Just 13.37) (Just 42) (Just 4) (Just 8) date

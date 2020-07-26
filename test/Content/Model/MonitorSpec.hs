@@ -20,7 +20,7 @@ spec = do
     it "should serialize to JSON properly" $ do
       let
         monitor = Monitor
-          { date = read "2019-03-04 13:37:42"
+          { date = read "2019-03-04 13:37:42Z"
           , sensorTemperatur = Just 2
           , sensorHumidity = Just 4
           , sensorTemperaturOutside = Just 7
@@ -28,8 +28,8 @@ spec = do
           , switchLight1 = Just (Switch False False)
           , switchLight2 = Just (Switch True False)
           , weather =
-            [ MonitorWeather "foo" 12 43 (read "2019-03-04 14:37:42") ]
-          , webcamDate = Just (read "2020-03-04 13:37:42")
+            [ MonitorWeather "foo" 12 43 (read "2019-03-04 14:37:42Z") ]
+          , webcamDate = Just (read "2020-03-04 13:37:42Z")
           , houseState = "x"
           }
         expectedValue = Object $ fromList
@@ -61,7 +61,7 @@ spec = do
     it "should serialize to JSON properly - minimal" $ do
       let
         monitor = Monitor
-          { date = read "2019-03-04 13:37:42"
+          { date = read "2019-03-04 13:37:42Z"
           , sensorTemperatur = Nothing
           , sensorHumidity = Nothing
           , sensorTemperaturOutside = Nothing
@@ -87,12 +87,12 @@ spec = do
       toJSON monitor `shouldBe` expectedValue
 
   describe "from" $ do
-    let 
+    let
       dates =
-        [ read "2019-03-04 13:37:42"
-        , read "2019-03-04 13:37:43"
-        , read "2019-03-04 13:37:44"
-        , read "2019-03-04 13:37:45"
+        [ read "2019-03-04 13:37:42Z"
+        , read "2019-03-04 13:37:43Z"
+        , read "2019-03-04 13:37:44Z"
+        , read "2019-03-04 13:37:45Z"
         ]
       emptyState = CSMState.State
         { light1 = Nothing
@@ -186,9 +186,9 @@ spec = do
         }
     it "should work with minimal data and undefined sensor data" $ do
       from (dates !! 1) [minimalStatus] emptyState emptyForecast `shouldBe` minimalMonitor
-    it "should work with minimal data and an empty status list" $ do 
+    it "should work with minimal data and an empty status list" $ do
       from (dates !! 1) [] emptyState emptyForecast `shouldBe` minimalMonitor
-    it "should render a default weather string" $ do 
+    it "should render a default weather string" $ do
       let
         forecast = COMForecast.Forecast
           { COMForecast.date = dates !! 3
@@ -246,7 +246,7 @@ spec = do
         , sensorHumidityOutside = Nothing
         , switchLight1 = Nothing
         , switchLight2 = Nothing
-        , weather = 
+        , weather =
           [ MonitorWeather "unspecified weather" 17 7 (dates !! 3)
           , MonitorWeather "unspecified weather" 18 7 (dates !! 3)
           , MonitorWeather "unspecified weather" 19 7 (dates !! 3)

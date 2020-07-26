@@ -35,13 +35,13 @@ spec = do
                        (Just 10)
                        (Just 5)
                        (Just 0)
-                       (read "2011-11-19 18:28:33")
+                       (read "2011-11-19 18:28:33Z")
             , C.Status (read "650e8400-e29b-11d4-a716-446655440000")
                        Nothing
                        (Just 12)
                        Nothing
                        (Just 6)
-                       (read "2011-11-20 18:28:42")
+                       (read "2011-11-20 18:28:42Z")
             ]
           service = mkGetStatusService (return records)
           result  = runIdentity service
@@ -50,14 +50,14 @@ spec = do
   describe "mkPostStatusService" $ do
     let
       uuid        = read "550e8400-e29b-11d4-a716-446655440000"
-      created     = read "2011-11-20 18:28:45"
+      created     = read "2011-11-20 18:28:45Z"
       env         = DummyEnvironment (return created) (return uuid)
       request     = StatusRequest (Just 11) (Just 12) (Just 5) (Just 0)
       expectedRow = C.Status uuid (Just 11) (Just 12) (Just 5) (Just 0) created
     it "should map a successfull insertion properly" $ do
       let insertStatusRepository expectedRow = return C.Success
           service = mkPostStatusService insertStatusRepository
-          result = runReaderT (service request) env 
+          result = runReaderT (service request) env
       case runIdentity (runCatchT result) of
         Right value -> value `shouldBe` from expectedRow
         x -> fail $ "unexpected value" ++ show x
@@ -65,7 +65,7 @@ spec = do
     it "should throw an UUIDCollisionException on PkAlreadyExists summand" $ do
       let insertStatusRepository expectedRow = return C.PkAlreadyExists
           service = mkPostStatusService insertStatusRepository
-          result = runReaderT (service request) env 
+          result = runReaderT (service request) env
       case runIdentity (runCatchT result) of
         Left (SomeException e) -> show e `shouldBe` "UUIDCollisionException"
         x -> fail $ "unexpected value" ++ show x

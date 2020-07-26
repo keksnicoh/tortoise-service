@@ -24,13 +24,13 @@ instance HasAssetsPath TestEnv where
 newtype Mock a = Mock a
 
 spec :: Spec
-spec = 
+spec =
   describe "mkPersistWebcam" $
     it "should persist the file and update state" $ do
       ioRef <- newIORef []
       let
-        now         = read "2019-03-04 13:37:42"
-        currentTime = return now 
+        now         = read "2019-03-04 13:37:42Z"
+        currentTime = return now
         assetsPath  = "a/b/"
         env         = TestEnv currentTime assetsPath
         mockedUpdateState f = do

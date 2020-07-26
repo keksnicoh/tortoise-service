@@ -13,8 +13,8 @@ import           Data.Maybe                     ( mapMaybe )
 import           Automation.Model.HouseStateConfig
 
 {-| reads the last defined temperature within a configured time range.
-    if a temperature value exists then it will be interpreted to be 
-    High, Low or Bound. If no temperature value is available, the 
+    if a temperature value exists then it will be interpreted to be
+    High, Low or Bound. If no temperature value is available, the
     result of this function is Nothing. -}
 mkReadSensor
   :: (MonadReader e m, HasHouseStateConfig e, D.HasCurrentTime e m)
