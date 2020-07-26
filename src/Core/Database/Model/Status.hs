@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
@@ -20,10 +21,10 @@ import           Data.UUID                      ( UUID )
 import           Core.Internal                  ( Temperature
                                                 , Humidity
                                                 )
-import           Core.Database.Env              ( HasDbConnection(..) )
 import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.FromRow
 import           Data.Time                      ( UTCTime )
+import           OpenEnv
 
 type InsertStatusRepository m = Status -> m InsertStatusRepositoryResult
 type FetchStatusRepository m = m [Status]
@@ -47,7 +48,7 @@ instance FromRow Status where
 -- |constructs a repository which returns the last n status rows
 -- from storage.
 mkFetchStatusRepository
-  :: (MonadIO m, MonadReader e m, HasDbConnection e)
+  :: (MonadIO m, MonadReader e m, Provides Connection e)
   => Int
   -> FetchStatusRepository m
 mkFetchStatusRepository n = simpleQuery selectQuery (Only n)
@@ -63,9 +64,10 @@ mkFetchStatusRepository n = simpleQuery selectQuery (Only n)
 
 -- | consructs a repository which inserts into storage
 insertStatusRepository
-  :: (MonadIO m, MonadReader e m, HasDbConnection e) => InsertStatusRepository m
+  :: (MonadIO m, MonadReader e m, Provides Connection e)
+  => InsertStatusRepository m
 insertStatusRepository status = do
-  conn <- reader getDbConnection
+  conn <- provide
   liftIO $ do
     count <- countByStatusId conn (statusId status)
     case count of
@@ -96,7 +98,7 @@ insertStatusRepository status = do
 
 -- |fetches status within a given time frame
 fetchStatusPeriodRepository
-  :: (MonadIO m, MonadReader e m, HasDbConnection e)
+  :: (MonadIO m, MonadReader e m, Provides Connection e)
   => FetchStatusPeriodRepository m
 fetchStatusPeriodRepository = simpleQuery selectQuery
  where
@@ -110,10 +112,10 @@ fetchStatusPeriodRepository = simpleQuery selectQuery
       <> "ORDER BY \"created\" DESC "
 
 simpleQuery
-  :: (MonadIO m, MonadReader e m, HasDbConnection e, ToRow a, FromRow b)
+  :: (MonadIO m, MonadReader e m, Provides Connection e, ToRow a, FromRow b)
   => Query
   -> a
   -> m [b]
 simpleQuery q p = do
-  runner <- query <$> reader getDbConnection
+  runner <- query <$> provide
   liftIO $ runner q p

@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Content.Service.MonitorService
   ( MonitorService
   , mkMonitorService
@@ -12,11 +13,8 @@ import           Core.Database.Model.Status     ( FetchStatusPeriodRepository )
 import           Data.Time                      ( addUTCTime
                                                 , UTCTime
                                                 )
-import           Dependencies
-import           Control.Monad.Reader           ( join
-                                                , reader
-                                                , MonadReader
-                                                )
+import           OpenEnv
+import           Control.Monad.Reader           ( MonadReader )
 import           Core.OpenWeatherMap.Repository.Forecast
 
 type MonitorService m = m Monitor
@@ -24,14 +22,14 @@ toStart :: UTCTime -> UTCTime
 toStart = addUTCTime (-300)
 
 mkMonitorService
-  :: (Monad m, MonadReader e m, HasCurrentTime e m)
+  :: (MonadReader e m, Embedded UTCTime e m)
   => GetState m
   -> FetchStatusPeriodRepository m
   -> FetchForecastRepository m
   -> MonitorService m
 mkMonitorService getState fetchStatusPeriodRepository fetchForecastRepository =
   do
-    now    <- join (reader getCurrentTime)
+    now    <- embedded
     result <- fetchStatusPeriodRepository (period now)
     from now result <$> getState <*> fetchForecastRepository
   where period time = (toStart time, time)

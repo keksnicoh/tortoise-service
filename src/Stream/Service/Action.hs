@@ -13,17 +13,14 @@ import           Network.WebSockets             ( Connection
                                                 , sendTextData
                                                 , receiveData
                                                 )
-import           Control.Monad.Reader           ( reader
-                                                , MonadReader
+import           Control.Monad.Reader           ( MonadReader
                                                 , when
-                                                , join
                                                 )
 import           Data.Aeson                     ( ToJSON
                                                 , encode
                                                 )
 import           Stream.Model.LightState
 import           Stream.Model.Action
-import qualified Dependencies                  as D
 import           Data.Time
 import qualified Data.ByteString.Lazy          as LBS
 import           Core.State.Model.State
@@ -33,6 +30,8 @@ import           Control.Monad.State.Strict     ( MonadState
                                                 , StateT
                                                 , gets
                                                 )
+import qualified Data.Time                     as T
+import           OpenEnv
 
 data ActionEnv
   = ActionEnv
@@ -60,13 +59,13 @@ receive :: (MonadState ActionEnv m, MonadIO m) => m LBS.ByteString
 receive = gets receiveC >>= liftIO
 
 streamData
-  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e m)
+  :: (MonadIO m, MonadReader e m, Embedded T.UTCTime e m)
   => CS.GetState m
   -> Connection
   -> m ()
 streamData getCurrentState connection = do
   debug "new client"
-  currentTime  <- join (reader D.getCurrentTime)
+  currentTime  <- embedded
   currentState <- getCurrentState
   let env = ActionEnv { lastLightStateC    = fromState currentState
                       , pingTimeC          = currentTime
@@ -80,7 +79,7 @@ streamData getCurrentState connection = do
   run getCurrentState env
 
 run
-  :: (MonadIO m, MonadReader e m, D.HasCurrentTime e m)
+  :: (MonadIO m, MonadReader e m, Embedded T.UTCTime e m)
   => CS.GetState m
   -> ActionEnv
   -> m ()
@@ -90,7 +89,7 @@ run getCurrentState env = do
     (Continue, env) -> do
       liftIO $ threadDelay 100000
       currentState <- getCurrentState
-      currentTime  <- join (reader D.getCurrentTime)
+      currentTime  <- embedded
       run getCurrentState
           env { dispatchStateC = currentState, dispatchTimeC = currentTime }
     (Exit, a) -> debug "exit..."

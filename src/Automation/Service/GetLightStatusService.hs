@@ -1,32 +1,27 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Automation.Service.GetLightStatusService
   ( mkGetLightStatus
   )
 where
 
-import           Control.Monad.Reader           ( join
-                                                , reader
-                                                , MonadReader
-                                                )
+import           Control.Monad.Reader           ( MonadReader )
+import           OpenEnv
 import qualified Data.Time                     as T
-
-import qualified Dependencies                  as D
-
 import qualified Core.State.Repository.State   as CSRState
 import qualified Core.State.Model.State        as CSMState
-
 import           Automation.Header              ( GetLightStatus )
 import           Automation.Model.SimpleHandlerConfig
 import           Automation.Free.SimpleController
 
 -- |returns the current state of a light switch used to control the light
 mkGetLightStatus
-  :: (MonadReader e m, HasSimpleHandlerConfig e, D.HasCurrentTime e m)
+  :: (MonadReader e m, Provides SimpleHandlerConfig e, Embedded T.UTCTime e m)
   => CSRState.GetState m
   -> GetLightStatus m
 mkGetLightStatus getState lightId = do
-  lockDuration <- lockDuration <$> reader getSimpleHandlerConfig
-  time         <- join (reader D.getCurrentTime)
-  
+  lockDuration <- lockDuration <$> provide
+  time         <- embedded
+
   dispatch time lockDuration . getByLightId lightId <$> getState
  where
   dispatch time lockDuration (Just state, Just date) =

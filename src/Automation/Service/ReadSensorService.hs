@@ -1,14 +1,12 @@
+{-# LANGUAGE FlexibleContexts #-}
 
 module Automation.Service.ReadSensorService where
 
-import           Control.Monad.Reader           ( join
-                                                , reader
-                                                , MonadReader
-                                                )
+import           Control.Monad.Reader           ( MonadReader )
+import           OpenEnv
 import           Automation.FSM.HouseFSM
 import qualified Core.Database.Model.Status    as CDMStatus
 import qualified Data.Time                     as T
-import qualified Dependencies                  as D
 import           Data.Maybe                     ( mapMaybe )
 import           Automation.Model.HouseStateConfig
 
@@ -17,14 +15,14 @@ import           Automation.Model.HouseStateConfig
     High, Low or Bound. If no temperature value is available, the
     result of this function is Nothing. -}
 mkReadSensor
-  :: (MonadReader e m, HasHouseStateConfig e, D.HasCurrentTime e m)
+  :: (MonadReader e m, Provides HouseStateConfig e, Embedded T.UTCTime e m)
   => CDMStatus.FetchStatusRepository m
   -> m (Maybe TemperatureSensor)
 mkReadSensor fetchStatusRepository = do
-  minT         <- reader (minTemperature . getHouseStateConfig)
-  maxT         <- reader (maxTemperature . getHouseStateConfig)
-  maxStatusAge <- reader (maxStatusAge . getHouseStateConfig)
-  now          <- join (reader D.getCurrentTime)
+  minT         <- minTemperature <$> provide
+  maxT         <- maxTemperature <$> provide
+  maxStatusAge <- maxStatusAge <$> provide
+  now          <- embedded
   let ageFilter s = T.diffUTCTime now (CDMStatus.created s) <= maxStatusAge
       interpret [] = Nothing
       interpret (x : _) | x < minT  = Just (Low x)

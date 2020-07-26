@@ -1,12 +1,13 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveAnyClass #-}
 
 module Core.OpenWeatherMap.Repository.Forecast where
 
 import           Core.OpenWeatherMap.Model.Forecast
 import           Core.OpenWeatherMap.Env
+import           OpenEnv
 import           Control.Monad.Reader           ( liftIO
                                                 , MonadIO
-                                                , reader
                                                 , MonadReader
                                                 )
 import           Network.HTTP.Client
@@ -27,10 +28,10 @@ data ForecastRepositoryException
   deriving (Eq, Show, Exception)
 
 forecastRepository
-  :: (MonadIO m, MonadThrow m, MonadReader e m, HasOpenWeatherMapEnv e)
+  :: (MonadIO m, MonadThrow m, MonadReader e m, Provides OpenWeatherMapEnv e)
   => FetchForecastRepository m
 forecastRepository = do
-  env <- reader getOpenWeatherMapEnv
+  env <- provide
   liftIO (parseRequest (weatherUrl env) >>= managedHttpLbs env) >>= handle
  where
   handle response = case responseStatus response of

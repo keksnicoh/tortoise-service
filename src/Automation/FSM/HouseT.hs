@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -10,14 +11,14 @@ module Automation.FSM.HouseT
   )
 where
 
+import           OpenEnv
 import           Automation.FSM.HouseFSM
 import           Control.Monad.IO.Class
-import           Control.Monad.Reader           ( reader
-                                                , MonadReader
-                                                )
-import qualified Core.State.Env                as CSEnv
+import           Control.Monad.Reader           ( MonadReader )
 import qualified Core.State.Model.State        as CSMState
-import           Data.IORef                     ( modifyIORef' )
+import           Data.IORef                     ( IORef
+                                                , modifyIORef'
+                                                )
 import           Automation.Model.HouseState
 
 
@@ -32,7 +33,8 @@ newtype HouseT m a = HouseT
              )
 
 
-instance (MonadIO m, MonadReader e m, CSEnv.HasState e) => HouseFSM (HouseT m) where
+instance (MonadIO m, MonadReader e m, Provides (IORef CSMState.State) e)
+  => HouseFSM (HouseT m) where
   type State (HouseT m) = HouseState
 
   initialize = do
@@ -66,9 +68,9 @@ instance (MonadIO m, MonadReader e m, CSEnv.HasState e) => HouseFSM (HouseT m) w
     return $ reasonFrom event
 
 monitor
-  :: (MonadReader a m, CSEnv.HasState a, MonadIO m)
+  :: (MonadReader e m, Provides (IORef CSMState.State) e, MonadIO m)
   => CSMState.HouseMonitor
   -> m ()
 monitor m = do
-  stateIORef <- reader CSEnv.getState
+  stateIORef <- provide
   liftIO $ modifyIORef' stateIORef $ \s -> s { CSMState.houseMonitor = m }

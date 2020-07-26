@@ -1,13 +1,13 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Automation.Service.EmergencyService where
 
 import           Control.Monad.IO.Class
-import           Control.Monad.Reader           ( reader
-                                                , MonadReader
-                                                )
+import           Control.Monad.Reader           ( MonadReader )
 import qualified Core.State.Model.State        as CSMState
 import qualified Core.State.Repository.State   as CSRState
 import           Automation.FSM.HouseFSM
 import           Automation.Model.HouseStateConfig
+import           OpenEnv
 
 {-| this action turns off / on the lights when it is startet with a Low / High
     temperature state. it will reset to the original state when
@@ -16,16 +16,15 @@ import           Automation.Model.HouseStateConfig
     if the light state chang during delay to manual, the reset is skipped as well.
 -}
 mkEmergencyAction
-  :: (MonadIO m, MonadReader e m, HasHouseStateConfig e)
+  :: (MonadIO m, MonadReader e m, Provides HouseStateConfig e)
   => CSRState.GetState m
   -> CSRState.UpdateState m
   -> TemperatureSensor
   -> m ()
-
 mkEmergencyAction _        _           (Bound _) = return ()
 mkEmergencyAction getState updateState value     = do
   state <- getState
-  delay <- reader (emergencyDelay . getHouseStateConfig)
+  delay <- emergencyDelay <$> provide
   let light1     = CSMState.light1 state
       light2     = CSMState.light2 state
       lightState = case value of

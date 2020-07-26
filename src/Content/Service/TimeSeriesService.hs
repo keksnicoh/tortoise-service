@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Content.Service.TimeSeriesService
   ( TimeSeriesService
   , mkTimeSeriesService
@@ -8,10 +9,10 @@ where
 
 import qualified Core.Database.Model.Status    as CStatus
 import qualified Content.Model.TimeSeries      as TimeSeries
-import qualified Dependencies                  as D
 import qualified Data.Time                     as T
 import           Control.Monad.Reader
 import           Data.Maybe                     ( fromMaybe )
+import           OpenEnv
 
 type TimeSeriesService m
   =  Maybe T.UTCTime -- start time, default value: `end` - `defaultPeriod`
@@ -32,14 +33,13 @@ defaultPeriod = 24 * 3600
    timeframe (start, end). If end is undefined, then end=now. If start is
    undefined, then start=end -1hour. -}
 mkTimeSeriesService
-  :: (MonadReader e m, D.HasCurrentTime e m)
+  :: (MonadReader e m, Embedded T.UTCTime e m)
   => CStatus.FetchStatusPeriodRepository m
   -> TimeSeriesService m
 mkTimeSeriesService fetchStatusPeriodRepository startOpt endOpt = do
-  getCurrentTime <- reader D.getCurrentTime
-  (start, end)   <- case (startOpt, endOpt) of
-    (Nothing   , Nothing ) -> periodEnd <$> getCurrentTime
-    (Just start, Nothing ) -> (,) start <$> getCurrentTime
+  (start, end) <- case (startOpt, endOpt) of
+    (Nothing   , Nothing ) -> periodEnd <$> embedded
+    (Just start, Nothing ) -> (,) start <$> embedded
     (Nothing   , Just end) -> return $ periodEnd end
     (Just start, Just end) -> return (start, end)
   TimeSeries.from <$> fetchStatusPeriodRepository (start, end)

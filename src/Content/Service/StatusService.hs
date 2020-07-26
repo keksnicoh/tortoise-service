@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE LambdaCase #-}
 
@@ -17,9 +18,11 @@ import           Content.Model.Status           ( Status
 import           Content.Model.StatusRequest    ( StatusRequest
                                                 , toStatus
                                                 )
+import           OpenEnv
+import qualified Data.Time                     as T
+import           Data.UUID                      ( UUID )
 import           Control.Monad.Catch
 import qualified Core.Database.Model.Status    as C
-import           Dependencies
 
 type GetStatusService m = m [Status]
 type PostStatusService m = StatusRequest -> m Status
@@ -35,17 +38,11 @@ data PostStatusServiceException = UUIDCollisionException
 
 -- |constructs a service which persists a status
 mkPostStatusService
-  :: ( MonadThrow m
-     , MonadReader e m
-     , HasCurrentTime e m
-     , HasRandomUUID e m
-     )
+  :: (MonadThrow m, MonadReader e m, Embedded T.UTCTime e m, Embedded UUID e m)
   => C.InsertStatusRepository m
   -> PostStatusService m
 mkPostStatusService insertStatusRepository request = do
-  getCurrentTime <- reader getCurrentTime
-  getRandomUUID  <- reader getRandomUUID
-  status         <- toStatus request <$> getRandomUUID <*> getCurrentTime
+  status <- toStatus request <$> embedded <*> embedded
   insertStatusRepository status >>= \case
     C.Success         -> return (from status)
     C.PkAlreadyExists -> throwM UUIDCollisionException

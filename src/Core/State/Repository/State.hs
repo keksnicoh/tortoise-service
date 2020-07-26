@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Core.State.Repository.State
   ( UpdateState
   , updateState
@@ -7,23 +8,25 @@ module Core.State.Repository.State
 where
 
 import           Core.State.Model.State         ( State )
-import           Core.State.Env                 ( HasState(..) )
 import           Control.Monad.Reader           ( liftIO
                                                 , MonadIO
                                                 , MonadReader
-                                                , reader
                                                 )
-import           Data.IORef                     ( readIORef
+import           Data.IORef                     ( IORef
+                                                , readIORef
                                                 , atomicModifyIORef'
                                                 )
+import           OpenEnv
 
 type UpdateState m = (State -> State) -> m ()
 type GetState m = m State
 
-updateState :: (MonadIO m, MonadReader e m, HasState e) => UpdateState m
+updateState
+  :: (MonadIO m, MonadReader e m, Provides (IORef State) e) => UpdateState m
 updateState modify = do
-  ioRef <- reader getState
+  ioRef <- provide
   liftIO $ atomicModifyIORef' ioRef $ \state -> (modify state, ())
 
-currentState :: (MonadIO m, MonadReader e m, HasState e) => GetState m
-currentState = reader getState >>= liftIO . readIORef
+currentState
+  :: (MonadIO m, MonadReader e m, Provides (IORef State) e) => GetState m
+currentState = provide >>= liftIO . readIORef

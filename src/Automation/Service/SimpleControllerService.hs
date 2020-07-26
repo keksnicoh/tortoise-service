@@ -4,19 +4,17 @@
 module Automation.Service.SimpleControllerService where
 
 import           Automation.Header
-import           Control.Monad.Reader           ( reader
-                                                , MonadReader
-                                                )
+import           Control.Monad.Reader           ( MonadReader )
+import           OpenEnv
 import           Control.Monad                  ( when )
 import           Automation.Model.SimpleHandlerConfig
 import           Automation.Free.SimpleController
 
 mkControllerHandler
-  :: (MonadReader e m, HasSimpleHandlerConfig e)
+  :: (MonadReader e m, Provides SimpleHandlerConfig e)
   => SimpleControllerInterpreter () m
   -> ControlHandler m
-mkControllerHandler interpreter =
-  program <$> reader getSimpleHandlerConfig >>= interpreter
+mkControllerHandler interpreter = program <$> provide >>= interpreter
  where
   program config = do
     fmap lightA <$> getTemperature >>= \case
