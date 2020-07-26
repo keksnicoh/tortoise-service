@@ -62,8 +62,8 @@ export TORTOISE_SERVICE_FSM_SC_LOCK_DURATION=600
 - webcam endpoints to send or request an image
 - sensor data timeseries for different periods and resolutions
 - light switch control
-- finite state machine monitoring if temperature is acceptable
-- automatic temperature controlling
+- finite state machine temperature monitoring
+- automatic light controlling
 
 ## upcoming / todo
 
