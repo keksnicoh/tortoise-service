@@ -20,7 +20,6 @@ import qualified Core.State.Repository.State   as CS
 import qualified Core.OpenWeatherMap.Repository.Forecast
                                                as COR
 import qualified Data.ByteString.Lazy          as LBS
-import           Network.Wai                    ( Application )
 import           Stream.Service.Action
 
 turtleJsonServer :: ServerT TurtleJsonAPI (ReaderT (Env Handler) Handler)

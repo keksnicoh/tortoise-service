@@ -13,7 +13,7 @@ import           Automation.Model.HouseStateConfig
     temperature state. it will reset to the original state when
       - the original state was undefined
       - ...                was controlled
-    if the light state chang during delay to manual, the reset is skipped as well.  
+    if the light state chang during delay to manual, the reset is skipped as well.
 -}
 mkEmergencyAction
   :: (MonadIO m, MonadReader e m, HasHouseStateConfig e)
