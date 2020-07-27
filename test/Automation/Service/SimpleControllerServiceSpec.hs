@@ -16,7 +16,7 @@ import           Control.Monad.Reader           ( runReaderT
                                                 , ReaderT
                                                 )
 import           Control.Monad                  ( forM_ )
-
+import OpenEnv
 type ST = ReaderT ControllerHandlerEnv (Writer [String])
 newtype ControllerHandlerEnv = ControllerHandlerEnv SimpleHandlerConfig
 instance HasSimpleHandlerConfig ControllerHandlerEnv where
@@ -28,7 +28,7 @@ spec = do
     let mockInterpreter
           :: Maybe Temperature
           -> (LightId -> LightStatus)
-          -> SimpleControllerInterpreter a ST
+          -> SimpleControllerInterpreter a (ReaderT e (Writer [String]))
         mockInterpreter temperature getLightStatus = foldFree $ \case
           GetTemperature n -> n <$> do
             tell ["GetTemperature"]
@@ -41,11 +41,11 @@ spec = do
           LockLight lightId n -> n <$ tell ["LockLight " ++ show lightId]
 
         runTest interpreter =
-          let env = ControllerHandlerEnv $ SimpleHandlerConfig
+          let env = SimpleHandlerConfig
                 { l1TRange     = TRange 10 27
                 , l2TRange     = TRange 9 28
                 , lockDuration = 1337
-                }
+                } #: nil
               controllerHandler = mkControllerHandler interpreter
           in  runWriter $ runReaderT controllerHandler env
 

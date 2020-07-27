@@ -1,7 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Env
+module ApplicationMode
   ( ApplicationMode(..)
   )
 where
@@ -11,4 +11,3 @@ data ApplicationMode
   | Staging
   | Production
   deriving (Eq, Show)
-

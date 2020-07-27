@@ -7,7 +7,7 @@ import           Data.IORef                     ( readIORef
                                                 , newIORef
                                                 )
 import           Control.Monad.Reader           ( ReaderT(runReaderT) )
-
+import OpenEnv
 spec :: Spec
 spec = do
   describe "updateState" $ do
@@ -31,7 +31,7 @@ spec = do
           f2 x | x == newState1 = newState2
 
       ioRef <- newIORef newState0
-      runReaderT (updateState f1) ioRef
+      runReaderT (updateState f1) (ioRef #: nil)
       readIORef ioRef >>= flip shouldBe newState1
-      runReaderT (updateState f2) ioRef
+      runReaderT (updateState f2) (ioRef #: nil)
       readIORef ioRef >>= flip shouldBe newState2

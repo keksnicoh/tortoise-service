@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -12,18 +13,9 @@ import           Content.Model.StatusRequest
 import           Control.Monad.Identity
 import qualified Core.Database.Model.Status    as C
 import           Test.Hspec
-import qualified Data.UUID                     as U
-import qualified Data.Time                     as T
-import           Dependencies
 import           Control.Monad.Reader
 import Control.Monad.Catch.Pure
-
-type RT = ReaderT DummyEnvironment (CatchT Identity)
-data DummyEnvironment = DummyEnvironment (RT T.UTCTime) (RT U.UUID)
-instance HasCurrentTime DummyEnvironment RT where
-  getCurrentTime (DummyEnvironment t _) =  t
-instance HasRandomUUID DummyEnvironment RT where
-  getRandomUUID (DummyEnvironment _ u) =  u
+import OpenEnv
 
 spec :: Spec
 spec = do
@@ -51,7 +43,7 @@ spec = do
     let
       uuid        = read "550e8400-e29b-11d4-a716-446655440000"
       created     = read "2011-11-20 18:28:45Z"
-      env         = DummyEnvironment (return created) (return uuid)
+      env         = return @(CatchT Identity) created #: return @(CatchT Identity) uuid #: nil
       request     = StatusRequest (Just 11) (Just 12) (Just 5) (Just 0)
       expectedRow = C.Status uuid (Just 11) (Just 12) (Just 5) (Just 0) created
     it "should map a successfull insertion properly" $ do

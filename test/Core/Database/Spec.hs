@@ -7,13 +7,13 @@ module Core.Database.Spec where
 import           Test.Hspec
 import qualified Core.Database.Model.StatusSpec
 import           Database.PostgreSQL.Simple
-import           SpecEnv
 import qualified Data.ByteString               as BS
 import           Data.ByteString.Internal      as BSI
 import           System.Environment             ( lookupEnv )
 import           Control.Exception              ( SomeException
                                                 , try
                                                 )
+import           OpenEnv
 
 databaseSpec :: IO (Maybe Spec)
 databaseSpec = do
@@ -22,12 +22,14 @@ databaseSpec = do
     Nothing -> return Nothing
     Just psqlConnectionString ->
       try (connectPostgreSQL psqlConnectionString) >>= \case
-        Left  (x :: SomeException) -> return Nothing
+        Left  (x :: SomeException) -> do
+          print x
+          return Nothing
         Right connection           -> do
           cleanDbSql <- BS.readFile "sql/clean.sql"
           dbSchema   <- BS.readFile "sql/db.sql"
           let fullSchema = [cleanDbSql, dbSchema]
-              env = Env { dbConnection = connection, dbSchema = fullSchema }
+              env        = connection #: fullSchema #: nil
           return
             $ Just
             $ describe "Core.Database.Model.StatusSpec"

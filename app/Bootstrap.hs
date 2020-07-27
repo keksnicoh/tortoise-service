@@ -9,7 +9,7 @@
 module Bootstrap where
 
 import           Database.PostgreSQL.Simple
-import           Env
+import           ApplicationMode
 import           Data.UUID.V4                   ( nextRandom )
 import qualified Data.Time                     as T
 import           GHC.IORef                      ( newIORef )
@@ -48,6 +48,7 @@ defaultPort = "8081"
 type Environment
   = '[Port, Connection, IORef State, SimpleHandlerConfig, ApplicationMode, OpenWeatherMapEnv, Handler
     T.UTCTime, Handler UUID, FilePath, HouseStateConfig, FSMNRetry]
+
 -- |creates an environment by reading system environment.
 createEnvironment :: IO (HList Environment)
 createEnvironment = do

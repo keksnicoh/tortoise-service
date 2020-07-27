@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -17,17 +18,13 @@ import           Data.IORef                     ( newIORef
                                                 )
 import           Automation.Model.HouseStateConfig
 import           Automation.Service.EmergencyService
+import           OpenEnv
 
-type RT = ReaderT EmergencyServiceEnv IO
-newtype EmergencyServiceEnv = MkEmergencyServiceEnv HouseStateConfig
-instance HasHouseStateConfig EmergencyServiceEnv where
-  getHouseStateConfig (MkEmergencyServiceEnv c) = c
 
 undefinedConfig :: HouseStateConfig
 undefinedConfig = HouseStateConfig { delaySensorRead = undefined
                                    , minTemperature  = undefined
                                    , maxTemperature  = undefined
-                                   , retrySensorRead = undefined
                                    , maxStatusAge    = undefined
                                    , emergencyDelay  = undefined
                                    }
@@ -51,7 +48,7 @@ spec = do
           config  = undefinedConfig
             { emergencyDelay = log DelayLog >> delayf logIORef
             }
-          env = MkEmergencyServiceEnv config
+          env = config #: nil
         return (logIORef, service, env)
 
       delayAction _ = return ()

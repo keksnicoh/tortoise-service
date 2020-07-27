@@ -1,18 +1,15 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase                 #-}
 
-module Automation.FSM.Transitions
-
-where
+module Automation.FSM.Transitions where
 
 import           Control.Monad.Reader           ( MonadReader
                                                 , (>=>)
                                                 )
-import Automation.FSM.HouseFSM
-import Automation.Header
-import OpenEnv
-import Automation.Env
-
+import           Automation.FSM.HouseFSM
+import           Automation.Header
+import           OpenEnv
+import           Automation.Env                 ( FSMNRetry )
 
 type Delay = Int
 

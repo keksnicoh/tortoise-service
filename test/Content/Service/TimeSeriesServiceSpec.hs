@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
@@ -12,21 +13,17 @@ import           Content.Model.TimeSeries
 import qualified Data.UUID                     as UUID
 import           Data.Time
 import           Control.Monad.Reader           ( ReaderT(runReaderT) )
-import           Dependencies
 import           Control.Monad.Identity         ( runIdentity
                                                 , Identity
                                                 )
-
-type RT = ReaderT (Identity UTCTime) Identity
-instance HasCurrentTime (Identity UTCTime) RT where
-  getCurrentTime = return . runIdentity
+import           OpenEnv
 
 spec :: Spec
 spec = do
   describe "mkTimeSeriesService" $ do
     let timeMockNotExpectedToBeInvoke = undefined
-        timeNow                       = read "2019-02-03 13:37:31Z"
-        timeMock                      = return timeNow
+        timeNow                       = read @UTCTime "2019-02-03 13:37:31Z"
+        timeMock                      = return @Identity timeNow
         records =
           [ C.Status { C.statusId           = UUID.nil
                      , C.temperature        = Just 1
@@ -45,23 +42,23 @@ spec = do
           ]
         mockRepository expected result = mock
          where
-          mock :: C.FetchStatusPeriodRepository RT
           mock arg | arg == expected = return result
-                   | otherwise       = error $ "unexpected invocation: " ++ show arg
+                   | otherwise = error $ "unexpected invocation: " ++ show arg
     it "should pass a defined period and transform the result" $ do
-      let start      = read "2019-02-03 13:37:30Z"
-          end        = read "2020-02-03 13:37:50Z"
-          repository = mockRepository (start, end) records
-          service    = mkTimeSeriesService repository
-          effect     = service (Just start) (Just end)
-          result     = runReaderT effect timeMockNotExpectedToBeInvoke
+      let
+        start      = read "2019-02-03 13:37:30Z"
+        end        = read "2020-02-03 13:37:50Z"
+        repository = mockRepository (start, end) records
+        service    = mkTimeSeriesService repository
+        effect     = service (Just start) (Just end)
+        result = runReaderT effect (return @Identity @UTCTime undefined #: nil)
       runIdentity result `shouldBe` from records
     it "should use (now - 24hours, now) for undefined period" $ do
       let start      = read "2019-02-02 13:37:31Z"
           repository = mockRepository (start, timeNow) records
           service    = mkTimeSeriesService repository
           effect     = service Nothing Nothing
-          result     = runReaderT effect timeMock
+          result     = runReaderT effect (timeMock #: nil)
       runIdentity result `shouldBe` from records
     it "should use (start, now) for undefined end" $ do
       let start      = read "2019-02-03 11:33:31Z"
@@ -69,7 +66,7 @@ spec = do
           repository = mockRepository (start, timeNow) records
           service    = mkTimeSeriesService repository
           effect     = service (Just start) Nothing
-          result     = runReaderT effect timeMock
+          result     = runReaderT effect (timeMock #: nil)
       runIdentity result `shouldBe` from records
     it "should use (end - 24hours, end) for undefined start" $ do
       let start      = read "2019-02-02 13:11:22Z"
@@ -77,7 +74,7 @@ spec = do
           repository = mockRepository (start, end) records
           service    = mkTimeSeriesService repository
           effect     = service Nothing (Just end)
-          result     = runReaderT effect timeMock
+          result     = runReaderT effect (timeMock #: nil)
       runIdentity result `shouldBe` from records
 
   describe "mkGroupedTimeSeriesService" $ do

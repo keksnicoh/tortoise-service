@@ -16,42 +16,42 @@ import           Servant.Multipart
 {-- # Endpoint section: single endpoint definitions --}
 
 {-- status endpoints --}
-type SetStatusEndpoint 
-  =  ReqBody '[JSON] StatusRequest 
+type SetStatusEndpoint
+  =  ReqBody '[JSON] StatusRequest
   :> Post '[JSON] Status
 
-type GetStatusEndpoint 
+type GetStatusEndpoint
   =  Get '[JSON] [Status]
 
 {-- timeseries endpoints --}
 type GetTimeSeriesEndpoint
-  =  QueryParam "start" UTCTime 
-  :> QueryParam "end" UTCTime 
-  :> QueryParam "timeWindow" NominalDiffTime 
+  =  QueryParam "start" UTCTime
+  :> QueryParam "end" UTCTime
+  :> QueryParam "timeWindow" NominalDiffTime
   :> Get '[JSON] TimeSeries
 
 {-- switch control endpoints --}
 type PostSwitchEndpoint
-  =  ReqBody '[JSON] SwitchRequest 
+  =  ReqBody '[JSON] SwitchRequest
   :> PostNoContent '[JSON] ()
 
 {-- monitoring endpoints --}
-type GetMonitorEndpoint 
+type GetMonitorEndpoint
   =  Get '[JSON] Monitor
 
 {-- webcam endpoints --}
-type PostWebcamEndpoint 
+type PostWebcamEndpoint
   =  MultipartForm Mem (MultipartData Mem)
   :> PostNoContent '[JSON] ()
 
-type RequestWebcamEndpoint 
+type RequestWebcamEndpoint
    = PostNoContent '[JSON] ()
 
 {-- # API section: combinations of several endpoints --}
 
 {-- api's grouped by path namespace --}
 type WebcamAPI
-  =  "image"   :> PostWebcamEndpoint :<|> 
+  =  "image"   :> PostWebcamEndpoint :<|>
      "request" :> RequestWebcamEndpoint
 
 type StreamAPI
@@ -64,7 +64,7 @@ type StatusAPI
 type TimeSeriesAPI
   =  GetTimeSeriesEndpoint
 
-type MonitorAPI 
+type MonitorAPI
   =  GetMonitorEndpoint
 
 type ControlAPI
@@ -72,19 +72,19 @@ type ControlAPI
 
 {-- combined apis --}
 type TurtleJsonAPI
-  =  "v1" :> ("status"  :> StatusAPI     :<|> 
-              "series"  :> TimeSeriesAPI :<|> 
-              "monitor" :> MonitorAPI    :<|> 
+  =  "v1" :> ("status"  :> StatusAPI     :<|>
+              "series"  :> TimeSeriesAPI :<|>
+              "monitor" :> MonitorAPI    :<|>
               "control" :> ControlAPI)
 
 type TurtleWebcamAPI
   =  "v1" :> "webcam" :> WebcamAPI
 
-type TurtleWebsocketsAPI 
+type TurtleWebsocketsAPI
   =  "v1" :> "stream" :> StreamAPI
 
 {-- full api type --}
-type TurtleAPI 
-  = TurtleJsonAPI :<|> 
-    TurtleWebcamAPI :<|> 
+type TurtleAPI
+  = TurtleJsonAPI :<|>
+    TurtleWebcamAPI :<|>
     TurtleWebsocketsAPI
