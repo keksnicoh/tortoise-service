@@ -36,7 +36,6 @@ instance (Traversable t, Applicative m, Get t (m a) ts)
   => EmbeddedF t a (HList ts) (HouseT (ReaderT (HList ts) m)) where
   embeddedFromF = HouseT . ReaderT . const . sequenceA . getF
 
-
 instance (MonadIO m, MonadReader e m, Provides (IORef CSMState.State) e)
   => HouseFSM (HouseT m) where
   type State (HouseT m) = HouseState

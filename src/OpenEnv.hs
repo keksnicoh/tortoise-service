@@ -20,18 +20,11 @@ module OpenEnv
   , provideF
   , embedded
   , embeddedF
-  , labeled
-  , labeledF
-  , Labeled(..)
-  , LabeledF(..)
-  , Label(..)
   , Embedded
   , getValue
   )
 where
 
-import           Data.Kind                      ( Type )
-import qualified GHC.TypeLits                  as TL
 import           Control.Monad.Reader           ( ReaderT(..)
                                                 , asks
                                                 , join
@@ -44,8 +37,6 @@ import           HList
 
 type Provides a e = ProvidesF Identity a e
 type Embedded a e m = EmbeddedF Identity a e m
-type Labeled l a e = Provides (Label l a) e
-type LabeledF f l a e = ProvidesF f (Label l a) e
 
 -- | provides an effectfull computation
 class ProvidesF f a e where
@@ -61,10 +52,6 @@ instance Get f t ts => ProvidesF f t (HList ts) where
 instance (Traversable t, Applicative m, Get t (m a) ts)
   => EmbeddedF t a (HList ts) (ReaderT (HList ts) m) where
   embeddedFromF = ReaderT . const . sequenceA . getF
-
-newtype Label (l :: TL.Symbol) (t :: Type)
-  = Label { runLabel :: t }
-  deriving (Show, Eq)
 
 getValue :: forall t e . Provides t e => e -> t
 getValue = runIdentity . provideFromF @Identity @t
@@ -118,32 +105,3 @@ embedded = runIdentity <$> embeddedF @Identity @a
 -}
 embeddedF :: forall t a e m . (MonadReader e m, EmbeddedF t a e m) => m (t a)
 embeddedF = join . asks $ embeddedFromF
-
-{-|
-  receives label from environment
-
-  @
-    f :: (MonadReader e m, Labeled "a" String e) -> m String
-    f = do
-      label <- labeled  @"a" @String
-      return label
-  @
--}
-labeled :: forall l a e m . (MonadReader e m, Labeled l a e) => m a
-labeled = runLabel <$> provide @(Label l a)
-
-{-|
-  receives label within functorial context from environment
-
-  @
-    f :: (MonadReader e m, LabeledF [] "a" String e) -> m [String]
-    f = do
-      labels <- labeledF @[] @"a" @String
-      return labels
-  @
--}
-labeledF
-  :: forall f l a e m
-   . (Functor f, MonadReader e m, LabeledF f l a e)
-  => m (f a)
-labeledF = fmap runLabel <$> provideF @f @(Label l a)

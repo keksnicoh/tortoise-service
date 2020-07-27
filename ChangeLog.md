@@ -1,5 +1,8 @@
 # Changelog for tortoise-service
 
+- **0.2.1** OpenEnv
+  - migrated project to use OpenEnv
+
 - **0.2.0** House Automation & Parametrized Environment
   - Emergency Mode if temperature is out of bounds (`Automation.HouseFSM`)
   - For bound temperature, simple house controlling based on two temperature intervals is implemented (`Automation.Free`)
@@ -16,4 +19,3 @@
   - Websockets API for server <-> client communication
 
 ## Unreleased changes
-
