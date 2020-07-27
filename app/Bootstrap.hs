@@ -35,7 +35,6 @@ import           Automation.Model.SimpleHandlerConfig
 import           Control.Concurrent             ( threadDelay )
 import           Control.Monad.Reader           ( MonadIO(liftIO) )
 import           OpenEnv
-import           HList
 import           Data.IORef                     ( IORef )
 import           Servant.Server.Internal.Handler
                                                 ( Handler )

@@ -13,6 +13,7 @@ defined by HList.
 module OpenEnv
   ( nil
   , (#:)
+  , HList
   , Provides(..)
   , ProvidesF(..)
   , EmbeddedF(..)
@@ -53,6 +54,12 @@ instance (Traversable t, Applicative m, Get t (m a) ts)
   => EmbeddedF t a (HList ts) (ReaderT (HList ts) m) where
   embeddedFromF = ReaderT . const . sequenceA . getF
 
+{-|
+  returns a value from environment
+  @
+    getValue @String env
+  @
+-}
 getValue :: forall t e . Provides t e => e -> t
 getValue = runIdentity . provideFromF @Identity @t
 

@@ -57,12 +57,6 @@ instance (Applicative f, HasIndexOf t ts) => Get f t ts where
 get :: forall t ts . Get Identity t ts => HList ts -> t
 get = runIdentity . getF
 
-headHV :: forall t ts . HList (t ': ts) -> t
-headHV = get
-
-tailHV :: forall t ts m . HList ts -> HList (Eval (Tail ts))
-tailHV (HList v) = HList (V.unsafeTail v)
-
 indexOf :: forall t ts . HasIndexOf t ts => Int
 indexOf = fromIntegral . TL.natVal $ Proxy @(IndexOf t ts)
 
@@ -88,17 +82,7 @@ type family FindIndexList_ (i :: TL.Nat) (x :: a) (xs :: [a]) :: [TL.Nat] where
   FindIndexList_ i t (t ': xs) = i ': FindIndexList_ ((TL.+) i 1) t xs
   FindIndexList_ i o (t ': xs) =      FindIndexList_ ((TL.+) i 1) o xs
 
-type family Drop_ (n :: TL.Nat) (xs :: [a]) :: [a] where
-  Drop_ _ '[]       = '[]
-  Drop_ 0  as       = as
-  Drop_ n (x ': xs) = Drop_ ((TL.-) n 1) xs
-
 -- # FCF
-data Drop :: TL.Nat -> [a] -> Exp [a]
-type instance Eval (Drop n as) = Drop_ n as
-
-data Tail :: [a] -> Exp [a]
-type instance Eval (Tail as) = Eval (Drop 1 as)
 
 data FindIndexList :: a -> [a] -> Exp [TL.Nat]
 type instance Eval (FindIndexList n as) = FindIndexList_ 0 n as
@@ -124,22 +108,3 @@ instance (TL.KnownNat x, KnownListNat xs) => KnownListNat (x ': xs) where
     headP _ = Proxy
     tailP :: Proxy (n ': ns) -> Proxy ns
     tailP _ = Proxy
-
--- instances
-
-instance Show (HList '[]) where
-  show _ = "Nil"
-instance (Show a, Show (HList ts)) => Show (HList (a ': ts)) where
-  show hv = show (get @a hv) ++ " :# " ++ show (tailHV hv)
-
-instance Eq (HList '[]) where
-  _ == _ = True
-instance (Eq t, Eq (HList ts)) => Eq (HList (t ': ts)) where
-  l1 == l2 = headHV l1 == headHV l2 && (tailHV l1 == tailHV l2)
-
-instance Ord (HList '[]) where
-  compare _ _ = EQ
-instance (Ord t, Ord (HList ts)) => Ord (HList (t ': ts)) where
-  compare l1 l2 = case compare (headHV l1) (headHV l2) of
-    EQ -> compare (tailHV l1) (tailHV l2)
-    r  -> r
