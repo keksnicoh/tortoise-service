@@ -1,20 +1,20 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase                 #-}
 
 module Automation.FSM.Transitions
 
 where
 
-import           Control.Monad.Reader           ( reader
-                                                , MonadReader
+import           Control.Monad.Reader           ( MonadReader
                                                 , (>=>)
                                                 )
 import Automation.FSM.HouseFSM
 import Automation.Header
+import OpenEnv
+import Automation.Env
+
 
 type Delay = Int
-
-class HasFSMNRetry a where
-  getFSMNRetry :: a -> Int
 
 data FSMHandlers m
   = FSMHandlers
@@ -25,7 +25,7 @@ data FSMHandlers m
   }
 
 mkFSM
-  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  :: (HouseFSM m, Monad m, MonadReader e m, Provides FSMNRetry e)
   => FSMHandlers m
   -> m (State m Terminating)
 mkFSM h = initialize >>= start h
@@ -33,7 +33,7 @@ mkFSM h = initialize >>= start h
 -- |starts finite state machine by reading sensor data. If no sensor data
 -- is available, then the fsm is terminated.
 start
-  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  :: (HouseFSM m, Monad m, MonadReader e m, Provides FSMNRetry e)
   => FSMHandlers m
   -> State m Initializing
   -> m (State m Terminating)
@@ -47,7 +47,7 @@ start h state = do
 
 -- |verifies that the temperature is bound (verified) or unbound (emergency).
 verifySensorData
-  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  :: (HouseFSM m, Monad m, MonadReader e m, Provides FSMNRetry e)
   => FSMHandlers m
   -> TemperatureSensor
   -> State m HasSensorData
@@ -57,9 +57,9 @@ verifySensorData h sd        = emergency >=> emergencyProgram h sd
 
 -- |temperature is bound, controlTick can be executed. After delay, new sensor
 -- data is read which either leads to a transition back into HasSensorData or
--- RetrySensor. 
+-- RetrySensor.
 bound
-  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  :: (HouseFSM m, Monad m, MonadReader e m, Provides FSMNRetry e)
   => FSMHandlers m
   -> State m TemperatureBound
   -> m (State m Terminating)
@@ -72,16 +72,16 @@ bound h state = do
  where
   onError state = do
     newState <- retry (LostSensor state)
-    nRetry   <- reader getFSMNRetry
+    nRetry   <- provide
     retryReadSensor h nRetry newState
   onSuccess sd = sensorRead sd . NewSensorData >=> verifySensorData h sd
 
 -- |when sensor data could not be read, n retries are performed. If temperature
 -- data is available again, then a transition into HasSensorData is performed.
 retryReadSensor
-  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  :: (HouseFSM m, Monad m, MonadReader e m, Provides FSMNRetry e)
   => FSMHandlers m
-  -> Int
+  -> FSMNRetry
   -> State m RetrySensor
   -> m (State m Terminating)
 retryReadSensor h n state
@@ -95,7 +95,7 @@ retryReadSensor h n state
 
 -- |when the temperture is out of bounds, this procedure is executed
 emergencyProgram
-  :: (HouseFSM m, Monad m, MonadReader e m, HasFSMNRetry e)
+  :: (HouseFSM m, Monad m, MonadReader e m, Provides FSMNRetry e)
   => FSMHandlers m
   -> TemperatureSensor
   -> State m Emergency

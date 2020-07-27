@@ -26,6 +26,7 @@ module OpenEnv
   , LabeledF(..)
   , Label(..)
   , Embedded
+  , getValue
   )
 where
 
@@ -64,6 +65,9 @@ instance (Traversable t, Applicative m, Get t (m a) ts)
 newtype Label (l :: TL.Symbol) (t :: Type)
   = Label { runLabel :: t }
   deriving (Show, Eq)
+
+getValue :: forall t e . Provides t e => e -> t
+getValue = runIdentity . provideFromF @Identity @t
 
 {-|
   provides a value from environment

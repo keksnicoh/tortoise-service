@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -6,7 +7,6 @@
 
 module Swagger where
 
-import           Env
 import           Data.Proxy
 import           Network.Wai
 import           Servant.API
@@ -44,7 +44,7 @@ api = Proxy
 turtleSwagger :: Swagger
 turtleSwagger = toSwagger turtleJsonAPI
 
-turtleSwaggerServer :: ServerT SwaggerTurtleApi (ReaderT (Env Handler) Handler)
+turtleSwaggerServer :: TurtleEnv e => ServerT SwaggerTurtleApi (ReaderT e Handler)
 turtleSwaggerServer = turtleServer :<|> swaggerServer :<|> directoryServer
  where
   swaggerServer   = return turtleSwagger
@@ -53,7 +53,7 @@ turtleSwaggerServer = turtleServer :<|> swaggerServer :<|> directoryServer
 swaggerAPI :: Proxy SwaggerTurtleApi
 swaggerAPI = Proxy
 
-swaggerApp :: Env Handler -> Application
+swaggerApp :: TurtleEnv e => e -> Application
 swaggerApp s = serve swaggerAPI
   $ hoistServer swaggerAPI (nt s) turtleSwaggerServer
   where nt s x = runReaderT x s

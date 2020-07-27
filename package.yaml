@@ -49,6 +49,7 @@ dependencies:
 - vector
 - websockets
 - free
+- first-class-families
 
 library:
   source-dirs: src

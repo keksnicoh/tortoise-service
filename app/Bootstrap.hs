@@ -1,6 +1,10 @@
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds #-}
 
 module Bootstrap where
 
@@ -9,7 +13,9 @@ import           Env
 import           Data.UUID.V4                   ( nextRandom )
 import qualified Data.Time                     as T
 import           GHC.IORef                      ( newIORef )
-import           Core.State.Model.State         ( initialState )
+import           Core.State.Model.State         ( initialState
+                                                , State
+                                                )
 import           Core.OpenWeatherMap.Env
 import           Network.HTTP.Client            ( httpLbs
                                                 , newManager
@@ -27,12 +33,23 @@ import           Automation.Model.SimpleHandlerConfig
                                                 )
 import           Control.Concurrent             ( threadDelay )
 import           Control.Monad.Reader           ( MonadIO(liftIO) )
+import           OpenEnv
+import           HList
+import           Data.IORef                     ( IORef )
+import           Servant.Server.Internal.Handler
+                                                ( Handler )
+import           Data.UUID                      ( UUID )
+import           Network.Wai.Handler.Warp       ( Port )
+import           Automation.Env
 
 defaultPort :: String
 defaultPort = "8081"
 
+type Environment
+  = '[Port, Connection, IORef State, SimpleHandlerConfig, ApplicationMode, OpenWeatherMapEnv, Handler
+    T.UTCTime, Handler UUID, FilePath, HouseStateConfig, FSMNRetry]
 -- |creates an environment by reading system environment.
-createEnvironment :: MonadIO m => IO (Env m)
+createEnvironment :: IO (HList Environment)
 createEnvironment = do
   putStrLn "read environment..."
   psqlConnectionString <- envPSQL (e "PSQL")
@@ -60,35 +77,30 @@ createEnvironment = do
   openWeatherMapTlsManager <- newManager tlsManagerSettings
 
   return
-    $ let houseStateConfig = HouseStateConfig
-            { delaySensorRead = fsmSensorDelay * 1000000
-            , minTemperature  = fsmMinTemperature
-            , maxTemperature  = fsmMaxTemperature
-            , retrySensorRead = fsmRetry
-            , maxStatusAge    = 600
-            , emergencyDelay  = threadDelay $ fsmEmergencyDelay * 1000000
-            }
-          openWeatherMapEnv = OpenWeatherMapEnv
-            { managedHttpLbs = (`httpLbs` openWeatherMapTlsManager)
-            , weatherUrl     = openWeatherMapApi
-            }
-      in  Env
-            { applicationMode     = applicationMode
-            , dbConnection        = dbConnection
-            , port                = port
-            , currentTime         = liftIO T.getCurrentTime
-            , randomUUID          = liftIO nextRandom
-            , state               = state
-            , openWeatherMapEnv   = openWeatherMapEnv
-            , assetsPath          = assetsPath
-            , houseStateConfig    = houseStateConfig
-            , simpleHandlerConfig = SimpleHandlerConfig
-                                      { l1TRange     = fsmScL1TLow
-                                      , l2TRange     = fsmScL2TLow
-                                      , lockDuration = fromInteger
-                                                         fsmScLockDuration
-                                      }
-            }
+    $  port
+    #: dbConnection
+    #: state
+    #: SimpleHandlerConfig { l1TRange     = fsmScL1TLow
+                           , l2TRange     = fsmScL2TLow
+                           , lockDuration = fromInteger fsmScLockDuration
+                           }
+    #: applicationMode
+    #: OpenWeatherMapEnv { managedHttpLbs = (`httpLbs` openWeatherMapTlsManager)
+                         , weatherUrl     = openWeatherMapApi
+                         }
+    #: liftIO T.getCurrentTime
+    #: liftIO nextRandom
+    #: assetsPath
+    #: HouseStateConfig
+         { delaySensorRead = fsmSensorDelay * 1000000
+         , minTemperature  = fsmMinTemperature
+         , maxTemperature  = fsmMaxTemperature
+         , maxStatusAge    = 600
+         , emergencyDelay  = threadDelay $ fsmEmergencyDelay * 1000000
+         }
+    #: fsmRetry
+    #: nil
+
  where
   e v = "TORTOISE_SERVICE_" <> v
   requiredEnv env = lookupEnv env >>= \case

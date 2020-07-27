@@ -12,6 +12,7 @@ The HList serves as an open environment
 module HList
   ( (#:)
   , nil
+  , get
   , Get(..)
   , HList
   )

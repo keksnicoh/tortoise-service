@@ -14,13 +14,13 @@ where
 import           OpenEnv
 import           Automation.FSM.HouseFSM
 import           Control.Monad.IO.Class
-import           Control.Monad.Reader           ( MonadReader )
+import           Control.Monad.Reader           (ReaderT(..),  MonadReader )
 import qualified Core.State.Model.State        as CSMState
 import           Data.IORef                     ( IORef
                                                 , modifyIORef'
                                                 )
 import           Automation.Model.HouseState
-
+import HList
 
 -- |MTL style transformer
 newtype HouseT m a = HouseT
@@ -31,6 +31,10 @@ newtype HouseT m a = HouseT
              , MonadIO
              , MonadReader e
              )
+
+instance (Traversable t, Applicative m, Get t (m a) ts)
+  => EmbeddedF t a (HList ts) (HouseT (ReaderT (HList ts) m)) where
+  embeddedFromF = HouseT . ReaderT . const . sequenceA . getF
 
 
 instance (MonadIO m, MonadReader e m, Provides (IORef CSMState.State) e)
