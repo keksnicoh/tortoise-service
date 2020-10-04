@@ -10,9 +10,11 @@ where
 import qualified Core.Database.Model.Status    as CStatus
 import qualified Content.Model.TimeSeries      as TimeSeries
 import qualified Data.Time                     as T
-import           Control.Monad.Reader
+import           Control.Monad.Reader           ( MonadReader )
 import           Data.Maybe                     ( fromMaybe )
-import           OpenEnv
+import           OpenEnv                        ( embedded
+                                                , Embedded
+                                                )
 
 type TimeSeriesService m
   =  Maybe T.UTCTime -- start time, default value: `end` - `defaultPeriod`

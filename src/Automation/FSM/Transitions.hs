@@ -6,9 +6,41 @@ module Automation.FSM.Transitions where
 import           Control.Monad.Reader           ( MonadReader
                                                 , (>=>)
                                                 )
-import           Automation.FSM.HouseFSM
-import           Automation.Header
-import           OpenEnv
+import           Automation.FSM.HouseFSM        ( Emergency
+                                                , HasSensorData
+                                                , HasSensorDataEvent
+                                                  ( RecoveredSensorData
+                                                  , SensorReadable
+                                                  , NewSensorData
+                                                  )
+                                                , HouseFSM(..)
+                                                , Initializing
+                                                , RetrySensor
+                                                , RetrySensorEvent
+                                                  ( Retry
+                                                  , LostSensor
+                                                  )
+                                                , TemperatureBound
+                                                , TemperatureBoundEvent
+                                                  ( TemperatureRecovered
+                                                  , TemperatureVerified
+                                                  )
+                                                , TemperatureSensor(Bound)
+                                                , Terminating
+                                                , TransitionTerminating
+                                                  ( EmergencyNotResolved
+                                                  , SensorNotInitialized
+                                                  , SensorUnavailable
+                                                  )
+                                                )
+import           Automation.Header              ( ControlHandler
+                                                , DelayHandler
+                                                , EmergencyHandler
+                                                , ReadSensorHandler
+                                                )
+import           OpenEnv                        ( provide
+                                                , Provides
+                                                )
 import           Automation.Env                 ( FSMNRetry )
 
 type Delay = Int

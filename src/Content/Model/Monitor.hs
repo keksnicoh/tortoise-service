@@ -9,17 +9,21 @@ module Content.Model.Monitor
   )
 where
 
-import           Core.Internal
+import           Core.Internal                  ( Humidity
+                                                , Temperature
+                                                )
 import qualified Core.Database.Model.Status    as CDB
 import qualified Core.State.Model.State        as CST
 import qualified Core.OpenWeatherMap.Model.Forecast
                                                as COM
-import           Data.Aeson
+import           Data.Aeson                     ( ToJSON )
 import           GHC.Generics                   ( Generic )
 import           Data.List                      ( genericLength )
-import           Data.Time
+import           Data.Time                      ( UTCTime )
 import           Data.Maybe                     ( catMaybes )
-import           Content.Model.Switch
+import           Content.Model.Switch           ( fromCoreSwitch
+                                                , Switch
+                                                )
 
 data MonitorWeather
   = MonitorWeather

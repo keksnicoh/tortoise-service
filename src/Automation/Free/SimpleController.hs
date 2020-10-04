@@ -10,8 +10,10 @@
 -}
 module Automation.Free.SimpleController where
 
-import           Core.Internal
-import           Control.Monad.Free
+import           Core.Internal                  ( Temperature )
+import           Control.Monad.Free             ( Free(Free)
+                                                , liftF
+                                                )
 
 type SimpleControllerM = Free SimpleController
 type SimpleControllerInterpreter a m = SimpleControllerM a -> m a

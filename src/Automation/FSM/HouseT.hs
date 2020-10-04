@@ -11,16 +11,30 @@ module Automation.FSM.HouseT
   )
 where
 
-import           OpenEnv
-import           Automation.FSM.HouseFSM
-import           Control.Monad.IO.Class
-import           Control.Monad.Reader           (ReaderT(..),  MonadReader )
+import           OpenEnv                        ( HList
+                                                , provide
+                                                , EmbeddedF(..)
+                                                , Provides
+                                                )
+import           Automation.FSM.HouseFSM        ( HouseFSM(..) )
+import           Control.Monad.IO.Class         ( MonadIO(..) )
+import           Control.Monad.Reader           ( ReaderT(..)
+                                                , MonadReader
+                                                )
 import qualified Core.State.Model.State        as CSMState
 import           Data.IORef                     ( IORef
                                                 , modifyIORef'
                                                 )
-import           Automation.Model.HouseState
-import HList
+import           Automation.Model.HouseState    ( reasonFrom
+                                                , HouseState
+                                                  ( Initializing
+                                                  , HasSensorData
+                                                  , TemperatureBound
+                                                  , RetrySensor
+                                                  , Emergency
+                                                  )
+                                                )
+import           HList                          ( Get(..) )
 
 -- |MTL style transformer
 newtype HouseT m a = HouseT

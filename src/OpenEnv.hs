@@ -56,6 +56,7 @@ instance (Traversable t, Applicative m, Get t (m a) ts)
 
 {-|
   returns a value from environment
+
   @
     getValue @String env
   @
@@ -65,6 +66,7 @@ getValue = runIdentity . provideFromF @Identity @t
 
 {-|
   provides a value from environment
+
   @
     f :: (MonadReader e m, Provide String e) -> m String
     f = do
@@ -77,6 +79,7 @@ provide = asks $ runIdentity . provideFromF @Identity @t
 
 {-|
   provides a boxed value from environment
+
   @
     f :: (MonadReader e m, ProvideF @[] String e) -> m [String]
     f = do

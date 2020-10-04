@@ -3,12 +3,23 @@
 
 module Automation.Free.Interpreter where
 
-import           Control.Monad.Free
+import           Control.Monad.Free             ( foldFree )
 
 import qualified Core.Database.Model.Status    as CDMStatus
 
-import           Automation.Header
+import           Automation.Header              ( GetLightStatus
+                                                , LockLight
+                                                , ProposeSwitchLight
+                                                )
 import           Automation.Free.SimpleController
+                                                ( SimpleController
+                                                  ( LockLight
+                                                  , GetTemperature
+                                                  , GetLightStatus
+                                                  , ProposeLightSwitch
+                                                  )
+                                                , SimpleControllerInterpreter
+                                                )
 
 {-| canonical interpreter using dependency injection -}
 mkInterpreter

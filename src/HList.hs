@@ -20,8 +20,13 @@ where
 
 import qualified GHC.TypeLits                  as TL
 import           GHC.Exts                       ( Any(..) )
-import           Fcf                     hiding ( Tail
-                                                , Any
+import           Fcf                            ( Eval
+                                                , type (=<<)
+                                                , FromMaybe
+                                                , Stuck
+                                                , FindIndex
+                                                , TyEq
+                                                , Exp
                                                 )
 import           Data.Proxy                     ( Proxy(..) )
 import           Unsafe.Coerce                  ( unsafeCoerce )

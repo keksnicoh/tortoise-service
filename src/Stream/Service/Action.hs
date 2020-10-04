@@ -19,11 +19,22 @@ import           Control.Monad.Reader           ( MonadReader
 import           Data.Aeson                     ( ToJSON
                                                 , encode
                                                 )
-import           Stream.Model.LightState
-import           Stream.Model.Action
-import           Data.Time
+import           Stream.Model.LightState        ( fromState
+                                                , LightState
+                                                )
+import           Stream.Model.Action            ( Action
+                                                  ( PingAction
+                                                  , LightChangedAction
+                                                  , LightAction
+                                                  , WebcamAction
+                                                  )
+                                                )
+import           Data.Time                      ( UTCTime
+                                                , addUTCTime
+                                                , diffUTCTime
+                                                )
 import qualified Data.ByteString.Lazy          as LBS
-import           Core.State.Model.State
+import           Core.State.Model.State         ( State(webcamRequest) )
 import           Control.Monad.State.Strict     ( MonadState
                                                 , runStateT
                                                 , modify'
@@ -31,7 +42,9 @@ import           Control.Monad.State.Strict     ( MonadState
                                                 , gets
                                                 )
 import qualified Data.Time                     as T
-import           OpenEnv
+import           OpenEnv                        ( embedded
+                                                , Embedded
+                                                )
 
 data ActionEnv
   = ActionEnv

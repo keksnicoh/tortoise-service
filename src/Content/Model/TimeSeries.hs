@@ -13,8 +13,10 @@ module Content.Model.TimeSeries
 where
 import qualified Data.Time                     as T
 import           GHC.Generics                   ( Generic )
-import           Data.Aeson
-import           Core.Internal
+import           Data.Aeson                     ( ToJSON )
+import           Core.Internal                  ( Humidity
+                                                , Temperature
+                                                )
 import qualified Core.Database.Model.Status    as CDMS
                                                 ( Status(..) )
 import           Data.Maybe                     ( catMaybes )
@@ -60,12 +62,13 @@ group
 group dt []       = []
 group dt (p : ps) = run (x p) [p] ps []
  where
-  run t []       []        !acc = acc
-  run t (b : bs) []        !acc = acc ++ [safeMean t b bs]
-  run t !bL       (p : ps) !acc = if T.diffUTCTime t (x p) > dt
+  run t []       []       !acc = acc
+  run t (b : bs) []       !acc = acc ++ [safeMean t b bs]
+  run t !bL      (p : ps) !acc = if T.diffUTCTime t (x p) > dt
     then case bL of
-      []       -> run (x p) [p] ps acc
-      (b : bs) -> run (T.addUTCTime dt t) [] (p : ps) (acc ++ [safeMean t b bs])
+      [] -> run (x p) [p] ps acc
+      (b : bs) ->
+        run (T.addUTCTime dt t) [] (p : ps) (acc ++ [safeMean t b bs])
     else run t (bL <> [p]) ps acc
   safeMean t !p !ps =
     Point (x p) ((y p + sum (y <$> ps)) / fromIntegral (1 + length ps))

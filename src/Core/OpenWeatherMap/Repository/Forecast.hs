@@ -4,14 +4,26 @@
 module Core.OpenWeatherMap.Repository.Forecast where
 
 import           Core.OpenWeatherMap.Model.Forecast
-import           Core.OpenWeatherMap.Env
-import           OpenEnv
+                                                ( ForecastResult )
+import           Core.OpenWeatherMap.Env        ( OpenWeatherMapEnv
+                                                  ( weatherUrl
+                                                  , managedHttpLbs
+                                                  )
+                                                )
+import           OpenEnv                        ( provide
+                                                , Provides
+                                                )
 import           Control.Monad.Reader           ( liftIO
                                                 , MonadIO
                                                 , MonadReader
                                                 )
-import           Network.HTTP.Client
-import           Data.Aeson
+import           Network.HTTP.Client            ( Response
+                                                  ( responseStatus
+                                                  , responseBody
+                                                  )
+                                                , parseRequest
+                                                )
+import           Data.Aeson                     ( eitherDecode )
 import           Control.Exception              ( Exception )
 import           Network.HTTP.Types.Status      ( Status
                                                 , ok200

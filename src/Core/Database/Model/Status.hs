@@ -15,16 +15,30 @@ module Core.Database.Model.Status
   )
 where
 
-import           Control.Monad.Reader
+import           Control.Monad.Reader           ( MonadReader
+                                                , MonadIO(..)
+                                                )
 import           GHC.Generics                   ( Generic )
 import           Data.UUID                      ( UUID )
 import           Core.Internal                  ( Temperature
                                                 , Humidity
                                                 )
-import           Database.PostgreSQL.Simple
+import           Database.PostgreSQL.Simple     ( FromRow
+                                                , Connection
+                                                , Only(Only)
+                                                , execute
+                                                , query
+                                                , ToRow
+                                                , Query
+                                                )
 import           Database.PostgreSQL.Simple.FromRow
+                                                ( FromRow(fromRow)
+                                                , field
+                                                )
 import           Data.Time                      ( UTCTime )
-import           OpenEnv
+import           OpenEnv                        ( provide
+                                                , Provides
+                                                )
 
 type InsertStatusRepository m = Status -> m InsertStatusRepositoryResult
 type FetchStatusRepository m = m [Status]

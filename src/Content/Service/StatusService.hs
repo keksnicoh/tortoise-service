@@ -11,17 +11,21 @@ module Content.Service.StatusService
   )
 where
 
-import           Control.Monad.Reader
+import           Control.Monad.Reader           ( MonadReader )
 import           Content.Model.Status           ( Status
                                                 , from
                                                 )
 import           Content.Model.StatusRequest    ( StatusRequest
                                                 , toStatus
                                                 )
-import           OpenEnv
+import           OpenEnv                        ( embedded
+                                                , Embedded
+                                                )
 import qualified Data.Time                     as T
 import           Data.UUID                      ( UUID )
-import           Control.Monad.Catch
+import           Control.Monad.Catch            ( Exception
+                                                , MonadThrow(..)
+                                                )
 import qualified Core.Database.Model.Status    as C
 
 type GetStatusService m = m [Status]

@@ -9,11 +9,21 @@ module Core.OpenWeatherMap.Model.Forecast
   )
 where
 
-import           Data.Time
-import           Core.Internal
-import           Data.Aeson
+import           Data.Time                      ( UTCTime
+                                                , localTimeToUTC
+                                                , utc
+                                                )
+import           Core.Internal                  ( Humidity
+                                                , Temperature
+                                                )
+import           Data.Aeson                     ( FromJSON(parseJSON)
+                                                , (.:)
+                                                , withArray
+                                                , withObject
+                                                , Value(Object)
+                                                )
 import           GHC.Generics                   ( Generic )
-import           Data.Vector
+import           Data.Vector                    ( (!?) )
 
 data ForecastResult
   = ForecastResult

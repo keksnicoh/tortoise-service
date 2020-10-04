@@ -9,7 +9,9 @@ module Content.Model.Switch
   )
 where
 
-import           Data.Aeson
+import           Data.Aeson                     ( ToJSON
+                                                , FromJSON
+                                                )
 import           GHC.Generics                   ( Generic )
 import qualified Core.State.Model.State        as CSM
 
@@ -29,8 +31,7 @@ data SwitchRequest
 
 toCoreSwitch :: Switch -> CSM.Switch Bool
 toCoreSwitch Switch { controlled = False, value = value } = CSM.Manual value
-toCoreSwitch Switch { controlled = True, value = value } =
-  CSM.Controlled value
+toCoreSwitch Switch { controlled = True, value = value }  = CSM.Controlled value
 
 fromCoreSwitch :: CSM.Switch Bool -> Switch
 fromCoreSwitch (CSM.Manual value) =

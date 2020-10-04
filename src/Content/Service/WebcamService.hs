@@ -14,7 +14,11 @@ import           Control.Monad.Reader           ( liftIO
                                                 )
 import qualified Data.ByteString.Lazy          as LBS
 import qualified Core.State.Repository.State   as CS
-import           OpenEnv
+import           OpenEnv                        ( embedded
+                                                , provide
+                                                , Embedded
+                                                , Provides
+                                                )
 import qualified Data.Time                     as T
 
 type PersistWebcam m = LBS.ByteString -> m ()

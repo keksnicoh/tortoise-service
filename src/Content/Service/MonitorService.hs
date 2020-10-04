@@ -13,9 +13,12 @@ import           Core.Database.Model.Status     ( FetchStatusPeriodRepository )
 import           Data.Time                      ( addUTCTime
                                                 , UTCTime
                                                 )
-import           OpenEnv
+import           OpenEnv                        ( embedded
+                                                , Embedded
+                                                )
 import           Control.Monad.Reader           ( MonadReader )
 import           Core.OpenWeatherMap.Repository.Forecast
+                                                ( FetchForecastRepository )
 
 type MonitorService m = m Monitor
 toStart :: UTCTime -> UTCTime

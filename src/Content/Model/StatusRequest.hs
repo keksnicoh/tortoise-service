@@ -5,9 +5,11 @@
 module Content.Model.StatusRequest where
 
 import           GHC.Generics                   ( Generic )
-import           Data.Aeson
-import           Core.Internal
-import           Data.UUID
+import           Data.Aeson                     ( FromJSON )
+import           Core.Internal                  ( Humidity
+                                                , Temperature
+                                                )
+import           Data.UUID                      ( UUID )
 import qualified Core.Database.Model.Status    as C
 import           Data.Time                      ( UTCTime )
 
