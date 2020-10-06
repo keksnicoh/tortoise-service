@@ -1,5 +1,5 @@
 module SpecEnv where
 
-import           Data.ByteString
+import           Data.ByteString (ByteString)
 
 type DbSchema = [ByteString]

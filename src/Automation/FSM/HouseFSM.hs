@@ -1,6 +1,6 @@
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE EmptyDataDeriving          #-}
+{-# LANGUAGE EmptyDataDeriving     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeFamilies          #-}
 
 {- this module is based on the great blog post
    "Finite-State Machines, Part 2: Explicit Typed State Transitions"
@@ -27,9 +27,7 @@ module Automation.FSM.HouseFSM
   )
 where
 
-import           Core.Internal                  ( Temperature )
-
-type Delay = Int
+import           Core.Internal (Temperature)
 
 -- @todo is it neccessary to carry the temperature in here, or should
 --       a product be used instrad? e.g. `(TemperatureSensor, Temperature)`

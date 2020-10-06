@@ -1,13 +1,11 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric  #-}
 
 module Stream.Model.LightState where
 
-import           Core.State.Model.State         ( State(..)
-                                                , Switch(..)
-                                                )
-import           GHC.Generics                   ( Generic )
-import           Data.Aeson                     ( ToJSON )
+import           Core.State.Model.State (State (..), Switch (..))
+import           Data.Aeson             (ToJSON)
+import           GHC.Generics           (Generic)
 
 data LightState
   = LightState

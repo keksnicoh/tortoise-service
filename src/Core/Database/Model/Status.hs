@@ -1,7 +1,7 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module Core.Database.Model.Status
   ( Status(..)
@@ -15,30 +15,16 @@ module Core.Database.Model.Status
   )
 where
 
-import           Control.Monad.Reader           ( MonadReader
-                                                , MonadIO(..)
-                                                )
-import           GHC.Generics                   ( Generic )
-import           Data.UUID                      ( UUID )
-import           Core.Internal                  ( Temperature
-                                                , Humidity
-                                                )
-import           Database.PostgreSQL.Simple     ( FromRow
-                                                , Connection
-                                                , Only(Only)
-                                                , execute
-                                                , query
-                                                , ToRow
-                                                , Query
-                                                )
-import           Database.PostgreSQL.Simple.FromRow
-                                                ( FromRow(fromRow)
-                                                , field
-                                                )
-import           Data.Time                      ( UTCTime )
-import           OpenEnv                        ( provide
-                                                , Provides
-                                                )
+import           Control.Monad.Reader               (MonadIO (..), MonadReader)
+import           Core.Internal                      (Humidity, Temperature)
+import           Data.Time                          (UTCTime)
+import           Data.UUID                          (UUID)
+import           Database.PostgreSQL.Simple         (Connection, FromRow,
+                                                     Only (Only), Query, ToRow,
+                                                     execute, query)
+import           Database.PostgreSQL.Simple.FromRow (FromRow (fromRow), field)
+import           GHC.Generics                       (Generic)
+import           OpenEnv                            (Provides, provide)
 
 type InsertStatusRepository m = Status -> m InsertStatusRepositoryResult
 type FetchStatusRepository m = m [Status]
@@ -48,12 +34,12 @@ data InsertStatusRepositoryResult = Success | PkAlreadyExists
   deriving (Show, Eq)
 
 data Status = Status
-  { statusId :: UUID
-  , temperature :: Maybe Temperature
-  , humidity :: Maybe Humidity
+  { statusId           :: UUID
+  , temperature        :: Maybe Temperature
+  , humidity           :: Maybe Humidity
   , temperatureOutside :: Maybe Temperature
-  , humidityOutside :: Maybe Humidity
-  , created :: UTCTime
+  , humidityOutside    :: Maybe Humidity
+  , created            :: UTCTime
 } deriving (Generic, Eq, Show)
 
 instance FromRow Status where

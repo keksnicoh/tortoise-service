@@ -1,7 +1,7 @@
 module Automation.Header where
 
-import           Automation.Free.SimpleController
-import           Automation.FSM.HouseFSM
+import           Automation.Free.SimpleController (LightId, LightStatus)
+import           Automation.FSM.HouseFSM          (TemperatureSensor)
 
 -- |Service to set a light state for a certain lightId. Note that there
 -- is no contract that the light state is actually switched to the desired state.

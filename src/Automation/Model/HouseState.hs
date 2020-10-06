@@ -1,8 +1,8 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE GADTs                #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 module Automation.Model.HouseState
   ( HouseState(..)
@@ -11,7 +11,11 @@ module Automation.Model.HouseState
   )
 where
 
-import           Automation.FSM.HouseFSM
+import           Automation.FSM.HouseFSM (Emergency, HasSensorData,
+                                          Initializing, RetrySensor,
+                                          TemperatureBound, TemperatureSensor,
+                                          Terminating,
+                                          TransitionTerminating (..))
 
 data TerminateReason
   = OutOfControlReason

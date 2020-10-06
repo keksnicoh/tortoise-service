@@ -1,29 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Core.OpenWeatherMap.Repository.ForecastSpec where
 
-import           Core.OpenWeatherMap.Repository.Forecast
-import           Core.OpenWeatherMap.Model.Forecast
-import           Test.Hspec
-import           Network.HTTP.Client.Internal   ( method
-                                                , Request(..)
-                                                , Response(..)
-                                                , newManager
-                                                , defaultManagerSettings
-                                                )
-import           Core.OpenWeatherMap.Env
-import           TestUtil
-import           Network.HTTP.Types             ( notFound404
-                                                , ok200
-                                                )
-import           Control.Monad.Reader           ( ReaderT(runReaderT) )
-import           Control.Exception              ( try )
-import qualified Data.ByteString.Lazy          as BSL
-import           Data.Either                    ( isRight )
-import           OpenEnv
+import           Control.Exception                       (try)
+import           Control.Monad.Reader                    (ReaderT (runReaderT))
+import           Core.OpenWeatherMap.Env                 (OpenWeatherMapEnv (OpenWeatherMapEnv, managedHttpLbs, weatherUrl))
+import           Core.OpenWeatherMap.Model.Forecast      (ForecastResult)
+import           Core.OpenWeatherMap.Repository.Forecast (ForecastRepositoryException (..),
+                                                          forecastRepository)
+import qualified Data.ByteString.Lazy                    as BSL
+import           Data.Either                             (isRight)
+import           Network.HTTP.Client.Internal            (Request (..),
+                                                          Response (..), method)
+import           Network.HTTP.Types                      (notFound404, ok200)
+import           OpenEnv                                 (nil, ( #: ))
+import           Test.Hspec                              (Spec, describe, it,
+                                                          shouldBe,
+                                                          shouldSatisfy)
+import           TestUtil                                (mockSingular)
 
 spec :: Spec
 spec = describe "forecastRepository" $ do
-  manager <- runIO $ newManager defaultManagerSettings
   let baseResponse = Response { responseStatus    = undefined
                               , responseVersion   = undefined
                               , responseHeaders   = undefined

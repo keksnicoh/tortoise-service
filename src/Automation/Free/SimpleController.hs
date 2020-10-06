@@ -1,8 +1,8 @@
+{-# LANGUAGE DeriveFunctor    #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DeriveFunctor #-}
 
 {-| Free Monad Algebra providing a set of operations to control the light switches
-    The choice of using Free for this package is motivated to gain practice 
+    The choice of using Free for this package is motivated to gain practice
     with different concepts.
 
     resources
@@ -10,10 +10,8 @@
 -}
 module Automation.Free.SimpleController where
 
-import           Core.Internal                  ( Temperature )
-import           Control.Monad.Free             ( Free(Free)
-                                                , liftF
-                                                )
+import           Control.Monad.Free (Free (Free), liftF)
+import           Core.Internal      (Temperature)
 
 type SimpleControllerM = Free SimpleController
 type SimpleControllerInterpreter a m = SimpleControllerM a -> m a

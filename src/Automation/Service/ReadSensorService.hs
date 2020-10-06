@@ -2,13 +2,14 @@
 
 module Automation.Service.ReadSensorService where
 
-import           Control.Monad.Reader           ( MonadReader )
-import           OpenEnv
-import           Automation.FSM.HouseFSM
-import qualified Core.Database.Model.Status    as CDMStatus
-import qualified Data.Time                     as T
-import           Data.Maybe                     ( mapMaybe )
-import           Automation.Model.HouseStateConfig
+import           Automation.FSM.HouseFSM           (TemperatureSensor (..))
+import           Automation.Model.HouseStateConfig (HouseStateConfig (maxStatusAge, maxTemperature, minTemperature))
+import           Control.Monad.Reader              (MonadReader)
+import qualified Core.Database.Model.Status        as CDMStatus
+import           Data.Maybe                        (mapMaybe)
+import qualified Data.Time                         as T
+import           OpenEnv                           (Embedded, Provides,
+                                                    embedded, provide)
 
 {-| reads the last defined temperature within a configured time range.
     if a temperature value exists then it will be interpreted to be

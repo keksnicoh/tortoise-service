@@ -1,7 +1,14 @@
-{-# LANGUAGE DataKinds, PolyKinds, FlexibleInstances,
-  ScopedTypeVariables, AllowAmbiguousTypes, FlexibleContexts,
-  TypeApplications, RankNTypes, ConstraintKinds,
-  UndecidableInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE ConstraintKinds       #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE RankNTypes            #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 {-|
 Module      : Env
@@ -26,15 +33,9 @@ module OpenEnv
   )
 where
 
-import           Control.Monad.Reader           ( ReaderT(..)
-                                                , asks
-                                                , join
-                                                , MonadReader
-                                                )
-import           Control.Monad.Identity         ( runIdentity
-                                                , Identity
-                                                )
-import           HList
+import           Control.Monad.Identity (Identity, runIdentity)
+import           Control.Monad.Reader   (MonadReader, ReaderT (..), asks, join)
+import           HList                  (Get (..), HList, nil, ( #: ))
 
 type Provides a e = ProvidesF Identity a e
 type Embedded a e m = EmbeddedF Identity a e m

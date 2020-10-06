@@ -1,19 +1,18 @@
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase       #-}
+{-# LANGUAGE TypeApplications #-}
 module SpecDatabase where
 
-import           Test.Hspec
-import           Control.Monad.Reader
-import           Database.PostgreSQL.Simple
-import           Database.PostgreSQL.Simple.Types
-                                                ( Query(Query) )
-import           Control.Exception              ( try )
-import           Control.Exception.Base         ( SomeException )
-import           GHC.Int                        ( Int64 )
-import OpenEnv
+import           Control.Exception                (try)
+import           Control.Exception.Base           (SomeException)
+import           Control.Monad.Reader             (forM_)
+import           Database.PostgreSQL.Simple       (Connection, execute)
+import           Database.PostgreSQL.Simple.Types (Query (Query))
+import           GHC.Int                          (Int64)
+import           OpenEnv                          (Provides, getValue)
+import           Test.Hspec                       (Expectation)
 
-import SpecEnv
+import           SpecEnv                          (DbSchema)
 
 withDatabaseMigrated
   :: (Provides Connection e, Provides DbSchema e)

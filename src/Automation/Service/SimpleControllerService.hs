@@ -1,14 +1,21 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase       #-}
 
 module Automation.Service.SimpleControllerService where
 
-import           Automation.Header
-import           Control.Monad.Reader           ( MonadReader )
-import           OpenEnv
-import           Control.Monad                  ( when )
-import           Automation.Model.SimpleHandlerConfig
-import           Automation.Free.SimpleController
+import           Automation.Free.SimpleController     (LightId (LightId1, LightId2),
+                                                       LightStatus (LightOff, LightOn, LightUndefined),
+                                                       SimpleControllerInterpreter,
+                                                       getLightStatus,
+                                                       getTemperature,
+                                                       lockLight,
+                                                       proposeLightSwitch)
+import           Automation.Header                    (ControlHandler)
+import           Automation.Model.SimpleHandlerConfig (SimpleHandlerConfig (l1TRange, l2TRange),
+                                                       TRange (highT, lowT))
+import           Control.Monad                        (when)
+import           Control.Monad.Reader                 (MonadReader)
+import           OpenEnv                              (Provides, provide)
 
 mkControllerHandler
   :: (MonadReader e m, Provides SimpleHandlerConfig e)

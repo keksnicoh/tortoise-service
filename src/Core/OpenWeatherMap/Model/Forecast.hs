@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Core.OpenWeatherMap.Model.Forecast
@@ -9,44 +9,35 @@ module Core.OpenWeatherMap.Model.Forecast
   )
 where
 
-import           Data.Time                      ( UTCTime
-                                                , localTimeToUTC
-                                                , utc
-                                                )
-import           Core.Internal                  ( Humidity
-                                                , Temperature
-                                                )
-import           Data.Aeson                     ( FromJSON(parseJSON)
-                                                , (.:)
-                                                , withArray
-                                                , withObject
-                                                , Value(Object)
-                                                )
-import           GHC.Generics                   ( Generic )
-import           Data.Vector                    ( (!?) )
+import           Core.Internal (Humidity, Temperature)
+import           Data.Aeson    (FromJSON (parseJSON), Value (Object), withArray,
+                                withObject, (.:))
+import           Data.Time     (UTCTime, localTimeToUTC, utc)
+import           Data.Vector   ((!?))
+import           GHC.Generics  (Generic)
 
 data ForecastResult
   = ForecastResult
-    { cod :: String
+    { cod  :: String
     , list :: [Forecast]
     }
   deriving (Show, Eq, Generic, FromJSON)
 
 data ForecastWeather
   = ForecastWeather
-    { name :: String
+    { name        :: String
     , description :: String }
   deriving (Show, Eq)
 
 data Forecast
   = Forecast
-    { date :: UTCTime
-    , temperature :: Temperature
+    { date           :: UTCTime
+    , temperature    :: Temperature
     , temperatureMin :: Temperature
     , temperatureMax :: Temperature
-    , humidity :: Humidity
-    , weather :: Maybe ForecastWeather
-    , wind :: Float
+    , humidity       :: Humidity
+    , weather        :: Maybe ForecastWeather
+    , wind           :: Float
     }
   deriving (Show, Eq)
 

@@ -1,5 +1,5 @@
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 module ApplicationMode
   ( ApplicationMode(..)

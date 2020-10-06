@@ -4,14 +4,16 @@ module Automation.Service.GetLightStatusService
   )
 where
 
-import           Control.Monad.Reader           ( MonadReader )
-import           OpenEnv
-import qualified Data.Time                     as T
-import qualified Core.State.Repository.State   as CSRState
-import qualified Core.State.Model.State        as CSMState
-import           Automation.Header              ( GetLightStatus )
-import           Automation.Model.SimpleHandlerConfig
-import           Automation.Free.SimpleController
+import           Automation.Free.SimpleController     (LightId (LightId1, LightId2),
+                                                       LightStatus (LightLocked, LightManual, LightOff, LightOn, LightUndefined))
+import           Automation.Header                    (GetLightStatus)
+import           Automation.Model.SimpleHandlerConfig (SimpleHandlerConfig (lockDuration))
+import           Control.Monad.Reader                 (MonadReader)
+import qualified Core.State.Model.State               as CSMState
+import qualified Core.State.Repository.State          as CSRState
+import qualified Data.Time                            as T
+import           OpenEnv                              (Embedded, Provides,
+                                                       embedded, provide)
 
 -- |returns the current state of a light switch used to control the light
 mkGetLightStatus

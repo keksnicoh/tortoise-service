@@ -7,14 +7,12 @@ module Content.Service.TimeSeriesService
   )
 where
 
-import qualified Core.Database.Model.Status    as CStatus
-import qualified Content.Model.TimeSeries      as TimeSeries
-import qualified Data.Time                     as T
-import           Control.Monad.Reader           ( MonadReader )
-import           Data.Maybe                     ( fromMaybe )
-import           OpenEnv                        ( embedded
-                                                , Embedded
-                                                )
+import qualified Content.Model.TimeSeries   as TimeSeries
+import           Control.Monad.Reader       (MonadReader)
+import qualified Core.Database.Model.Status as CStatus
+import           Data.Maybe                 (fromMaybe)
+import qualified Data.Time                  as T
+import           OpenEnv                    (Embedded, embedded)
 
 type TimeSeriesService m
   =  Maybe T.UTCTime -- start time, default value: `end` - `defaultPeriod`

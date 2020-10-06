@@ -6,12 +6,11 @@ module Content.Service.SwitchService
   )
 where
 
-import           Content.Model.Switch           ( toCoreSwitch
-                                                , SwitchRequest(light1, light2)
-                                                )
-import           Core.State.Repository.State    ( UpdateState )
-import qualified Core.State.Model.State        as CSM
-import           Control.Applicative            ( Alternative((<|>)) )
+import           Content.Model.Switch        (SwitchRequest (light1, light2),
+                                              toCoreSwitch)
+import           Control.Applicative         (Alternative ((<|>)))
+import qualified Core.State.Model.State      as CSM
+import           Core.State.Repository.State (UpdateState)
 
 type SwitchService m = SwitchRequest -> m ()
 

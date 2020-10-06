@@ -1,25 +1,14 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase       #-}
 
 module Automation.Free.Interpreter where
 
-import           Control.Monad.Free             ( foldFree )
-
-import qualified Core.Database.Model.Status    as CDMStatus
-
-import           Automation.Header              ( GetLightStatus
-                                                , LockLight
-                                                , ProposeSwitchLight
-                                                )
-import           Automation.Free.SimpleController
-                                                ( SimpleController
-                                                  ( LockLight
-                                                  , GetTemperature
-                                                  , GetLightStatus
-                                                  , ProposeLightSwitch
-                                                  )
-                                                , SimpleControllerInterpreter
-                                                )
+import           Automation.Free.SimpleController (SimpleController (GetLightStatus, GetTemperature, LockLight, ProposeLightSwitch),
+                                                   SimpleControllerInterpreter)
+import           Automation.Header                (GetLightStatus, LockLight,
+                                                   ProposeSwitchLight)
+import           Control.Monad.Free               (foldFree)
+import qualified Core.Database.Model.Status       as CDMStatus
 
 {-| canonical interpreter using dependency injection -}
 mkInterpreter

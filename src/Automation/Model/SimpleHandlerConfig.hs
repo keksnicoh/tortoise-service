@@ -1,19 +1,19 @@
 module Automation.Model.SimpleHandlerConfig where
 
-import qualified Data.Time                     as T
+import qualified Data.Time     as T
 
-import           Core.Internal
+import           Core.Internal (Temperature)
 
 data TRange
   = TRange
-  { lowT :: Temperature
+  { lowT  :: Temperature
   , highT :: Temperature
   }
 
 data SimpleHandlerConfig
   = SimpleHandlerConfig
-  { l1TRange :: TRange
-  , l2TRange :: TRange
+  { l1TRange     :: TRange
+  , l2TRange     :: TRange
   , lockDuration :: T.NominalDiffTime
   }
 

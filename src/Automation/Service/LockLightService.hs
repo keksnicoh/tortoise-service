@@ -4,14 +4,14 @@ module Automation.Service.LockLightService
   )
 where
 
-import           Control.Monad.Reader           ( MonadReader )
-import           OpenEnv
-import qualified Data.Time                     as T
-import qualified Core.State.Repository.State   as CSRState
-import qualified Core.State.Model.State        as CSMState
+import           Control.Monad.Reader             (MonadReader)
+import qualified Core.State.Model.State           as CSMState
+import qualified Core.State.Repository.State      as CSRState
+import qualified Data.Time                        as T
+import           OpenEnv                          (Embedded, embedded)
 
-import           Automation.Header              ( LockLight )
-import           Automation.Free.SimpleController
+import           Automation.Free.SimpleController (LightId (LightId1, LightId2))
+import           Automation.Header                (LockLight)
 
 -- |sets locked state for given light to current environmental time
 mkLockLight

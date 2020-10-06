@@ -1,7 +1,8 @@
 module Core.State.Model.StateSpec where
 
-import           Core.State.Model.State
-import           Test.Hspec
+import           Core.State.Model.State (HouseMonitor (MonitorOff), State (State, controlLockDate1, controlLockDate2, houseMonitor, light1, light2, webcamDate, webcamRequest),
+                                         initialState)
+import           Test.Hspec             (Spec, describe, it, shouldBe)
 
 spec :: Spec
 spec = describe "initialState" $ do

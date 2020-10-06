@@ -1,13 +1,14 @@
 module Core.State.Repository.StateSpec where
 
-import           Core.State.Repository.State
-import           Core.State.Model.State
-import           Test.Hspec
-import           Data.IORef                     ( readIORef
-                                                , newIORef
-                                                )
-import           Control.Monad.Reader           ( ReaderT(runReaderT) )
-import OpenEnv
+import           Control.Monad.Reader        (ReaderT (runReaderT))
+import           Core.State.Model.State      (HouseMonitor (MonitorOK, MonitorOff),
+                                              State (State),
+                                              Switch (Controlled, Manual),
+                                              initialState)
+import           Core.State.Repository.State (updateState)
+import           Data.IORef                  (newIORef, readIORef)
+import           OpenEnv                     (nil, ( #: ))
+import           Test.Hspec                  (Spec, describe, it, shouldBe)
 spec :: Spec
 spec = do
   describe "updateState" $ do

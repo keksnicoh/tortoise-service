@@ -1,7 +1,7 @@
 module TestUtil where
 
-import           Test.Hspec
-import           Control.Monad.Reader
+import           Control.Monad.Reader (MonadIO (..))
+import           Test.Hspec           (Expectation, shouldBe)
 
 mockSingular
   :: (MonadIO m) => (a -> Expectation) -> b -> (a -> m b)

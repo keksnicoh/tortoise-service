@@ -6,7 +6,7 @@ module Core.State.Model.State
   )
 where
 
-import           Data.Time
+import           Data.Time (UTCTime)
 
 data Switch a
   = Manual a
@@ -22,11 +22,11 @@ data HouseMonitor
 
 data State
   = State
-    { light1 :: Maybe (Switch Bool)
-    , light2 :: Maybe (Switch Bool)
-    , webcamDate :: Maybe UTCTime
-    , webcamRequest :: Maybe UTCTime
-    , houseMonitor :: HouseMonitor
+    { light1           :: Maybe (Switch Bool)
+    , light2           :: Maybe (Switch Bool)
+    , webcamDate       :: Maybe UTCTime
+    , webcamRequest    :: Maybe UTCTime
+    , houseMonitor     :: HouseMonitor
     , controlLockDate1 :: Maybe UTCTime
     , controlLockDate2 :: Maybe UTCTime
     }

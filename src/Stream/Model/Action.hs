@@ -2,8 +2,9 @@
 
 module Stream.Model.Action where
 
-import           Stream.Model.LightState        ( LightState(..) )
-import           Data.Aeson
+import           Data.Aeson              (KeyValue ((.=)), ToJSON (toJSON),
+                                          Value (String), object)
+import           Stream.Model.LightState (LightState (..))
 
 data Action
   = LightAction LightState

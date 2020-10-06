@@ -1,56 +1,31 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE LambdaCase       #-}
 
 module Automation.FSM.Transitions where
 
-import           Control.Monad.Reader           ( MonadReader
-                                                , (>=>)
-                                                )
-import           Automation.FSM.HouseFSM        ( Emergency
-                                                , HasSensorData
-                                                , HasSensorDataEvent
-                                                  ( RecoveredSensorData
-                                                  , SensorReadable
-                                                  , NewSensorData
-                                                  )
-                                                , HouseFSM(..)
-                                                , Initializing
-                                                , RetrySensor
-                                                , RetrySensorEvent
-                                                  ( Retry
-                                                  , LostSensor
-                                                  )
-                                                , TemperatureBound
-                                                , TemperatureBoundEvent
-                                                  ( TemperatureRecovered
-                                                  , TemperatureVerified
-                                                  )
-                                                , TemperatureSensor(Bound)
-                                                , Terminating
-                                                , TransitionTerminating
-                                                  ( EmergencyNotResolved
-                                                  , SensorNotInitialized
-                                                  , SensorUnavailable
-                                                  )
-                                                )
-import           Automation.Header              ( ControlHandler
-                                                , DelayHandler
-                                                , EmergencyHandler
-                                                , ReadSensorHandler
-                                                )
-import           OpenEnv                        ( provide
-                                                , Provides
-                                                )
-import           Automation.Env                 ( FSMNRetry )
+import           Automation.Env          (FSMNRetry)
+import           Automation.FSM.HouseFSM (Emergency, HasSensorData, HasSensorDataEvent (NewSensorData, RecoveredSensorData, SensorReadable),
+                                          HouseFSM (..), Initializing,
+                                          RetrySensor,
+                                          RetrySensorEvent (LostSensor, Retry),
+                                          TemperatureBound,
+                                          TemperatureBoundEvent (TemperatureRecovered, TemperatureVerified),
+                                          TemperatureSensor (Bound),
+                                          Terminating,
+                                          TransitionTerminating (EmergencyNotResolved, SensorNotInitialized, SensorUnavailable))
+import           Automation.Header       (ControlHandler, DelayHandler,
+                                          EmergencyHandler, ReadSensorHandler)
+import           Control.Monad.Reader    (MonadReader, (>=>))
+import           OpenEnv                 (Provides, provide)
 
 type Delay = Int
 
 data FSMHandlers m
   = FSMHandlers
-  { readSensor :: ReadSensorHandler m
-  , controlTick :: ControlHandler m
+  { readSensor      :: ReadSensorHandler m
+  , controlTick     :: ControlHandler m
   , emergencyAction :: EmergencyHandler m
-  , delay :: DelayHandler m
+  , delay           :: DelayHandler m
   }
 
 mkFSM

@@ -7,16 +7,10 @@ module Core.State.Repository.State
   )
 where
 
-import           Core.State.Model.State         ( State )
-import           Control.Monad.Reader           ( liftIO
-                                                , MonadIO
-                                                , MonadReader
-                                                )
-import           Data.IORef                     ( IORef
-                                                , readIORef
-                                                , atomicModifyIORef'
-                                                )
-import           OpenEnv
+import           Control.Monad.Reader   (MonadIO, MonadReader, liftIO)
+import           Core.State.Model.State (State)
+import           Data.IORef             (IORef, atomicModifyIORef', readIORef)
+import           OpenEnv                (Provides, provide)
 
 type UpdateState m = (State -> State) -> m ()
 type GetState m = m State

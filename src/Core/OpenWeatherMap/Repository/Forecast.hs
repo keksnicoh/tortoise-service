@@ -1,36 +1,19 @@
+{-# LANGUAGE DeriveAnyClass   #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DeriveAnyClass #-}
 
 module Core.OpenWeatherMap.Repository.Forecast where
 
-import           Core.OpenWeatherMap.Model.Forecast
-                                                ( ForecastResult )
-import           Core.OpenWeatherMap.Env        ( OpenWeatherMapEnv
-                                                  ( weatherUrl
-                                                  , managedHttpLbs
-                                                  )
-                                                )
-import           OpenEnv                        ( provide
-                                                , Provides
-                                                )
-import           Control.Monad.Reader           ( liftIO
-                                                , MonadIO
-                                                , MonadReader
-                                                )
-import           Network.HTTP.Client            ( Response
-                                                  ( responseStatus
-                                                  , responseBody
-                                                  )
-                                                , parseRequest
-                                                )
-import           Data.Aeson                     ( eitherDecode )
-import           Control.Exception              ( Exception )
-import           Network.HTTP.Types.Status      ( Status
-                                                , ok200
-                                                )
-import           Control.Monad.Catch            ( throwM
-                                                , MonadThrow
-                                                )
+import           Control.Exception                  (Exception)
+import           Control.Monad.Catch                (MonadThrow, throwM)
+import           Control.Monad.Reader               (MonadIO, MonadReader,
+                                                     liftIO)
+import           Core.OpenWeatherMap.Env            (OpenWeatherMapEnv (managedHttpLbs, weatherUrl))
+import           Core.OpenWeatherMap.Model.Forecast (ForecastResult)
+import           Data.Aeson                         (eitherDecode)
+import           Network.HTTP.Client                (Response (responseBody, responseStatus),
+                                                     parseRequest)
+import           Network.HTTP.Types.Status          (Status, ok200)
+import           OpenEnv                            (Provides, provide)
 
 type FetchForecastRepository m = m ForecastResult
 

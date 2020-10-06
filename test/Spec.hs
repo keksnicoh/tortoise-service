@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Test.Hspec
+import           Test.Hspec               (describe, hspec, it, shouldBe)
 
 import qualified Automation.Spec
 import qualified Content.Spec

@@ -1,13 +1,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Automation.Service.EmergencyService where
 
-import           Control.Monad.IO.Class
-import           Control.Monad.Reader           ( MonadReader )
-import qualified Core.State.Model.State        as CSMState
-import qualified Core.State.Repository.State   as CSRState
-import           Automation.FSM.HouseFSM
-import           Automation.Model.HouseStateConfig
-import           OpenEnv
+import           Automation.FSM.HouseFSM           (TemperatureSensor (Bound, Low))
+import           Automation.Model.HouseStateConfig (HouseStateConfig (emergencyDelay))
+import           Control.Monad.IO.Class            (MonadIO (..))
+import           Control.Monad.Reader              (MonadReader)
+import qualified Core.State.Model.State            as CSMState
+import qualified Core.State.Repository.State       as CSRState
+import           OpenEnv                           (Provides, provide)
 
 {-| this action turns off / on the lights when it is startet with a Low / High
     temperature state. it will reset to the original state when

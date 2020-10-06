@@ -1,10 +1,13 @@
 module Core.OpenWeatherMap.Model.ForecastSpec where
 
-import           Core.OpenWeatherMap.Model.Forecast
-import           Test.Hspec
-import           Data.Aeson
+import           Core.OpenWeatherMap.Model.Forecast (Forecast (Forecast, date, humidity, temperature, temperatureMax, temperatureMin, weather, wind),
+                                                     ForecastResult (..),
+                                                     ForecastWeather (ForecastWeather))
+import           Data.Aeson                         (eitherDecode)
+import           Test.Hspec                         (Spec, describe, it,
+                                                     shouldBe)
 
-import qualified Data.ByteString.Lazy          as BSL
+import qualified Data.ByteString.Lazy               as BSL
 
 expectedResult :: ForecastResult
 expectedResult = ForecastResult

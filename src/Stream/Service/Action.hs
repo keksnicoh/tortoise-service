@@ -1,61 +1,36 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Stream.Service.Action where
 
-import qualified Core.State.Repository.State   as CS
-import           Control.Concurrent             ( threadDelay )
-import           Control.Monad.IO.Class         ( MonadIO
-                                                , liftIO
-                                                )
-import           Network.WebSockets             ( Connection
-                                                , sendTextData
-                                                , receiveData
-                                                )
-import           Control.Monad.Reader           ( MonadReader
-                                                , when
-                                                )
-import           Data.Aeson                     ( ToJSON
-                                                , encode
-                                                )
-import           Stream.Model.LightState        ( fromState
-                                                , LightState
-                                                )
-import           Stream.Model.Action            ( Action
-                                                  ( PingAction
-                                                  , LightChangedAction
-                                                  , LightAction
-                                                  , WebcamAction
-                                                  )
-                                                )
-import           Data.Time                      ( UTCTime
-                                                , addUTCTime
-                                                , diffUTCTime
-                                                )
-import qualified Data.ByteString.Lazy          as LBS
-import           Core.State.Model.State         ( State(webcamRequest) )
-import           Control.Monad.State.Strict     ( MonadState
-                                                , runStateT
-                                                , modify'
-                                                , StateT
-                                                , gets
-                                                )
-import qualified Data.Time                     as T
-import           OpenEnv                        ( embedded
-                                                , Embedded
-                                                )
+import           Control.Concurrent          (threadDelay)
+import           Control.Monad.IO.Class      (MonadIO, liftIO)
+import           Control.Monad.Reader        (MonadReader, when)
+import           Control.Monad.State.Strict  (MonadState, StateT, gets, modify',
+                                              runStateT)
+import           Core.State.Model.State      (State (webcamRequest))
+import qualified Core.State.Repository.State as CS
+import           Data.Aeson                  (ToJSON, encode)
+import qualified Data.ByteString.Lazy        as LBS
+import           Data.Time                   (UTCTime, addUTCTime, diffUTCTime)
+import qualified Data.Time                   as T
+import           Network.WebSockets          (Connection, receiveData,
+                                              sendTextData)
+import           OpenEnv                     (Embedded, embedded)
+import           Stream.Model.Action         (Action (LightAction, LightChangedAction, PingAction, WebcamAction))
+import           Stream.Model.LightState     (LightState, fromState)
 
 data ActionEnv
   = ActionEnv
-    { lastLightStateC :: LightState
-    , pingTimeC :: UTCTime
-    , lightTimeC :: UTCTime
-    , dispatchTimeC :: UTCTime
-    , dispatchStateC :: State
+    { lastLightStateC    :: LightState
+    , pingTimeC          :: UTCTime
+    , lightTimeC         :: UTCTime
+    , dispatchTimeC      :: UTCTime
+    , dispatchStateC     :: State
     , webcamRequestDateC :: UTCTime
-    , sendC :: LBS.ByteString -> IO ()
-    , receiveC :: IO LBS.ByteString
+    , sendC              :: LBS.ByteString -> IO ()
+    , receiveC           :: IO LBS.ByteString
     }
 
 data ActionResult = Continue | Exit

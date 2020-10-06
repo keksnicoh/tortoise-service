@@ -1,12 +1,9 @@
 module Core.State.Spec where
 
-import           Test.Hspec
-
-import qualified Core.State.Model.StateSpec
-
-import qualified Core.State.Repository.StateSpec
-
 import qualified Core.State.EnvSpec
+import qualified Core.State.Model.StateSpec
+import qualified Core.State.Repository.StateSpec
+import           Test.Hspec                      (Spec, describe)
 
 spec :: Spec
 spec = do

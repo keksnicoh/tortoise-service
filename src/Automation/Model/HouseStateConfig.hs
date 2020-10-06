@@ -4,16 +4,16 @@ module Automation.Model.HouseStateConfig
   )
 where
 
-import qualified Data.Time                     as T
-import           Core.Internal
+import           Core.Internal (Temperature)
+import qualified Data.Time     as T
 
 data HouseStateConfig
   = HouseStateConfig
   { delaySensorRead :: Int
-  , minTemperature :: Temperature
-  , maxTemperature :: Temperature
-  , maxStatusAge :: T.NominalDiffTime
-  , emergencyDelay :: IO ()
+  , minTemperature  :: Temperature
+  , maxTemperature  :: Temperature
+  , maxStatusAge    :: T.NominalDiffTime
+  , emergencyDelay  :: IO ()
   }
 
 class HasHouseStateConfig a where

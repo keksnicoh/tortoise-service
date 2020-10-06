@@ -1,17 +1,16 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase       #-}
 
 module Automation.Service.ProposeSwitchLightService
   ( mkProposeSwitchLight
   )
 where
 
-import qualified Core.State.Repository.State   as CSRState
-import qualified Core.State.Model.State        as CSMState
-import           Automation.Header              ( GetLightStatus
-                                                , ProposeSwitchLight
-                                                )
-import           Automation.Free.SimpleController
+import           Automation.Free.SimpleController (LightId (LightId1, LightId2), LightStatus (LightLocked, LightManual))
+import           Automation.Header                (GetLightStatus,
+                                                   ProposeSwitchLight)
+import qualified Core.State.Model.State           as CSMState
+import qualified Core.State.Repository.State      as CSRState
 
 {-| proposes a change of light switch state. dependeing on the state of the
     light switch, the porposed new state might be ignored, (e.g. light is locked). -}

@@ -75,19 +75,28 @@ export TORTOISE_SERVICE_FSM_SC_LOCK_DURATION=600
 For local execution, create a psql db via docker
 
 ```bash
-docker run --rm --name pg-docker \
-  -e POSTGRES_PASSWORD=docker    \
-  -d -p 5432:5432                \
-  -v <path-to-mnt>               \
-  postgres
+docker run --rm --name=<name> -e POSTGRES_PASSWORD=<pw> -e POSTGRES_USER=<user> -e POSTGRES_DB=<dbname> -d -p 5432:5432 postgres
 ```
 
 Open psql cli and create table by executing `sql/db.dql`
 
-Execute tests
+### specs
 
+create a a fresh psql container
+
+```bash
+docker run --rm --name=tortoise_service_spec -e POSTGRES_PASSWORD=docker -e POSTGRES_USER=postgres -e POSTGRES_DB=test_hspec -d -p 5432:5432 postgres
 ```
+
+this container fits the following env
+
+```bash
 source local-service.sh
+```
+
+run the test using stack
+
+```bash
 stack test
 ```
 

@@ -1,8 +1,17 @@
-{-# LANGUAGE DataKinds, PolyKinds, TypeFamilies,
-  TypeOperators, FlexibleInstances, GADTs, ScopedTypeVariables,
-  AllowAmbiguousTypes, FlexibleContexts, TypeApplications,
-  RankNTypes, ConstraintKinds, UndecidableInstances,
-  MultiParamTypeClasses #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE ConstraintKinds       #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE RankNTypes            #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 {-|
 Module      : HList
@@ -18,22 +27,14 @@ module HList
   )
 where
 
-import qualified GHC.TypeLits                  as TL
-import           GHC.Exts                       ( Any(..) )
-import           Fcf                            ( Eval
-                                                , type (=<<)
-                                                , FromMaybe
-                                                , Stuck
-                                                , FindIndex
-                                                , TyEq
-                                                , Exp
-                                                )
-import           Data.Proxy                     ( Proxy(..) )
-import           Unsafe.Coerce                  ( unsafeCoerce )
-import qualified Data.Vector                   as V
-import           Control.Monad.Identity         ( runIdentity
-                                                , Identity
-                                                )
+import           Control.Monad.Identity (Identity, runIdentity)
+import           Data.Proxy             (Proxy (..))
+import qualified Data.Vector            as V
+import           Fcf                    (type (=<<), Eval, Exp, FindIndex,
+                                         FromMaybe, Stuck, TyEq)
+import           GHC.Exts               (Any (..))
+import qualified GHC.TypeLits           as TL
+import           Unsafe.Coerce          (unsafeCoerce)
 
 -- # basic datatype
 

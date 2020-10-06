@@ -2,43 +2,55 @@
 
 module Content.Model.SwitchSpec where
 
-import           Test.Hspec
-import           Data.Aeson
-import           Content.Model.Switch
-import           Data.Aeson.Types               ( parse )
-import           GHC.Exts
-import qualified Data.ByteString.Lazy          as BSL
-import qualified Core.State.Model.State        as C
+import Content.Model.Switch
+  ( Switch (Switch),
+    SwitchRequest (SwitchRequest),
+    fromCoreSwitch,
+    toCoreSwitch,
+  )
+import qualified Core.State.Model.State as C
+import Data.Aeson
+  ( FromJSON (parseJSON),
+    Result (Success),
+    ToJSON (toJSON),
+    Value (Bool, Object),
+    eitherDecode,
+  )
+import Data.Aeson.Types (parse)
+import qualified Data.ByteString.Lazy as BSL
+import GHC.Exts (IsList (fromList))
+import Test.Hspec (Spec, describe, it, shouldBe)
 
 spec :: Spec
 spec = do
   describe "Switch#FromJSON" $
     it "must decode json properly" $
-      let 
-        value = Object $ fromList 
-          [ ("value", Bool True)
-          , ("controlled", Bool False)
-          ]
-        expectedModel = Switch True False
-      in parse parseJSON value `shouldBe` Success expectedModel
+      let value =
+            Object $
+              fromList
+                [ ("value", Bool True),
+                  ("controlled", Bool False)
+                ]
+          expectedModel = Switch True False
+       in parse parseJSON value `shouldBe` Success expectedModel
 
   describe "Switch#ToJSON" $
     it "encode json properly" $
-      let
-        switch = Switch False True
-        expectedValue = Object $ fromList 
-          [ ("value", Bool False)
-          , ("controlled", Bool True)
-          ]
-      in
-        toJSON switch `shouldBe` expectedValue
+      let switch = Switch False True
+          expectedValue =
+            Object $
+              fromList
+                [ ("value", Bool False),
+                  ("controlled", Bool True)
+                ]
+       in toJSON switch `shouldBe` expectedValue
 
   describe "SwitchRequest#FromJSON" $
     it "must decode json properly" $ do
-      let 
-        expectedModel = SwitchRequest 
-          (Just $ Switch False True)
-          (Just $ Switch True False)
+      let expectedModel =
+            SwitchRequest
+              (Just $ Switch False True)
+              (Just $ Switch True False)
       contents <- BSL.readFile "test/fixtures/content/switchRequest0.json"
       eitherDecode contents `shouldBe` Right expectedModel
 

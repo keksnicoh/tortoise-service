@@ -7,19 +7,13 @@ module Content.Service.WebcamService
   )
 where
 
-import qualified Core.State.Model.State        as CState
-import           Control.Monad.Reader           ( liftIO
-                                                , MonadIO
-                                                , MonadReader
-                                                )
-import qualified Data.ByteString.Lazy          as LBS
-import qualified Core.State.Repository.State   as CS
-import           OpenEnv                        ( embedded
-                                                , provide
-                                                , Embedded
-                                                , Provides
-                                                )
-import qualified Data.Time                     as T
+import           Control.Monad.Reader        (MonadIO, MonadReader, liftIO)
+import qualified Core.State.Model.State      as CState
+import qualified Core.State.Repository.State as CS
+import qualified Data.ByteString.Lazy        as LBS
+import qualified Data.Time                   as T
+import           OpenEnv                     (Embedded, Provides, embedded,
+                                              provide)
 
 type PersistWebcam m = LBS.ByteString -> m ()
 type RequestWebcamService m = m ()

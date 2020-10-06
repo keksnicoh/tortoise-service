@@ -1,40 +1,26 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE UndecidableInstances  #-}
-{-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
 module Automation.FSM.HouseT
   ( HouseT(..)
   )
 where
 
-import           OpenEnv                        ( HList
-                                                , provide
-                                                , EmbeddedF(..)
-                                                , Provides
-                                                )
-import           Automation.FSM.HouseFSM        ( HouseFSM(..) )
-import           Control.Monad.IO.Class         ( MonadIO(..) )
-import           Control.Monad.Reader           ( ReaderT(..)
-                                                , MonadReader
-                                                )
-import qualified Core.State.Model.State        as CSMState
-import           Data.IORef                     ( IORef
-                                                , modifyIORef'
-                                                )
-import           Automation.Model.HouseState    ( reasonFrom
-                                                , HouseState
-                                                  ( Initializing
-                                                  , HasSensorData
-                                                  , TemperatureBound
-                                                  , RetrySensor
-                                                  , Emergency
-                                                  )
-                                                )
-import           HList                          ( Get(..) )
+import           Automation.FSM.HouseFSM     (HouseFSM (..))
+import           Automation.Model.HouseState (HouseState (Emergency, HasSensorData, Initializing, RetrySensor, TemperatureBound),
+                                              reasonFrom)
+import           Control.Monad.IO.Class      (MonadIO (..))
+import           Control.Monad.Reader        (MonadReader, ReaderT (..))
+import qualified Core.State.Model.State      as CSMState
+import           Data.IORef                  (IORef, modifyIORef')
+import           HList                       (Get (..))
+import           OpenEnv                     (EmbeddedF (..), HList, Provides,
+                                              provide)
 
 -- |MTL style transformer
 newtype HouseT m a = HouseT

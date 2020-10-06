@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
 module Content.Model.Monitor
@@ -9,42 +9,37 @@ module Content.Model.Monitor
   )
 where
 
-import           Core.Internal                  ( Humidity
-                                                , Temperature
-                                                )
-import qualified Core.Database.Model.Status    as CDB
-import qualified Core.State.Model.State        as CST
-import qualified Core.OpenWeatherMap.Model.Forecast
-                                               as COM
-import           Data.Aeson                     ( ToJSON )
-import           GHC.Generics                   ( Generic )
-import           Data.List                      ( genericLength )
-import           Data.Time                      ( UTCTime )
-import           Data.Maybe                     ( catMaybes )
-import           Content.Model.Switch           ( fromCoreSwitch
-                                                , Switch
-                                                )
+import           Content.Model.Switch               (Switch, fromCoreSwitch)
+import qualified Core.Database.Model.Status         as CDB
+import           Core.Internal                      (Humidity, Temperature)
+import qualified Core.OpenWeatherMap.Model.Forecast as COM
+import qualified Core.State.Model.State             as CST
+import           Data.Aeson                         (ToJSON)
+import           Data.List                          (genericLength)
+import           Data.Maybe                         (catMaybes)
+import           Data.Time                          (UTCTime)
+import           GHC.Generics                       (Generic)
 
 data MonitorWeather
   = MonitorWeather
-    { label :: String
+    { label       :: String
     , temperature :: Temperature
-    , humidity :: Humidity
-    , date :: UTCTime
+    , humidity    :: Humidity
+    , date        :: UTCTime
     } deriving (Show, Eq, Generic, ToJSON)
 
 data Monitor
   = Monitor
-    { date :: UTCTime
-    , sensorTemperatur :: Maybe Temperature
-    , sensorHumidity :: Maybe Humidity
+    { date                    :: UTCTime
+    , sensorTemperatur        :: Maybe Temperature
+    , sensorHumidity          :: Maybe Humidity
     , sensorTemperaturOutside :: Maybe Temperature
-    , sensorHumidityOutside :: Maybe Humidity
-    , switchLight1 :: Maybe Switch
-    , switchLight2 :: Maybe Switch
-    , weather :: [MonitorWeather]
-    , webcamDate :: Maybe UTCTime
-    , houseState :: String
+    , sensorHumidityOutside   :: Maybe Humidity
+    , switchLight1            :: Maybe Switch
+    , switchLight2            :: Maybe Switch
+    , weather                 :: [MonitorWeather]
+    , webcamDate              :: Maybe UTCTime
+    , houseState              :: String
     }
   deriving (Show, Eq, Generic, ToJSON)
 
@@ -72,5 +67,5 @@ from date status state forecast = Monitor
     , humidity    = COM.humidity forecast
     , date        = COM.date forecast
     }
-  renderLabel Nothing = "unspecified weather"
+  renderLabel Nothing                                 = "unspecified weather"
   renderLabel (Just (COM.ForecastWeather name descr)) = name <> " - " <> descr

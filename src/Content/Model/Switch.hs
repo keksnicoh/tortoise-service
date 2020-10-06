@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric  #-}
 
 module Content.Model.Switch
   ( Switch(..)
@@ -9,15 +9,13 @@ module Content.Model.Switch
   )
 where
 
-import           Data.Aeson                     ( ToJSON
-                                                , FromJSON
-                                                )
-import           GHC.Generics                   ( Generic )
-import qualified Core.State.Model.State        as CSM
+import qualified Core.State.Model.State as CSM
+import           Data.Aeson             (FromJSON, ToJSON)
+import           GHC.Generics           (Generic)
 
 data Switch
   = Switch
-    { value :: Bool
+    { value      :: Bool
     , controlled :: Bool
     }
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
